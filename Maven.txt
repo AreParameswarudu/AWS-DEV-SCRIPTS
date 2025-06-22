@@ -1,0 +1,179 @@
+=======================
+MAVEN
+=======================
+
+Raw Code(java ) --> Build --> Test --> Artifact --> Deployment
+
+Artifact is the final product of the code
+
+Developers will give us raw code we will covert that to Artifact
+
+TYPES
+=====
+.jar = Java Archive : Backend Code
+.war = Web Archive : Frontend code + Backend Code
+.ear = Enterprise Archive : jar + war
+
+======
+JAR FILE : .java ---> Compile --> .class --> .jar file
+
+Developer write java code with extension .java and then compile , we get .class file , compile group of .class files or single  
+we get .jar file
+
+.java : Basic raw
+.class : Executable file
+.jar : Artifact
+
+All artifacts can be created using Build tool called Maven
+
+===========
+MAVEN
+===========
+
+Maven is the Build tool, its a free and open source
+
+Build: Process of adding the libraries and dependencies to Code --> Build process  
+       Developers has libs etc
+
+Its also called Project Management Tool
+
+It will manage the complete structure of the project
+
+Maven is written on java by Apache software foundation
+Supports: JAVA-1.8.0
+Year: 2004, GIT = 2005, written in C
+Home path of maven: .m2
+
+Maven main file is POM.xml : POM = Project Object Model; XML = Extensible Markup Langugage
+
+POM.XML --> its a file which consists of complete project information
+Ex: Name, artifacts, tools, libs , dependencies etc..
+
+Developers provide POM.XML in the source code, we will build
+
+============
+LAB
+==========
+
+Launch Amazon Linux 2 EC2 instance
+
+we need to get source code and build so we need to install git and maven
+
+yum install git java-1.8.0-openjdk maven tree -y
+
+mvn -v
+
+git clone https://github.com/ReyazShaik/java-project-maven-new.git  
+
+cd java-project-maven-new
+
+ls
+
+--> now we took the code and we need to build
+
+--> if you want to see all the folders and subfolders use tree command
+
+tree
+
+To use Maven, maven has lifecycle called goals : each goal is a task
+
+=======
+MAVEN LIFECYCLE
+==========
+GOALS : is a command use to run task
+Goals refer pom.xml to execute
+
+PLUGIN: its a small software which makes our work automated
+Instead of downloading tools we can download plugins
+this plugins will download automatically when we run GOALS
+
+Maven goals include compile, test, package, and install
+
+1. mvn compile : is used to compile the code (.java[src] --> .class [target]) [in source code we have .java files, we if run compile it will create .class in target folder]
+tree -- see what files are there
+now, run the below command
+
+--> mvn compile
+--> tree -- it will create target folder and .class files
+
+2. mvn test : used to test the code (.java[test]--> .class [target])
+
+run the below command
+
+mvn test
+
+IT will create a test folder with .class files
+
+tree
+
+
+3. mvn package : use to create artifact
+
+run the below command
+
+mvn package
+
+tree
+
+It will show the war file, the project has frontend + backend code
+
+
+4. mvn install : use to copy artifacts to .m2 (project folder --> .m2, under root/.m2 folder(maven home path))
+
+Run the below command -- artifacts will be copied to maven home folder
+
+mvn install
+
+tree
+
+
+
+5. mvn clean : to delete the target folder
+
+Run the below command
+
+mvn clean
+
+===============
+IN real time, we will not do one by one step , just use below command mvn clean package
+
+It will generate the arifacts --> if you want to generate use below command, it will delete the existing target folder and create new
+
+
+6. mvn clean package : It compile to install (all steps)
+
+run below command
+
+mvn clean package
+
+===============================================================
+
+PROBLEMS WITHOUT MAVENS
+--> we cant create artifacts
+--> we cant create project structure
+--> we cant build and deploy the apps
+
+======================================================
+
+Alternate tools : ANT, Gradle
+
+Each programing language use different build tools, for example
+
+JAVA : Maven or Gradle
+PYTHON : Gradle or Maven
+.NET : VS Code
+C, C++ : MAKE FILE
+Node js : npm (node package manager)
+
+Maven vs ANT
+--> Maven is a build and project management tool, ANT is only build tool(it will not manage project)
+--> maven has pom.xml, ANT has build.xml
+--> Maven has lifecycle, ANT will not have any lifecycle
+--> Maven plugins are re-usable(it will download once and re-use) , ANT scripts are not reusable
+--> Maven is declarative(declare everything in pom.xml), ANT is procedural(we need to tell what to do)
+
+
+Troubleshooting
+============
+run maven commands in pom.xml folder
+check java versions

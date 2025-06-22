@@ -1,0 +1,32 @@
+
+create a transit gateway in Mumbai , ASN = 4200000000
+
+Create Transit Gateway attachment, attachment type VPC, select Mumbai VPC 
+
+See TG route tables ==> routes --> propagated or not
+
+Mumbai Private RT --> Add route --> Ireland 192.169.0.0/16 routed to transit gateway
+
+
+
+create a transit gateway in Ireland , ASN = 4200000000
+
+Create Transit Gateway attachement, attachement type VPC, select Ireland VPC 
+
+See TG route tables ==> routes --> propagated or not
+
+Ireland Private RT --> Add route --> Ireland 192.168.0.0/16 routed to transit gateway
+
+
+
+create a transit gateway attachment in Mumbai to Ireland
+
+attachment type -- peering connection, copy paste Ireland transit gateway id
+
+Go to Ireland and accept transit gateway attachment - accept it
+
+
+Go to Transit gateway route tables on both Mumbai and Ireland
+
+In mumbai -- create a static route -- 192.169.0.0/16 ---> select peering
+In Ireland -- create a static route -- 192.168.0.0/16 ---> be careful --. select peering not TG  (in routes, one should be VPC and other should be peering)
