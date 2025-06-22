@@ -1,0 +1,1213 @@
+======================
+JENKINS
+====================
+
+In General--> Jenkins called as CI/CD tool but,
+
+Jenkins is only used for CI --> take code --> build --> test
+
+Explain what is CI
+Continuous Integration = Continuous build + Continuous Test
+
+Developers continuously generate/write code (old + new)--> so we need to continuously build and test
+
+Maven does the same but it is manual, to automate use Jenkins
+
+Before CI, everything is manual process
+After CI, everything is automated
+
+
+What is CD ? Continuous Delivery / Deployment
+
+Continuous Delivery = Deployment Manually to Prod Env
+Continuous Deployment = Deployment Automatically to Prod Env
+
+Explain about Environments
+PRE-PROD
+--> Dev = Developers
+--> QA = Testers
+--> UAT = Client will use Apps and suggests
+
+PROD / Live
+--> PROD = Accessed by Users
+
+Continuous Delivery = Deploying application to Production manually
+Continuous Deployment = Deploying applications to Production automatically
+
+==========================================
+
+If I want to do CI / CD --> we use Pipelines
+
+PIPELINE
+
+Maven will do first few , compile , test and artifact but NOT DEPLOY
+Maven will do manual, but Jenkins will automate these steps
+
+=========================================
+
+JENKINS
+
+Its a free and open source tool (source code is available to use)
+Jenkins written in java
+its a platform independent (works on windows, Linux)
+It consists of Plugins
+We have community support
+It can automate entire SDLC
+It is owned by Sun micro system
+Previous we called Hudson and it was a paid version
+Later Oracle bought Hudson and made it free
+Later Hudson was renamed as Jenkins
+Inventor : Kohsuke Kawaguchi
+Port number : 8080
+Java: Java 11 / 17
+Default path : /var/bin/jenkins
+
+===========================
+Alternatives : GO CI, Circle CI, Tarvis, Semaphore, Buddy Build Master, Gitlab, Harness, argoCD
+
+CLOUD : AWS CodePipeline, Azure Pipeline
+
+==================================
+
+
+SETUP : Launch EC2 instance Amazon Linux 2
+____________________________________________
+
+	In SG, allow protocols, 8080, 80 http
+
+	To setup Jenkins, we need to take code from git , build using maven , that's the reason we install below all
+
+
+Step 1: installing git, java 17 and maven
+____________________________________
+
+	yum install git java-17-amazon-corretto maven -y
+
+
+Step 2: Getting the REPO (Jenkins.io --> download --> RedHat) - show in browser Jenkins.io --> LTS --> Redhat
+_______________________________________________________________________________________________
+
+	sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+
+	sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+
+
+STEP-3: DOWNLOAD and install JENKINS
+_______________________________________
+
+
+	yum install jenkins -y
+
+STEP-4: RESTARTING JENKINS (when we download service it will on stopped state)
+________________________________________________________________________
+
+	systemctl start jenkins.service
+
+	systemctl status jenkins.service
+
+
+NOTE: chkconfig jenkins on
+above command will make jenkins service automatically restart itself when sevrver is stopped and started
+
+CONNECTION:
+public-ip-server:8080 (browser)
+cat /var/lib/jenkins/secrets/initialAdminPassword
+
+give this password in browser and install plugins
+give sample usernames and passwords --> start Jenkins
+
+For logs:
+
+journalctl -u Jenkins
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+========================================================
+Creating a sample job
+=======================================================
+
+Example 1: Firstjob - Execute shell
+--------
+
+CREATING A JOB:
+---------------
+New item -- > Name -- > Free Style -- > Ok
+Description --> THis is my first job
+Build Steps --> Execute Shell --> echo "Welcome to Jenkins" --> Save
+Build Now
+
+--> Now Modify Build --> echo "Welcome to Jenkins" > /tmp/first-job.txt
+
+Run the build
+
+see in Jenkins server --> cd /tmp/  [What ever we create in pipeline, all files will be stored in jenkins server]
+
+--> lets create a small bash script
+
+    vi     basic.sh
+    #!/bin/bash
+    echo "This is sample script under tmp"
+
+sh basic.sh
+
+Edit the job and modify the script . If you want to run any script which is there on server from pipeline
+
+echo "Welcome to Jenkins" > /tmp/first-job.txt
+bash /tmp/basic.sh
+
+Run the Build and see Output
+
+Build with Parameters
+------------------
+
+Edit the Job --> THis Project is Parameterized
+Example --> Select --> String Parameter
+Name = FirstName
+Default Value = Reyaz
+
+One more
+
+Select --> String Parameter
+Name = LastName
+Default Value = Shaik
+
+
+Nows lets use these parameters in script
+
+echo "I am" $FirstName $LastName
+echo "Welcome to Jenkins"
+echo "Welcome to Jenkins" > /tmp/first-job.txt
+bash /tmp/basic.sh
+
+Run the Build
+
+By default, you get Reyaz shaik, but you can override it with other string/name
+
+see the output
+
+
+Another Example:  Lets add choice parameter: Edit the Build Job
+-----------------
+	--> This Project is Parameterized --> Add Parameter --> choice Parameter
+	Name: Gender
+	Choices:
+MALE
+FEMALE
+OTHER
+
+Edit the Script and add $Gender
+
+echo $FirstName $LastName $Gender
+echo "Welcome to Jenkins"
+echo "Welcome to Jenkins" > /tmp/first-job.txt
+bash /tmp/basic.sh
+
+Another Example: Lets add choice Parameter : Edit the Build Job
+-----------------
+--> This Project is Parameterized --> Add Parameter --> choice Parameter
+Name: ENV
+Choices:
+Production
+Development
+
+echo "I am" $FirstName $LastName $Gender
+echo "Welcome to Jenkins Pipeline by Reyaz" > /tmp/first-job.txt
+bash /tmp/basic.sh
+echo "Deploying to environment: $ENV"
+if [ "$ENV" = "Production" ]; then
+  echo "Warning: You are deploying to Production!"
+else
+   echo "Deploying to $ENV Environment."
+fi
+
+
+
+Scheduling the job
+----------------
+
+	If you want to run the job based on schedule, we can use Build Periodically option
+
+	Create a new free style job --> Name = cron-job
+
+	Description --> THis is scheduled job
+	Build Periodically --> *****  -- every min  */5 * * * *  -- Every 5 mins
+
+	search in google -- cronjob generator -- https://crontab.cronhub.io/
+
+	Build Steps --> Execute Shell --> echo "Welcome to Jenkins" --> Save
+
+	Build Now
+
+	This job will build every min
+
+
+
+CREATING A JOB : Integration with GitHub
+----------------------------------------
+
+	Note: To integrate any tool, we need to install plugins first.
+
+	Check if git plugins are available, if available, no need to install. If not, install plugins
+
+Example 1 : Simple, Lets get source code to Jenkins
+-------------------------------------------
+	New item -- > GetCodefromGit -- > Free Style -- > Ok --> source code management --> GIT
+
+	--> Repo URL(take sample project repo) https://github.com/ReyazShaik/website.git
+
+	--> Branch : master , keep default or change    
+
+	Run the Build
+
+	Now see the data Click on GetCodefromGit job --> WorkSpace
+
+	Where is the code now in Jenkin server?
+
+	cd /var/lib/Jenkins/workspace/
+
+	cd GetCodefromGit
+
+
+
+Example 2:
+----------
+	New item -- > Name -- > Free Style -- > Ok --> source code management
+
+	--> Repo URL(take sample maven project repo) https://github.com/ReyazShaik/java-project-maven-new.git
+
+	or take sample maven project https://github.com/jenkins-docs/simple-java-maven-app.git
+
+	--> Branch : master , keep default or change    
+
+	Build step --> Select Execute shell --> mvn clean package (sample) --> save --> build now
+
+	If fails: In general, GitHub uses main branch instead master --> in job replace /master with /main
+
+	GO to Jenkins Linux machine
+
+	--> cd /var/lib/Jenkins/workspace/Firstjob/target/
+
+	ls --> war file will be here
+
+
+Example 2: Secondjob
+----------
+	New item -- > Name -- > Free Style -- > Ok --> source code management
+
+	--> Repo URL(take sample maven project repo) https://github.com/ReyazShaik/java-project-maven-new.git
+
+	--> Branch : master , keep default or change
+
+	--> Build step --> Invoke top-level Maven targets --> just clean package (no need to give mvn)    
+
+	--> Build Now
+
+	GO to Jenkins Linux machine
+
+	--> cd /var/lib/Jenkins/workspace/Firstjob/target/
+
+	ls --> war file will be here
+
+
+	Now, change the file in GitHub --> index.html or pom.xml and build now
+
+	Every time developer do changes he will do build --> this is called continuous integration
+
+Email Notification
+==================
+
+	If build fails, we should get notifications
+
+	Manage Jenkins --> System --> Email Notification
+	
+	SMTP server = smtp.gmail.com
+	Default user e-mail suffix= @jenkinstest.com
+	Use SMTP Authentication = Username = reyazr3f@gmail.com
+	For password = Go to browser --> gmail profile--> Manage your Google Account --> Security --> Turn ON 2-steps authentication -->  On Top --> Search for App Password --> App name --> Jenkins --> Create --> Copy code -->
+	miqx ynqp dprc qgpt --> Done
+                  copy the code and paste in password section
+
+
+	Use SSL
+	SMTP Port = 465
+	Test configuration by sending test e-mail = reyazr3f@gmail.com = Test Configuration
+
+	Edit the job --> Configuration --> Post-build Actions --> Recipients = reyazr3f@gmail.com
+	And Fail the job to get email
+
+Restore Deleted Job
+=================
+
+	If you accidentally delete the job , how to restore
+
+	Install plugin = job configuration history
+
+	Delete a job now --> Go to Dashboard --> click on job config history --> show delete jobs --> restore
+
+	note: If you install the plugin initially then all jobs create after plugin installation , restore option is available
+
+	Create a new job and delete
+
+	Delete a job now --> Go to Dashboard --> click on job config history --> show delete jobs --> restore
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Transferring Files from Jenkins to Remote Server
+===============================================
+
+1. Setup connection from Jenkins to remote server
+2. Install SSH plugins
+3. Create a job to copy files to remote server
+
+
+Have 2 Servers
+1. Jenkins Server
+2. Test Server (Amazon Linux 2)
+
+In Jenkins Server
+ssh-keygen
+
+eval $(ssh-agent -s)        --- to see agent is running
+
+vi MyKey.pem
+copy paste pem data
+
+chmod 400 MyKey.pem
+
+ssh-add MyKey.pem
+
+cd /root/.ssh/
+
+ssh-copy-id -i id_rsa.pub ec2-user@172.31.22.33
+
+Testing to connect = ssh ec2-user@172.31.22.33
+
+install ssh plugins
+---------------
+
+Manage Jenkins --> Plugins --> Publish Over SSH
+
+Manage Jenkins --> System --> Publish Over SSH
+
+cd /root/.ssh
+cat id_rsa
+
+--> Publish over SSH --> key -->
+
+Paste this id_rsa data in "Key" section in Jenkins
+
+SSH Server --> ADD
+Name = TestServer
+Hostname = Private IP
+Username = ec2-user
+Test Configuration
+
+Create a new job
+-----------------
+
+New item --> Remotefiles --> FreeStyle --> OK
+
+Build Steps --> Send files or execute commands over SSH -->
+Name = autoselect
+
+Build now --> First build empty job because it will create a directory in workspace
+
+cd /var/lib/jenkins/workspace/remotefiles/
+mkdir files
+touch test.py
+
+
+Sourcefiles = files/test.py  or top copy multiple files files/*
+
+Remove Prefix = empty [if you want to remote prefix directory and copy only files]
+Remote Directory = empty [you can specify remote server directory to copy]
+Exec command = Empty [if you want to execute file, sh /home/ec2-user/files/bash.sh]
+
+Advance --> Exclude files if you want -->Exclude files --> files/test1.py, files/test2.py
+
+Build now
+
+See the files in remote server --> /home/ec2-user/files/
+
+
+
+==============
+VARIABLES
+=============
+
+	VARIABLES: are used to store values, changes frequently : ex: Name = Reyaz
+
+			 1. User Defined Variables 2. Jenkins Env Variables
+
+	1. USER DEFINED VARS: these variables will be declared by user.
+	--------------------------------------------------------------------------------------------------------
+
+	    --> LOCAL VARS: these variables will work inside job, works for only one job
+
+	    --> GLOBAL VARS: these variables will work for all jobs in Jenkins
+
+	2. JENKINS ENV VARIABLES: these variables will be given by Jenkins.
+	--------------------------------------------------------------------------------------------------------------
+		user cant define Jenkins variables.
+
+Example for Local variable :
+===========================
+
+	Create a new job --> Free Style --> Build Step --> Execute shell (no git required)
+
+	echo "This is DevOps Course, here you are learning DevOps, DevOps is good "
+
+	--> Here every time you use DevOps , instead mention it as a Variable course = devops
+
+	course=DevOps  --> no space
+	echo "This is $course Course, here you are learning $course, $course is good "
+
+	save and build now
+
+	and configure build again and change course variable as AWS and build now
+
+Example for Global variable :
+===========================
+
+	Now remove, course=DevOps in build and build now, Jenkins will not understand
+
+	Now set Global Variables
+
+	Dashboard -> Manage Jenkins --> System --> Global properties --> Environment variables --> ADD --> name = course, value = DevOps
+
+Example for Jenkins Env variables :
+===========================
+
+	Create a new Job --> Free Style --> Build Step --> Execute shell (no git required)
+	click on list of available environment variables
+	echo "The Current Build Number is $BUILD_NUMBER, Job Name is $JOB_NAME"
+	Build now and see the output
+
+	if you want all env to print use in shell : printenv and run the build
+
+
+
+
+===================================
+JENKINS Port Change:
+==================================
+	TO search a file -- find / -name Jenkins.service
+	
+	vi /usr/lib/systemd/system/jenkins.service
+	line 72 (8080=8069)
+	systemctl daemon-reload
+	systemctl restart jenkins.service
+
+===========================
+Jenkins without Password Login
+=========================
+	find / -name config.xml
+	vi /var/lib/jenkins/config.xml (true=false)
+	<useSecurity>true</useSecurity>   ---> False
+	systemctl restart jenkins.service
+	
+	Put IP in browser and directly it will login without asking username and password
+
+==================
+BUILD Executors - Builds running parallelly
+=================
+
+	By default Jenkins runs the jobs sequentially --> click on the build 2 times , it will run only 2 at a time
+
+	Manage Jenkins --> System --> # of executors = 2 by default
+
+	if you want to run parallelly --> Job --> configure --> Execute concurrent builds if necessary --> build now (now run parallel)
+
+	or
+
+	Go to Dashboard --> Click on Build Executors Status-->Built-In Node--> Configure --> Number of executors --> 10
+
+
+=======
+POLLSCM
+=======
+
+	CRON just run at that time based on schedule, but it will not take updated code from Repo,
+	What if I need like , someone push the code or my source code change, automatically build should happen based on schedule
+
+	CRON will just run the job on scheduled time. But it doesn't check the code change.
+	POLLSCM will run the job on scheduled time but it will check the code change.
+
+	Go to Job --> configure --> remove Build periodically if enabled and enable POLLSCM --> 20 14 8 7 1 (UTC time, 14:20 8th July monday)
+
+	Change the Code in index.jsp and wait for the time, it will build automatically only if code change(POLLSCM)
+
+	IF dev want to run the build immediately , he cannot wait for the CRON to build as per POLLSCM , we use webhook
+
+============
+WebHook
+============
+
+	Webhook - It will trigger the build immediately when you commit the code in SCM
+
+	Go to GitHub --> Select Repo --> Settings --> Webhook --> Add Webhook --> Payload URL --> http://13.200.252.207:8080/github-webhook/
+	--> Content Type --> Application/Json --> Add webhook
+
+	-> Now Create a new job --> Free Style --> git --> Repo url(java-project) --> branch (/main or /master) --> Build Trigger --> GitHub hook trigger for GITScmpolling --> Build Step --> Maven target --> clean package
+
+	Do any change in index.jsp
+
+	--> in AWS SG enable ALL traffic because GitHub needs to connect to your ec2 Jenkins
+
+===============
+THROTTLE BUILD:
+===============
+ 	It will restrict the number of builds per interval.
+	create a  job -- > Throttle build -- > builds: 3 time period: hours -- > save --> make a build and test
+
+================
+Remote Triggering
+=================
+	Create a job --> Build Triggers --> Trigger build remotely --> Authentication Token : Reyaz --> Save
+
+	Copy the URL , change values and put in browser
+
+	JENKINS_URL/job/cijob/build?token=TOKEN_NAME   /  http://13.233.214.180:8080/job/firstjob/build?token=reya
+
+	Build will start automatically now
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+================================
+Project on FreeStyle Job - Deployment on Tomcat
+=================================
+
+CODE --> BUILD --> TEST --> ARTIFACT --> Deployment
+
+1 Server Jenkins
+Another server for Tomcat
+
+Now lets deploy our application war file on tomcat
+
+Launch Amazon Linux 2 instance and install tomcat manually ---
+
+
+Tomcat Setup
+============
+
+Launch amazon Linux 2 and install tomcat manually first and then automatically using script
+
+All apache software are available in http://dlcdn.apache.org --> tomcat --> tomcat-10--> v10.1.42--> bin--> apache-tomcat-10.1.42.tar.gz
+
+Step1: install java
+-------------------
+amazon-linux-extras install java-openjdk11 -y
+
+Step 2: download tomcat
+----------------------
+yum install -y wget
+
+wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.42/bin/apache-tomcat-10.1.42.tar.gz
+
+Step3: Extract
+--------------
+tar -zxvf apache-tomcat-10.1.42.tar.gz
+
+Step4: Configure user, passwords and roles
+-------------------------------------------
+ --> cd apache-tomcat-10.1.42/conf/
+ --> vi tomcat-users.xml
+     Add new files --> copy 3 lines and paste, line 56
+     <role rolename="manager-gui"/>
+     <role rolename="manager-script"/>
+     <user username="tomcat" password="root123" roles="manager-gui,manager-script"/>
+
+Step 5: Delete line 21 and 22 -- if not delete, we need to give public ip
+------------------------------
+  --> cd apache-tomcat-10.1.42/webapps/manager/META-INF
+  --> vi context.xml
+       :22
+
+Step 6: Start Tomcat
+--------------------
+  --> cd apache-tomcat-10.1.42/bin
+  --> sh startup.sh
+
+Connection
+=========
+http://IP:8080
+manager apps --> username: tomcat, password: root123
+
+
+Install Plugin
+-------------
+In Jenkins server first install a plugin(Deploy to container) to integrate with Tomcat
+
+Create a Job
+------------
+
+--> Create a New item --> Free Style --> Source Code Management --> GIT --> https://github.com/ReyazShaik/java-project-maven-new.git
+
+--> Build Steps --> Invoke top level maven target --> clean package
+
+--> Post Build actions -->
+ Deploy war/ear to a container --> **/*.war
+ Context path = mywebapp
+--> Add container --> Select tomcat 9 --> credentials --> Add Jenkins --> username=tomcat, password= root123, ID = tomcatcred    
+    --> tomcat url = http://35.154.10.118:8080/ (ec2 url)
+
+--> Build Now
+
+--> Go to tomcat page , refresh /mywebapp
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    NOTE START   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	even the 2 instances in the same SG that has an inbound rule of all traffic with source as same SG-ID
+	the 2 instances can only be able to talk through private IPs
+
+	if they want to communicate using public ip then we need to specify an inbound rule separately for that
+
+
+	in this case, the Jenkins tries to connect to the tomcat through the public ip of the tomcat ( after .war files have been created in the build process )
+	this connection says that Jenkins server need to connect to the public ip of the tomcat 
+	this results timeout error in the build process ( since the working of the SG's rules )
+
+	so we need to explicitly mention the rule to allow tomcat's public ip as source for SG's inbound rule 
+	or 
+	simply add inbound rule of all-traffic from all sources for this task itself.
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   NOTE END   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+Now Store the Artifacts to S3
+================================
+🔹 Step 1: Install the Plugin
+
+Go to Jenkins Dashboard → Manage Jenkins → Manage Plugins.
+
+Search for "S3 publisher" and "Pipeline: AWS Steps"(optional) install it.
+
+🔹 Step 2: Configure AWS Credentials
+Go to Manage Jenkins → System → Amazon S3 profiles --> ProfileName=s3creds --> access key and secret key - Save
+
+Go to your Jenkins Job → Configure -->  
+ --> Post-build Actions.
+ → Select "Publish artifacts to S3 bucket".
+ --> Source = **/*.war
+ --> Destination Bucket = jen-test-me-reyaz/
+ --> Bucket Region = ap-south-1
+
+
+
+Pipeline --> Series of steps
+Pipelines are written in Groovy language
+We can see the steps in visuals
+Pipeline is used to automate the work
+
+CODE --> BUILD --> TEST --> ARTIFACT --> Deployment
+
+Types : Scripted and Declarative(commonly used)
+
+Scripted   ||   Declarative
+===========================
+SHORT        LONG
+NO Stages    Stages
+Start Node    Start with pipeline
+
+
+Pipeline Syntax
+==============
+
+To write the pipeline we use DSL (Domain specific Language)
+
+We use GROOVY Script for Jenkins pipeline
+
+It consists of blocks that includes stages : stages are stage1 = code , stage2 = build, stage3 = test, stage4 = artifact, stage5= deployment
+it includes () & {}
+
+
+Create a job -- select Pipeline --> under script --> use below or --> try sample pipeline and explain
+
+short cut to remember how to create a pipeline :
+PASSS -  PAS3
+Pipeline,
+Agent,
+Stages,
+Stage ,
+Steps
+
+Below pipeline has one stage
+
+pipeline {
+    agent any
+   
+    stages {
+        stage('one') {
+            steps {
+                sh 'touch file1'
+            }
+        }
+    }
+}
+
+--> now, file1 is created at cd /var/lib/jenkins/workspace/
+
+==============
+Now create a CI Pipeline
+==============
+
+CODE --> BUILD --> TEST -->Code Review --> ARTIFACT --> Deployment
+
+
+pipeline {
+    agent any
+    stages {
+        stage('Clone Git Repo') {
+            steps {
+                echo 'Cloning Git Repository'
+            }
+        }
+        stage('Building') {
+            steps {
+                echo 'Building the Project'
+            }
+        }
+        stage('Code Test') {
+            steps {
+                echo 'Testing the Project'
+            }
+        }
+        stage('Code Review') {
+            steps {
+                echo 'Code Quality Checking'
+            }
+        }
+        stage('Artifact') {
+            steps {
+                echo 'Generating war file'
+            }
+        }
+        stage('Deployment') {
+            steps {
+                echo 'Code is deployed'
+            }
+        }
+    }
+}
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+pipeline with  agent any:
+==================
+
+pipeline {
+    agent any
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/ReyazShaik/java-project-maven-new.git&#39;
+            }
+        }
+        stage('compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('artifact') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('Deployment') {
+            steps {
+                echo 'Code is deploy - actual we need to learn tomcat, using tomcat we deploy'
+            }
+        }
+    }
+}
+
+or
+
+Pipeline as a Code - Running more than one command inside a single stage (Advantages: save time, can run all commands in one stage, reduce length of code):
+==============================================================================================
+
+pipeline {
+    agent any
+    stages {
+        stage('one') {
+            steps {
+                git 'https://github.com/ReyazShaik/java-project-maven-new.git&#39;
+        sh 'mvn compile'
+        sh 'mvn test'
+        sh 'mvn package'
+            }
+        }
+       
+     
+    }
+}
+
+
+Multi stage pipeline as a Code:
+======================
+
+
+pipeline {
+    agent any
+   
+    stages {
+        stage('one') {
+            steps {
+                git 'https://github.com/ReyazShaik/java-project-maven.git&#39;
+        sh 'mvn compile'
+            }
+        }
+
+        stage('two') {
+            steps {
+                sh 'mvn test'
+        sh 'mvn package'
+            }
+        }
+       
+    }
+}
+
+
+Pipeline as a Code over single shell:
+==========================
+
+pipeline {
+    agent any
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/ReyazShaik/java-project-maven-new.git&#39;
+        sh '''
+        sh mvn compile
+        sh mvn test
+        sh mvn clean package
+        '''
+            }
+        }
+    }
+}
+
+HOW TO ADD PARAMETERS:
+========================
+PARAMETERS: Used to pass input for jobs
+
+
+CHOICE: to pass single input at a time.
+STRING: to pass multiple inputs at a time.
+MULTI-LINE STRING: to pass multiple inputs on multiple lines at a time.
+FILE: to pass the file as input.
+BOOL: to pass input either yes or no.
+
+
+This project is parameterized
+Name: Environment
+Choices:
+Dev
+Test
+Prod
+
+
+
+===============================================================================
+INPUT PARAMETERS - Manual input :  In real time, we use input to continue the pipeline like yes or no
+================================================================================
+
+Create a new pipeline for input parameter and copy the below code
+
+
+
+pipeline {
+    agent any  
+    stages {
+        stage ('checkout') {
+            steps {
+                git 'https://github.com/ReyazShaik/java-project-maven-new.git&#39;
+            }
+        }
+        stage ('build') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage ('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage ('artifact') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+        stage ('deploy') {
+            input {
+                message "is your inputs correct ?"
+                ok "yes"
+            }
+            steps {
+                echo "my code is deployed"
+            }
+        }
+    }
+}
+
+===========
+Linked Jobs - Link the jobs with each other --> first job will trigger another job
+==========
+
+Create job1 and job2 with build steps --> execute shell --> echo "welcome"
+
+Upstream and downstream
+
+
+job1 - Post-build Actions -->Build other projects--> Projects to build --> job2
+
+Build the job now, and once first job build done and second job will get trigger
+
+
+============================
+ MASTER and SLAVE
+============================
+
+MASTER AND SLAVE:
+when we continuously build jobs on Jenkins ,it will get load and have the chance to crash.
+to avoid this load on Jenkins we use salve servers to build the jobs
+
+Setup Master
+============
+
+Install Jenkins with Script
+
+
+SETUP: SLAVE 1
+---------------
+CREATE AN EC2 INSTANCE Amazon Linux 2 AND INSTALL JAVA-11/17
+
+amazon-linux-extras install java-openjdk11 -y
+or
+sudo yum install java-17-amazon-corretto-devel maven git -y
+
+Dashboard -- > Manage Jenkins -- >Nodes -- > New node-- > name: salve1 -- > Permanent Agent -- > create
+
+Number of executors    : 3 (number of parallel build we can do)
+Remote root directory   : /tmp (where your op is going to store)
+Labels            : slave1 (way of assigning work to particular slave)
+Usage            : last opt
+Launch method        : last opt
+Host            : private-ip of slave
+Credentials        : add -- > Jenkins -- >
+kind: ssh username with private key
+Username: ec2-user
+Private Key: enter directly -- > copy paste the pem content
+Host Key Verification Strategy: last opt
+
+
+================
+Now Setup Slave 2
+
+Follow above process -- but one thing generally miss - install amazon-linux-extras install java-openjdk11 -y on slave 2 first and then add node in Jenkins
+
+Create a job , execute on build
+
+if build fails --> on slave see java version
+
+update-alternatives --config java
+
+run the build again
+
+--> if you want to run the pipeline using slave not in configuring Jenkins(Restrict where this project can be run), but directly through pipeline use the below script as agent label
+
+NOTE: We can run multiple agents in single pipeline. Each stage can be run on diff agents
+===========================================================================================
+
+pipeline {
+    agent none  // No default agent; stages will define their own
+
+    stages {
+        stage('Build on Linux') {
+            agent { label 'linux-agent' }  // Run this stage on Linux agent
+            steps {
+                sh 'echo Building on Linux'
+            }
+        }
+
+        stage('Build on Windows') {
+            agent { label 'windows-agent' }  // Run this stage on Windows agent
+            steps {
+                bat 'echo Building on Windows'
+            }
+        }
+    }
+}
+
+Example 2 with Pipeline
+-------------------------
+
+
+pipeline {
+    agent {
+        label 'slave1'
+    }
+   
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/ReyazShaik/java-project-maven-new.git&#39;
+        (or)
+        git branch: 'main', url: 'https://github.com/ReyazShaik/java-project-maven.git&#39;
+            }
+        }
+        stage('compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('artifact') {
+            steps {
+                sh 'mvn clean package'    
+            }
+        }
+        stage('Deployment') {
+            steps {
+                echo 'Code is deploy - actual we need to learn tomcat, using tomcat we deploy'
+            }
+        }
+    }
+}
+
+
+================
+Monitor Slave machines --> Click on Node --> left side --> Load statistics, System info , Build history etc
+
+
+==================================
+Integrate tomcat in Jenkins Pipeline
+--------------------------------
+
+Install plugin : deploy to container
+--------------
+
+Restart Jenkins
+
+systemctl restart Jenkins.service
+
+Manage Jenkins --> Credentials --> System --> Global credentials (unrestricted) --> Add credentials --> Username:tomcat, password: root123456, id = tomcatcreds
+
+
+
+Open Pipeline Syntax
+-------------------
+select deploy:Deploy war/ear to a container
+WAR/EAR files = **/*.war
+Context path = myapp
+Add container --> select tomcat 9
+credentials = tomcatcreds
+Tomcat URL = http://13.126.17.44:8080/
+
+Generate
+=========
+
+Tomcat integration Pipeline
+--------------------------
+
+pipeline {
+    agent any
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/ReyazShaik/java-project-maven-new.git&#39;
+            }
+        }
+        stage('compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('artifact') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }      
+        stage('deploy') {
+            steps {
+                deploy adapters: [tomcat9(credentialsId: 'tomcatcreds', path: '', url: 'http://13.126.17.44:8080/&#39;)], contextPath: 'myapp', war: '**/*.war'
+            }
+        }
+       
+    }
+}
+   
+
+
+
+
+Upload artifacts to S3
+======================
+
+Instal plugins = S3 publisher
+
+RESTART the Jenkins
+
+Manage Jenkins --> System --> S3 Profile --> Name = s3creds, Access Key and Secret Key and Test
+
+Create a New Build job
+
+Use Pipeline Script S3upload and fill all details
+
+
+pipeline {
+    agent {
+        label 'slave1'
+    }
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/ReyazShaik/java-project-maven-new.git&#39;
+            }
+        }
+        stage('compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('artifact') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('Upload to S3') {
+            steps {
+                s3Upload consoleLogLevel: 'INFO', dontSetBuildResultOnFailure: false, dontWaitForConcurrentBuildCompletion: false, entries: [[bucket: 'jenkins-artifacts-demo-test', excludedFile: '', flatten: false, gzipFiles: false, keepForever: false, managedArtifacts: false, noUploadOnFailure: false, selectedRegion: 'ap-south-1', showDirectlyInBrowser: false, sourceFile: '**/*.war', storageClass: 'STANDARD', uploadFromSlave: false, useServerSideEncryption: true]], pluginFailureResultConstraint: 'FAILURE', profileName: 's3creds', userMetadata: []
+            }
+        }        
+        stage('deploy') {
+            steps {
+                deploy adapters: [tomcat9(credentialsId: 'tomcatcreds', path: '', url: 'http://13.126.17.44:8080/&#39;)], contextPath: 'myapp', war: '**/*.war'
+            }
+        }
+       
+    }
+}
