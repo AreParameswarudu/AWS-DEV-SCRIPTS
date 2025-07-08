@@ -1,0 +1,313 @@
+=====================================
+			SONARQUBE
+=====================================
+
+1.  Launch an EC2 instance - Amazon linux 2 - go for at-least  t2.medium 
+	Copy the Public IP --> Mobaxterm --> login as ec2-user --> use the .epm file ( if used during configure) 
+	
+2. TAKE SonarQube.sh from GitHub  to install
+
+	============ SCRIPT START ==============================================
+		#! /bin/bash
+		#Launch an instance t2.medium, port 9000
+		cd /opt/
+		wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-8.9.6.50800.zip
+		unzip sonarqube-8.9.6.50800.zip
+		amazon-linux-extras install java-openjdk11 -y
+		useradd sonar
+		chown sonar:sonar sonarqube-8.9.6.50800 -R
+		chmod 777 sonarqube-8.9.6.50800 -R
+		su - sonar
+
+
+		# use the below command manually after installation
+		#sh /opt/sonarqube-8.9.6.50800/bin/linux-x86-64/sonar.sh start
+
+	===================SCRIPT ENDS========================================
+
+	create a file named sonar.sh using  vi
+	add the content to the file and save.
+	
+	run the script --> sh sonar.sh 
+		
+	In the script the run command was not executed 
+	so run the following command manually 
+
+	sh /opt/sonarqube-8.9.6.50800/bin/linux-x86-64/sonar.sh start
+
+	SonarQube asks for admin password at time of login to UI, default port for SonarQube is 9000.
+	Open http://sonarqube-servers-public-ip:9000
+
+	username: admin,
+	Password : admin			(these are default)
+	
+	It will prompt you to set own password as well
+	remember the password for integrating to Jenkins.
+
+
+
+===========NOTE START===================
+	If you have stopped the sonar, start the sonar manually
+	su - sonar
+	sh /opt/sonarqube-8.9.6.50800/bin/linux-x86-64/sonar.sh start
+============NOTE ENDS===================
+
+	
+
+3. Adding new project in SonarQube
+	
+	Add project --> Manually 
+		1. project key = Hotstar 
+		2.1 generate token =  hotstarapp , it will generate token like { 273e2ffa1f4e8bdfbfe1882689a836df9fca40e0 } ( copy it and save it ) 
+		2.2 click on maven ( it will provide you with some commands, ignore them, they will be automatically ran during pipeline )
+
+	
+
+4. Integrating SonarQube to Jenkins 
+	
+	4.1 In Jenkins: Add plugin:  
+		Dashboard ---> Manage Jenkins --> Plugins --> Available Plugins --> search for each and install them
+			SonarQube Scanner,
+			Maven Integration plugins
+			Sonar Scanner Quality Gates
+
+		RESTART JENKINS
+
+	4.2 Adding SonarQube credential in Jenkins: 
+		Dashboard ---> Manage Jenkins --> Credentials --> Global ---> Add credentials 
+		
+			Kind= Secret text , 
+			secret = c7fc89bc61e79ad060081f980aa3b0a40dfe9115 ( Token generated in sonarqube)
+			id  = sonar , 
+			description = sonar
+
+	4.3 Adding SonarQube server details 
+		Dashboard ---> Manage Jenkins -->System --> search for SonarQube servers --> Enable Environment Variables --> Add SonarQube Server
+     
+			Name = SonarQube
+     			URL = http://sonarqube-servers-public-ip:9000
+     			Server authentication token = select token ( sonar ) { credentials that we added previously )
+
+
+	4.4 Go to  Tools
+		Dashboard ---> Manage Jenkins  --> SonarQube Scanner installations , Name = SonarScanner --> install automaticallly ---> don't click add installer
+
+		OPTIONAL : ---> Add maven --> Name= maven--> don't click add installer
+
+
+
+5. Build the pipeline 
+ 	update sonar before artifact, as we need to first scan the code and create artifact
+
+	note:  Dsonar.login=e2230d52b1ef8f7581bc4e9df5b08470c039e7b4'  is the key in SonarQube
+
+	================GROOVY SCRIPT START===============
+pipeline {
+    agent any
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/ReyazShaik/java-project-maven-new.git&#39;
+            }
+        }
+        stage('compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar'
+                }
+            }
+        }
+        stage('artifact') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+    }
+}
+
+	=====================GROOVY SCRIPT END==================
+
+!!!!!!!!!!!!!!!!!!!!!!!  NOTE START !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	In the groovy script, at adding the SONARQUBE ANALYSIS,\
+	If the generate the code snippet wont work, them  
+	simply replace the sonar ( which is a credential of SonarQube ) with the sonarqube server name
+	that you used at.. Manage Jenkins -->System --> search for SonarQube servers.
+	
+!!!!!!!!!!!!!!!!!!!!!!  NOTE ENDS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+				===================
+						NEXUS 
+				====================
+
+1. Launch an EC2 instance - Amazon linux 2 - go for at-least  t2.medium 
+
+2. Get the script form the GITHUB 
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEXUS.sh  start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	wget https://download.sonatype.com/nexus/3/nexus-unix-x86-64-3.79.0-09.tar.gz
+	tar -zxvf nexus-unix-x86-64-3.79.0-09.tar.gz
+	yum install java-17-amazon-corretto -y
+	sudo useradd nexus
+	chown -R  nexus:nexus  nexus-3.79.0-09
+	sudo sh nexus-3.79.0-09/bin/nexus start
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEXUS.sh  ends !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	
+	additional commands if needed 
+ 		nexus restart
+		nexus start
+ 		nexus status
+
+	create a file in the ec2 instance named nexus.sh using vi
+	add content and save the file
+	
+	run the script --> sh nexus.sh
+
+3. Access the GUI 
+	
+	use --> http://server-public-IP:8081  
+
+	Click on SignIN 
+		Username = admin, 
+		password = cat /opt/nexus/sonatype-work/nexus3/admin.password
+                                               
+	Creating Repo 
+
+		Go to settings  --> Repositories --> Create repository --> maven2(hosted) --> name(Hotstar-project) --> save
+
+		Version Policy --> Snapshot
+
+		Deployment policy --> allow to redeploy
+
+
+
+4. Integrate Nexus to Jenkins Pipeline
+
+	Jenkins (Code --> Build --> Test --> Artifact) --> Nexus
+
+	If you want to integrate any 3rd party to Jenkins, install plugins
+
+	4.1. Download the Plugins (nexus artifacts uploader)
+ 		  --> Manage Jenkins --> Plugins --> Available Plugins --> Just type Nexus , it will give nexus artifacts uploader
+	
+
+	4.2 Create Credentials for Nexus
+
+		Manage Jenkins --> Credentials --> Username = admin, password = root123  , id = nexus , description = nexus
+
+5. Create a new pipeline job --> and copy paste the script and click on pipeline systax
+	
+	Note: all the information will be available in pom.xml file
+
+	For generating the snippet for NEXUS stage:
+
+		sample step : nexusartifactuploader
+		Nexus Version : see nexus version in browser left top 3.0
+		Protocol:http
+		Nexus URL : IP:8081 (dont put http)
+		Credentials : Add --> Jenkins --> username:admin, password: root123, description: nexus
+		credentials: select admin
+		Groupid: see pom file (in.reyaz)
+		version: see pom file (1.2.2) 8.3.3-SNAPSHOT
+		Repository: repo that you created in nexus  : hotstar
+		Artifact: Add : Artifactid: see pom (myapp) , Type = .war, classifier = empty,  File = target/myapp.war
+		
+			 --> generate pipeline script
+
+					nexusArtifactUploader artifacts: [[artifactId: 'myapp', classifier: '', file: 'target/myapp.war', type: '.war']], credentialsId: 'nexus', groupId: 'in.reyaz', nexusUrl: '13.126.193.100:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'hotstar', version: '8.3.3-SNAPSHOT'
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!GROOVY SCRIPT FOR PIPELINE STARTS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+pipeline {
+    agent any
+   
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/ReyazShaik/java-project-maven-new.git&#39;
+            }
+        }
+        stage('compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('artifact') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('nexus') {
+            steps {
+                nexusArtifactUploader artifacts: [[artifactId: 'myapp', classifier: '', file: 'target/myapp.war', type: '.war']], credentialsId: 'nexuscreds', groupId: 'in.reyaz', nexusUrl: '13.127.129.23:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'hotstarapp', version: '8.3.3-SNAPSHOT'
+            }
+        }
+       
+    }
+}
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!GROOVY SCRIPT FOR PIPELINE ENDS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+		==================
+			TOMCAT
+		==================
+
+1. Launch an EC2 instance - Amazon linux 2 - t2.micro is enough.
+
+2. Install TOMCAT using script.  
+
+3. Access the GUI  
+use: http://server_IP:8080  
+manager apps --> username: tomcat, password: root123456
+
+4. Integrate with Jenkins
+	1. In Jenkins server first install a plugin(Deploy to container).  
+		--> Manage Jenkins --> Plugins --> Available Plugins --> Deploy to container.  
+
+	Restart the jenkins.  
+
+	2. Create credentials for tomcat  
+		--> Manage Jenkins --> Credentials --> System --> Global credentials (unrestricted) --> Add credentials --> Username:tomcat, password: root123456, id = tomcatcreds
+
+
+Open Pipeline Syntax
+-------------------
+select deploy:Deploy war/ear to a container
+WAR/EAR files = **/*.war
+Context path = myapp
+Add container --> select tomcat 9
+credentials = tomcatcreds
+Tomcat URL = http://13.126.17.44:8080/
+
+
+
+Creating Pipeline:
+------------------
+
+New Item --> Name = application --> Pipeline --> OK.  
+Go to groovy code snadbox,
+
+start writing the pipeline.
+
+Pipeline can be found in the pipeline.txt file.
+
+Save --> build --> enter the build --> pipeline overview. 
