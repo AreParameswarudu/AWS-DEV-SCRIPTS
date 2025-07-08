@@ -1,0 +1,1870 @@
+ANSIBLE:
+
+  Simply It is a IT automation tool
+  its a Configuration Management Tool.
+
+  Launch Amazon Linux 2 , t2.micro
+
+Installation, Ansible needs python
+----------------------------------
+
+  amazon-linux-extras install ansible2 -y
+
+  yum install python3 python-pip python-dlevel -y
+
+  ansible --version
+
+Examples: Adhoc Commands
+------------------------
+
+  ansible -m ping localhost    [Ping localhost]
+
+    -a = argument
+
+  ansible localhost -a "yum install git -y"
+  ansible localhost -a "git --version"
+  ansible localhost -a "yum install maven -y"
+  ansible localhost -a "mvn --version"
+  ansible localhost -a "touch file1"
+
+  ansible localhost -a "ls"
+
+  ansible localhost -a "yum install httpd -y"
+
+  ansible localhost -a "systemctl status httpd"
+
+  ansible localhost -a "systemctl start httpd"
+
+  ansible localhost -a "user add reyaz"
+
+  ansible localhost -a "cat /etc/passwd"
+
+  ansible localhost -a "yum remove git* maven* httpd* -y"
+
+SETUP:
+======
+
+  CREATE 5 SERVERS - Amazon Linux 2 [1=ANSIBLE Master, 2=PROD, 2=DEV]
+
+  EXECUTE THE BELOW COMMANDS ON ALL SERVERS:
+  sudo -i
+  hostnamectl set-hostname ansible/prod-1/prod-2/dev-1/dev-2
+  sudo -i
+
+  Now Root user from ansible server needs to login to all servers using root username and password
+
+  Do below commands in all servers using multi-exec
+
+    ## first set the password for root
+    passwd root  
+
+    set new password: root123456
+
+    ## enable all server to login as root
+
+    vi /etc/ssh/sshd_config (38 & 61 uncomment both lines)
+    systemctl restart sshd
+    systemctl status sshd
+    hostname -i  -- to see the private ip
+
+Go to Ansible Master
+--------------------
+  Lets Generate SSH Keys, using this KEY Ansible server will communicate with worker nodes
+
+  ssh-keygen
+
+  ll .ssh
+
+
+  ssh-copy-id root@private ip of prod-1 -- > yes -- > password -- > ssh private ip -- > ctrl d
+  ssh-copy-id root@private ip of prod-2 -- > yes -- > password -- > ssh private ip -- > ctrl d
+  ssh-copy-id root@private ip of dev-1 -- > yes -- > password -- > ssh private ip -- > ctrl d
+  ssh-copy-id root@private ip of dev-2 -- > yes -- > password -- > ssh private ip -- > ctrl d
+
+  just to see the connection
+  ssh ec2-user@privateip
+
+
+Inventory file
+=============
+
+There are 2 types of inventory file, static and Dynamic
+
+  vi /etc/ansible/hosts
+  # Ex 1: Ungrouped hosts, specify before any group headers.
+  [prod]
+  172.31.20.40
+  172.31.21.25
+  [dev]
+  172.31.31.77
+  172.31.22.114
+
+
+Another method for authentication
+---------------------------------
+  In host file create variables
+
+  [all:var]
+  ansible_user=ec2-user
+  ansible_ssh_private_key_file=/home/ec2-user/MyKey.pem
+
+-----------------------------------------------------
+
+
+ansible-inventory --list   --> This will show the inventory list
+
+ansible -m ping all : To check worker node connection with ansible server.
+
+1. ADHOC COMMANDS:
+-----------------
+  These are simple Linux commands.
+  ADHOC commands  are great for tasks you repeat daily
+  These are used for temp works.
+
+  -a = argument
+
+  ansible all -a "yum update -y"
+  ansible all -a "yum install git -y"
+  ansible all -a "git --version"
+  ansible all -a "yum install maven -y"
+  ansible all -a "mvn --version"
+  ansible all -a "touch file1"
+  ansible all -a "touch reyaz.txt"
+  ansible all -a "ls"
+  ansible all -a "yum install httpd -y"
+  ansible all -a "systemctl status httpd"
+  ansible all -a "systemctl start httpd"
+  ansible all -a "user add reyaz"
+  ansible all -a "cat /etc/passwd"
+  ansible all -a "yum remove git* maven* httpd* -y"
+
+
+  Delete all software, lets play with empty servers
+
+  ansible all -a "yum remove git* maven* httpd* tree* -y"
+
+
+Modules supports
+-----------------
+
+
+    ADHOC commands  are great for tasks you repeat daily
+
+    ADHOC     : ansible all -a "yum install git -y"
+              ansible all -a "yum remove git* -y"
+    -----
+
+    Ansible Modules are units of code that can control system resources or execute system commands
+
+  MODULE    : ansible all -m yum -a "name=git state=present"  --> -m is module , name = packagename, , state = present(install)
+  ------
+
+    States:
+    -------
+      yum modules (States for Package Management)
+      -----------
+      Present = install
+      absent = uninstall
+      latest = install or upgrades to latest version
+
+
+    Services module (States for Service Management)
+    ---------------
+      started = start
+      stopped = stop
+      restarted = restart the service
+      enabled = Ensures the service starts on boot.
+
+
+
+
+
+
+  Install packages with modules
+  --------------------------------
+    ansible all -m yum -a "name=git state=present"
+
+    ansible all -a "git -v"
+
+    ansible all -m yum -a "name=maven state=present"
+
+  To install Apache service
+  ------------------------
+
+    ansible all -m yum -a "name=httpd state=present"
+
+  TO see the Version of Apache
+  ----------------------------
+
+    ansible all -a "httpd -v"
+
+  TO start Apache
+  ----------------
+
+    ansible all -m service -a "name=httpd state=started"  
+
+    ---> this is use to start the service {we changed module yum to service, because yum to install, service to start}
+
+  TO see the status of Apache
+  ------------------------
+
+    ansible all -a "systemctl status httpd" --> to see the status of httpd in all servers
+
+  To Stop Apache service
+  ---------------------
+
+    ansible all -m service -a "name=httpd state=stopped" --> to stop the service
+
+  Update Apache to latest version
+  ------------------------------
+
+    ansible all -m yum -a "name=httpd state=latest"   --> to update to latest version
+
+  uninstall apache:
+  ---------------
+
+    ansible all -m yum -a "name=httpd state=absent"  ---> to uninstall httpd, absent = uninstall
+
+
+==================================
+
+TO create users in servers
+--------------------
+
+  ansible all -m user -a "name=reyaz state=present"  --> present = to create
+
+  ansible all -a "cat /etc/passwd"
+
+  create another user
+
+==============================
+
+To create a file
+--------------
+
+  touch file1
+
+  ansible all -m copy -a "src=file1 dest=/home/ec2-user/"
+
+  ansible all -a "ls /home/ec2-user"
+
+====================
+
+Remove all packages
+----------------
+
+  ansible all -a "yum remove  maven* git* httpd* -y"
+
+==============================================
+
+yum , service, user etc all these are modules
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+PLAYBOOK:
+  its a collection of modules.
+  we can execute multiple modules inside playbooks.
+  playbook is written on YAML langauge.
+  YAML=YET ANOTHER MARKUP LANGUAGE
+  Extension: .yml or .yaml
+  its a human redable and seraliazable language.
+  it consits key-value pairs (dictionary).
+  space blw key and value must.
+  playbook start with --- and end with ... (opt)
+
+
+PLAYBOOK-1:
+
+  # for comments, no option for multiline comment, only single line with #
+
+  - meaning description
+
+
+===========================================
+Test all Hosts Connectivity: ping module
+===========================================
+
+
+    vi pb1.yml    # To create and edit pb1.yml file 
+
+      ---
+      - name: First Playbook
+        hosts: all
+      
+        tasks:
+        - name: Test connectivity
+          ping:
+
+      ansible-playbook --syntax-check pb1.yml
+      ...
+
+    # run the playbook
+    ansible-playbook pb1.yml   
+
+
+
+===========================================
+Installing APACHE and print Message
+===========================================
+
+vi pb2.yml
+
+    ---
+    - name: Installing Apache
+      hosts: all
+      become: yes
+      tasks:
+        - name: Installing Apache
+          yum:
+            name: httpd
+            state: present
+        - name: Print Message
+          debug: msg="Apache Installed"
+    ...
+
+ansible-playbook pb2.yml
+
+===========================================
+Installing and start Apache, yum and service module
+===========================================
+
+
+vi pb2.yml
+
+    ---
+    - name: Installing Apache
+      hosts: all
+      become: yes
+      tasks:
+        - name: Installing Apache
+          yum:
+            name: httpd
+            state: present
+        - name: Print Message
+          debug: msg="Apache Installed"
+
+        - name: Start Apache
+          service:
+            name: httpd
+            state: started
+    ...
+
+ansible-playbook pb2.yml
+
+
+===========================================
+Installing GIT and Docker and starting docker
+===========================================
+
+vi pb3.yml
+
+    ---
+    - name: Install GIT and DOCKER Playbook
+      hosts: all
+      tasks:
+        - name: Installing GIT
+          yum: name=git state=present
+
+        - name: Installing Docker
+          yum: name=docker state=present
+
+        - name: Starting Docker Service
+          service: name=docker state=started
+    ...
+
+ansible-playbook pb3.yml
+
+==================================
+Creating User and Copy files playbook
+====================================
+
+vi pb4.yml
+
+    ---
+    - name: Create users and copy files
+      hosts: all
+      tasks:
+        - name: Creating User
+          user: name=ramesh state=present
+
+        - name: Copy files
+          copy: src=file.txt dest=/home/ec2-user/
+    ...
+
+ansible-playbook --syntax-check pb4.yml  --> this will show you syntax errors
+
+you can correct yourself syntax or use online tool called yamllint.com to see where are the errors
+
+ansible-playbook pb3.yml
+
+COLOR CODES
+-----------
+  Yellow = successfully executed
+  Red = Failed
+  Green = Already executed
+  Blue = Skipped
+
+
+Gather facts : First it will get all information about all worker nodes , default task performed by ansible
+--------------
+
+  OK = total number of tasks
+  changed = no of tasks successfully executed
+
+
+--> again run the same playbook --> now ok =6 , changed =0
+
+---> now all are installed on workernodes , now try to uninstall , to uninstall , state=absent
+
+--> use sed command to replace present to absent
+
+=============================================
+Uninstall docker and GIT playbook
+=============================================
+
+sed -i 's/present/absent/g' pb3.yml
+
+vi pb3.yml
+
+    ---
+    - name: Uninstall GIT and DOCKER Playbook
+      hosts: all
+      tasks:
+        - name: Uninstalling GIT
+          yum: name=git state=absent
+
+        - name: Uninstalling Docker
+          yum: name=docker state=absent
+
+        - name: Starting Docker Service
+          service: name=docker state=started
+    ...
+
+ansible-playbook pb3.yml
+
+---> now you see some error for docker , because dokcer package is removed do that it is not starting
+
+--> we can ignore these error by placing ignore_errors: true in playbook
+
+============================
+Ignore ERROR messages
+=============================
+
+    ---
+    - name: Uninstall GIT and DOCKER Playbook
+      hosts: all
+      ignore_errors: true
+      tasks:
+        - name: Uninstalling GIT
+          yum: name=git state=present
+
+        - name: Uninstalling Docker
+          yum: name=docker state=present
+
+        - name: Starting Docker Service
+          service: name=docker state=started
+    ...
+
+First uninstall httpd
+
+ansible all -a "yum remove httpd* -y"
+
+================================
+Install NGINX using Playbook
+=================================
+
+vi nginx.yml
+
+    ---
+    - name: Install Nginx and Start it
+      hosts: all
+      become: yes # Run as root
+      tasks:
+        - name: Enable Nginx Repo    
+          command: amazon-linux-extras enable nginx1 # Add nginx to amazon package manager repo
+
+        - name: Install Nginx
+          yum:
+            name: nginx
+            state: present
+
+        - name: Start Nginx
+          service:
+            name: nginx
+            state: started
+            enabled: yes
+    ...
+
+ansible-playbook nginx.yml
+
+
+================================
+Deploy application on NGINX using Playbook
+=================================
+
+create one index.html page
+
+
+vi nginx.yml
+
+    ---
+    - name: Install Nginx and Start it
+      hosts: all
+      become: yes # Run as root
+      tasks:
+        - name: Enable Nginx Repo
+          command: amazon-linux-extras enable nginx1
+
+        - name: Install Nginx
+          yum:
+            name: nginx
+            state: present
+
+        - name: Start Nginx
+          service:
+            name: nginx
+            state: started
+            enabled: yes
+
+        - name: Deploy a web page
+          copy:
+            src: index.html
+            dest: /usr/share/nginx/html/index.html
+
+        - name: Restart Nginx
+          service:
+            name: nginx
+            state: restarted
+    ...
+
+
+==============================
+Setup module
+=============================
+
+  ansible all -m setup
+
+  This command will give you full information about all workernodes, the above command shows a lot of info, but if you want to get only particular data grep
+
+  ansible all -m setup | grep -i cpu
+  ansible all -m setup | grep -i mem
+
+      cpu         : ansible_processor_vcpus
+      mem        : ansible_memtotal_mb
+      host        : ansible_nodename
+      flavour        : ansible_os_family
+      pkg manager    : ansible_pkg_mgr
+      blk        : block_available
+      kernel        : BOOT_IMAGE
+
+DEBUG Module - to print values
+-----------
+
+    debug module: it will print messages
+
+    ---
+    - name: Printing messages
+      hosts: all
+      tasks:
+        - name: printing a msg
+          debug:
+            msg: hai all my name is Reyaz
+    ...
+
+
+    ---
+    - name: Printing messages
+      hosts: all
+      tasks:
+        - name: printging a msg
+          debug:
+            msg: "server name is: {{ansible_nodename}}, number of cpus: {{ansible_processor_vcpus}}, total memsize: {{ansible_memtotal_mb}}, the flavour is: {{ansible_os_family}}, package manager is: {{ansible_pkg_mgr}}"
+    ...
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+TAGS: used to execute or skip specific tasks in playbook.
+======================================================
+    ---
+    - name: TAGS Playbook
+      hosts: all
+      tasks:
+        - name: installing git
+          yum: name=git state=present
+          tags: git
+        - name: installing docker
+          yum: name=docker state=present
+          tags: dockerinstall
+        - name: starting docker
+          service: name=docker state=started
+          tags: dockerstart
+        - name: create user
+          user: name=suresh state=present
+          tags: user
+    ...
+
+
+  SINGLE TAG:ansible-playbook reyaz.yml --tags user
+  MULTI TAG: ansible-playbook reyaz.yml --tags dockerinstall,dockerstart
+
+  --> remove all packages now
+
+  sed -i 's/present/absent/g' reyaz.yml   or  sed -i 's/present/absent/; s/installing/uninstalling/' reyaz.yml  ---> replace words using sed
+
+
+  ansible all -a "yum install git -y"
+
+  SKIPPING SINGLE TAG: ansible-playbook reyaz.yml --skip-tags "git"
+
+  SKIPPING MULTI TAG: ansible-playbook reyaz.yml --skip-tags "dockerinstall,dockerstart"
+
+===================================
+
+VARIBALES: Static variables and Dynamic Variables
+
+============================================
+
+  remove all packages first to install again
+
+  ansible all -a "yum remove git* maven* httpd* docker* -y"
+
+  STATIC VARS: these variables will declared inside playbook.
+  it will not change until unless we change.
+
+  vi staticvar.yml
+
+  ---
+  - name: STATIC Variable
+    hosts: all
+    vars:
+      a: git
+      b: maven
+    tasks:
+      - name: installing git
+        yum: name={{a}} state=present
+      - name: installing maven
+        yum: name={{b}} state=present
+  ...
+
+  ansible-playbook staticvar.yml
+
+  ---> now uninstall again
+
+  sed -i 's/present/absent/g' staticvar.yml
+
+  ansible-playbook staticvar.yml
+
+
+DYNAMIC VARS: these variables will declared outside playbook.it will  change frequently as per our requirement.
+--------------------------------------------------------------------
+
+
+  vi dynamicvar.yml
+
+    ---
+    - name: Dynamic Vars
+      hosts: all
+      tasks:
+        - name: installing pkg
+          yum: name={{a}} state=present
+        - name: installing pkg
+          yum: name={{b}} state=present    
+
+  ansible-playbook dynamicvar.yml --extra-vars "a=git b=maven"
+
+uninstall again
+----------------
+
+  sed -i 's/present/absent/' dynamicvar.yml
+
+  ansible-playbook dynamicvar.yml --extra-vars "a=git b=maven"
+
+=====================================
+LOOPS - Reduce the number of lines of code
+====================
+
+  Make sure no software are there on workernodes, we will run the commands again
+
+  vi loop.yml
+
+    ---
+    - name: Loops playbook
+      hosts: all
+      gather_facts: false
+      tasks:
+        - name: installing pkgs
+          yum: name={{item}} state=present
+          with_items:
+            - git
+            - tree
+            - docker
+            - httpd
+            - java-1.8.0-openjdk
+            - maven
+    ...
+
+
+  ansible-playbook loop.yml
+
+  see all packges are installed
+  ansible all -a "mvn -v"
+  ansible all -a "docker -v"
+
+uninstall
+---------
+
+  vi loopuninstall.yml
+
+    ---
+    - name: uninstalling pkgs
+      hosts: all
+      tasks:
+        - name: uninstalling pkgs
+          yum: name="{{item}}" state=absent
+          with_items:
+            - git*
+            - tree*
+            - httpd*
+            - java-1.8.0-openjdk*
+            - maven*
+    ...
+
+  ansible-playbook loopuninstall.yml
+
+  ansible all -a "mvn -v"
+  ansible all -a "docker -v"
+
+
+creating users - replace yum module with user in playbook
+-------------
+
+  vi loopusers.yml
+
+      ---
+      - name: Loops playbook
+        hosts: all
+        tasks:
+          - name: Creating Users
+            user: name="{{item}}" state=present
+            loop:
+              - lucky
+              - imthiaz
+              - siva
+              - rajesh
+              - pavan
+      ...
+
+  ansible-playbook loopusers.yml
+
+  ansible all -a "cat /etc/passwd"
+
+remove users
+-----------
+
+vi removeloopusers.yml
+
+    ---
+    - name: uninstall pkgs
+      hosts: all
+      tasks:
+        - name: uninstalling pkgs
+          user: name="{{item}}" state=absent
+          loop:
+            - lucky
+            - imthiaz
+            - siva
+            - rajesh
+            - pavan
+    ...
+
+  ansible-playbook removeloopusers.yml
+
+
+
+==============================
+Handlers:
+===============================
+
+  one task will depend on another task.
+  when task-1 is executed it will ask to run task-2.
+  notify is used to tell task-2 to execute.
+
+  ---> apache should be installed first and then start apache later, so starting service is depending on installation
+  --> notify is calling the handler
+
+vi handlers.yml
+
+  ---
+  - name: Handlers
+    hosts: all
+    tasks:
+      - name: installing apache
+        yum: name=httpd state=present
+        notify: starting apache
+
+    handlers:
+      - name: starting apache
+        service: name=httpd state=started
+
+  ansible-playbook handlers.yml
+
+  --->
+  sed -i 's/present/absent/g; s/install/uninstall/g' handlers.yml
+
+or
+
+  vi handlersuninstall.yml  ---> httpd will be uninstalled, but there is no service to start , so ignore errors
+
+    ---
+    - name: Handlers uninstall
+      hosts: all
+      tasks:
+        - name: uninstalling apache
+          yum: name=httpd state=absent
+          notify: starting apache
+
+      handlers:
+        - name: starting apache
+          service: name=httpd state=started
+          ignore_errors: yes
+
+
+ansible-playbook handlersuninstall.yml
+
+============================
+SHELL in Playbook
+========================
+
+  We can directly run shell / Linux commands in playbook , use module shell or command or raw module, all are same -->
+
+  raw is latest module, raw is commonly used
+
+  ✅ Use command whenever possible (it's safer).
+  ✅ Use shell only if needed (for pipes, loops, variables).
+  ✅ Use raw only for bootstrapping systems without Python.
+
+
+  vi shell.yml
+
+
+    ---
+    - name: Shell in Playbook
+      hosts: all
+      tasks:
+        - name: installing apache
+          shell: yum install httpd -y
+
+        - name: installing git
+          command: yum install git -y
+
+        - name: installing maven
+          raw: yum install maven -y
+    ...
+
+  ansible-playbook shell.yml
+
+  uninstall
+  ---------
+
+  sed -i 's/install/remove' shell.yml
+
+  or
+
+  vi shellremove.yml
+
+    ---
+    - hosts: all
+      tasks:
+        - name: installing apache
+          shell: yum remove httpd -y
+
+        - name: installing git
+          command: yum remove git -y
+
+        - name: installing maven
+          raw: yum remove maven -y
+    ...
+
+
+=======================================
+CONDITIONS
+===========================================
+
+  CLUSTER: group of servers/nodes which communicate with each other.
+  HOMOGENIUS: all servers with same os and flavour.
+  HETROGENIUS: all servers with different os and flavour.
+
+  RedHat: yum
+  Ubuntu: apt
+  Python : pip  (if you want to install numpy and pandas in python use pip)
+
+
+  ansible all -m setup
+  ansible all -m setup | grep -i family
+
+
+CONDITIONS:
+
+  - hosts: all
+    tasks:
+      - name: installing apache on RedHat
+        yum: name=httpd state=present
+        when: ansible_os_family == "RedHat"
+
+      - name: installing apache on Ubuntu
+        apt: name=apache2 state=present
+        when: ansible_os_family == "Debian"
+
+ansible all -m setup
+ansible all -m setup | grep -i family
+
+
+  - hosts: all
+    gather_facts: false
+    tasks:
+      - name: installing apache on RedHat
+        yum: name=httpd state=present
+        when: ansible_os_family == "RedHat"
+
+      - name: installing apache on Ubuntu
+        apt: name=apache2 state=present
+        when: ansible_os_family == "Debian"
+
+if you want to install only on dev-1 node
+
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: installing apache on RedHat
+      yum: name=httpd state=present
+      when: ansible_nodename == "dev-1"
+
+=======================================
+
+LAMP:
+
+L : LINUX
+A : APACHE
+M : MYSQL
+P : PHP or Python
+
+WAMP - IN WIndows, Windows, apache, MySQL and php or python
+
+In node machine we are using amazon Linux 2 , it has already python installed , so last module will not work
+
+---
+- name: LAMP
+  hosts: all
+  tasks:
+    - name: Installing Apache
+      yum: name=httpd state=present
+
+    - name: Installing Mysql
+      yum: name=mysql state=present
+
+    - name: Installing Python
+      yum: name=python3 state=present
+
+=============================
+LOOKUPS -
+============================
+
+Lookup --> this module is used to read the data from file, db, and key value
+
+For Example: create a file creds.txt  --> username:reya, password:123
+
+---
+- name: Lookups
+  hosts: all
+  vars:
+    creds: "{{lookup('file', '/root/creds.txt')}}"
+  tasks:
+    - debug:
+        msg: "My Credentials are {{creds}}"
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+=========================
+Jinja2 Templates in Ansible  
+===========================
+
+	Jinja2 is a templating engine used in Ansible for dynamically generating files, configurations, and scripts based on variables.
+
+	The Jinja2 templating engine is quite powerful and widely used with other frameworks and applications such as Flask and Django.
+
+
+🔹 Example: Nginx Configuration Template
+------------------------------------------------------------------
+
+	mkdir templates
+	cd templates
+
+	📌 Create a Jinja2 Template (templates/nginx.conf.j2)
+
+		vi nginx.conf.j2
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  nginx.conf.j2 starts !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+server {
+    listen {{ nginx_port }};
+    server_name {{ server_name }};
+
+    location / {
+         root {{ web_root }};
+        index index.html;
+    }
+}
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  nginx.conf.j2 ends !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+This template uses variables ({{ variable_name }}) that will be replaced dynamically.
+
+
+	vi nginx.yml
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  ngonx.yml starts !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+---
+- name: Deploy Nginx Config using Jinja2
+  hosts: all
+  become: yes
+  vars:
+    nginx_port: 80
+    server_name: mywebsite.com
+    web_root: /var/www/html
+
+  tasks:
+    - name: Enable Nginx Repo
+      command: amazon-linux-extras enable nginx1
+
+    - name: Install Nginx
+      yum:
+        name: nginx
+        state: present
+
+    - name: Copy Nginx Config with Template
+      template:
+        src: templates/nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+...
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  ngonx.yml ends !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+	ansible-playbook nginx.yml
+
+=========================
+Jinja2 HTTPD another Example
+==========================
+
+Below is a Jinja2 template for an Apache (httpd.conf) configuration file. It dynamically sets port, document root, and virtual hosts using Ansible variables.
+
+🔹 Step 1: Create Jinja2 Template (templates/httpd.conf.j2)
+----------------------------------------------------------
+
+mkdir templates
+
+# Apache HTTPD Configuration File
+
+vi httpd.conf.j2
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! httpd.conf.j2 start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Listen {{ http_port }}
+
+<VirtualHost *:{{ http_port }}>
+    ServerName {{ server_name }}
+    DocumentRoot {{ document_root }}
+
+    <Directory "{{ document_root }}">
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    ErrorLog /var/log/httpd/{{ server_name }}_error.log
+    CustomLog /var/log/httpd/{{ server_name }}_access.log combined
+</VirtualHost>
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! httpd.conf.j2 end !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+	Variables Used:
+	--------------
+
+		http_port → Defines the listening port.
+		server_name → Sets the domain name.
+		document_root → Defines the root directory for website files.
+
+🔹 Step 2: Ansible Playbook Using the Template
+-----------------------------------------------
+
+	Create a playbook (apache_setup.yml) to deploy the template:
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! apache_setup.yml start !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+---
+- name: Configure Apache HTTPD with Jinja2
+  hosts: all
+  become: yes
+  vars:
+    http_port: 80
+    server_name: example.com
+    document_root: /var/www/html
+
+  tasks:
+    - name: Install Apache (httpd)
+      yum:
+        name: httpd
+        state: present
+
+    - name: Deploy Apache Configuration
+      template:
+        src: templates/httpd.conf.j2
+        dest: /etc/httpd/conf/httpd.conf
+...
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! apache_setup.yml ends !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+	What This Playbook Does:
+	-------------------------
+
+		Installs Apache (httpd).
+		Copies the Jinja2 template (httpd.conf.j2) to /etc/httpd/conf/httpd.conf.
+		Notifies the handler to restart Apache when the config changes.
+
+
+
+================================
+
+Ansible Strategies  
+
+================================
+
+Linear = Execute tasks one by one, all task will execute on one node then only go to second node
+FREE = Execute all tasks parallelly on all nodes, it will not wait for tasks
+Rolling = see in internet
+
+✅ linear (default) = Default execution (wait for all hosts per task)
+                      Moves to the next task only after all hosts complete the current task.
+   
+✅ free = Fastest execution (tasks don't wait for each other)    
+           Each host executes tasks as fast as it can, without waiting for others
+       Faster execution but tasks can finish out of order.
+
+✅ host_pinned  = Host-by-host execution (one host at a time)    
+
+✅ debug = Debugging playbooks (step-by-step execution)    
+
+✅ custom strategy = Custom execution needs
+
+---
+- name: Strategies
+  hosts: all
+  strategy: Linear
+  tasks:
+    - name: Installing Apache
+      yum: name=httpd state=present
+
+=============================
+PIP - its a package manager used to install libs/modules
+=============================
+
+Python : pip  (if you want to install numpy and pandas in python use pip)
+
+using pip module install NumPy and Pandas
+----------------------------------------
+- name: Playbook using pip
+  hosts: all
+  tasks:
+    - name: install pip module
+      yum: name=pip state=present
+
+    - name: installing Numpy
+      pip: name=NumPy state=present
+
+    - name: installing Pandas
+      pip: name=Pandas state=present
+
+
+=====================
+Ansible ROLES
+====================
+
+Ansible roles help organize and structure your playbooks by breaking them into reusable components. They simplify automation by grouping related tasks, handlers, variables, and templates in a standardized directory format.
+
+
+Ansible Roles used to divide playbook into directory structure.
+
+Ansible roles are reusable.
+
+
+🔹 Why Use Roles?
+✅ Modular & Reusable: Write once, use multiple times.
+✅ Scalable: Easily manage configurations across many systems.
+✅ Organized: Avoid large, cluttered playbooks.
+
+🔹 Role Directory Structure
+When you create a role, Ansible generates a standard folder structure:
+
+yum install tree -y ---> to see folders in tree structure
+
+Manual method of creating Ansible Roles
+------------------------------------------------------------
+
+mkdir playbooks
+cd playbooks
+
+mkdir -p roles/pkgs/tasks
+
+mkdir -p roles/users/tasks
+
+tree
+
+mkdir -p roles/webserver/tasks
+
+tree
+
+vi roles/pkgs/tasks/main.yml
+
+- name: install pkgs
+  yum: name={{item}} state=present
+  loop:
+    - git
+    - java-1.8.0-openjdk
+    - tree
+    - docker
+    - maven
+
+
+vi roles/users/tasks/main.yml
+
+- name: create users
+  user: name={{item}} state=present
+  with_items:
+    - luckyy
+    - imthiaz
+    - siva
+    - rajesh
+    - pavan
+
+
+vi roles/webserver/tasks/main.yml
+
+- name: install webserver
+  yum: name=httpd state=present
+
+- name: starting httpd
+  service: name=httpd state=started
+
+--> tree
+
+ --> create a new master yml and mention which role you want to execute
+
+vi master.yml
+
+---
+- name: ROLE PLAYBOOK
+  hosts: all
+  roles:
+    - pkgs
+    - user
+    - webserver
+
+ansible-playbook master.yml
+
+
+Now uninstall all
+
+sed -i 's/present/absent/g' roles/pkgs/tasks/main.yml
+
+Above command need to do one by one for all yml files, use exec command
+
+find . -type f -exec sed -i 's/present/absent/g' {} \;
+
+
+find . =     Searches in the current directory (.) and all subdirectories.
+-type f =     Finds only files (not directories).
+-exec ... \;    Executes a command (sed) on each file found.
+sed -i 's/present/absent/g' =     Uses sed (stream editor) to replace "present" with "absent" globally (g) within each file.
+{} =        A placeholder for each file found by find.
+\; =        Ends the -exec command.
+
+now run the playbook
+
+ansible-playbook master.yml
+
+
+=========================
+Ansible-Galaxy -    
+=========================
+
+Ansible Galaxy is a repository for sharing pre-built Ansible roles. You can download, install, and use roles to speed up automation.
+
+Use ansible galaxy website and use the roles locally by copying the command like search for tomcat and run the command
+
+https://galaxy.ansible.com/ui/standalone/roles/
+
+search for tomcat and copy paste the command ansible-galaxy role install criecm.tomcat
+
+ansible-galaxy role install criecm.tomcat
+
+By default it will install in /root/.ansible/roles
+
+If you want to change the path , edit ansible.cfg and uncomment
+
+vi /etc/ansible/ansible.cfg
+role_path = /etc/ansible/roles
+
+It will create so many roles itself and we can use the roles
+
+if we want to create roles, use either mkdir manually or init command (it will create folder structure)
+
+cd /etc/ansible/roles
+
+ansible-galaxy init Reyaz
+
+tree
+
+.
+└── reyaz
+    ├── defaults
+    │   └── main.yml
+    ├── files
+    ├── handlers
+    │   └── main.yml
+    ├── meta
+    │   └── main.yml
+    ├── README.md
+    ├── tasks
+    │   └── main.yml
+    ├── templates
+    ├── tests
+    │   ├── inventory
+    │   └── test.yml
+    └── vars
+        └── main.yml
+
+
+
+
+examples
+
+  ansible-galaxy search tomcat
+  ansible-galaxy install amtega.tomcat
+
+
+==========================
+Ansible - VAULT - ENCRYPTION
+=========================
+
+Ansible Vault allows you to encrypt and secure sensitive data like passwords, API keys, SSH keys, and confidential variables within playbooks.
+
+Ansible vault is used to encrypt the data.
+
+In real time to keep our sensitive data protectively we use vault.
+
+Technique: AES256
+
+we can restrict the playbooks to run.
+
+-------------------------------------------------
+
+ansible-vault create secret.txt  --> to create a vault
+
+give password
+db_password: mysecurepassword
+api_key: "12345-abcde-67890"
+
+
+cat secret.txt
+
+Encrypted
+
+ansible-vault edit secret.txt   --> to edit a vault
+give password
+change something
+
+cat secret.txt
+
+ansible-vault rekey secret.txt   --> to change the password
+
+ansible-vault decrypt secret.txt --> to decrypt and see the content
+
+cat secret.txt
+
+ansible-vault encrypt secret.txt --> to encrypt again
+
+cat secret.txt
+
+ansible-vault view secret.txt  --> to view the content without decryption
+
+======================================
+ASYNCHRONOUS & POLLING ACTIONS:
+========================================
+
+By default, Ansible runs tasks synchronously, meaning it waits for each task to finish before moving to the next one.
+However, for long-running tasks (e.g., software installation, backups, database updates), you can use asynchronous execution with polling to avoid timeouts
+
+
+For every task in  ansible we can set time limit
+
+If the task is not performed in that time limit ansible will stop playbook execution
+
+This is called as asynchronous and polling.
+
+---
+- name: Async and poll playbook
+  hosts: all
+  ignore_errors: yes
+  tasks:
+    - name: sleeping
+      command: sleep 30
+      async: 20
+      poll: 10
+    - name: install git
+      yum: name=git state=present
+
+
+async: time we set for task to complete
+poll: it will check if task is completed or not for every 10 sec
+
+=======================================================
+Using Multiple Playbooks in a Single Playbook in Ansible
+=======================================================
+
+Method 1: Using import_playbook (Recommended)
+-----------------------------------------
+
+---
+- import_playbook: setup_webserver.yml
+- import_playbook: deploy_application.yml
+- import_playbook: configure_firewall.yml
+
+Method 2: Using include_tasks (For Tasks Inside a Playbook)
+-----------------------------------------------------------
+
+---
+- name: Setup Server
+  hosts: all
+  become: yes
+
+  tasks:
+    - include_tasks: install_nginx.yml
+    - include_tasks: configure_firewall.yml
+
+
+
+
+===================
+MINI PROJECT - How to setup Front end code
+====================
+
+WEB SERVER : TO SHOW THE APP : httpd  : 80  : /var/www/html
+frontend code
+APP SERVER : TO USE THE APP : Tomcat  : 8080  : tomcat/webapps
+frontend code + backend code
+
+vi miniproject.yml
+---
+- name: Mini Project
+  hosts: all
+  tasks:
+    - name: installing httpd
+      yum: name=httpd state=present
+
+    - name: starting httpd
+      service: name=httpd state=started
+
+    - name: installing git
+      yum: name=git state=present
+
+    - name: checkout
+      git:
+        repo: https://github.com/ReyazShaik/amazon.git
+        dest: /var/www/html
+
+
+copy paste the ip in browser
+
+TO encrypt playbook
+
+
+ansible-vault create miniproject1.yml
+
+now ansible-playbook miniproject1.yml   --> you cannot run the playbook in encrypt mode
+
+decrypt the playbook and run if you want
+
+ansible-vault decrypt miniproject1.yml
+
+ansible-playbook miniproject1.yml
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			PROJECT --> Deploying JAVA based application to the tomcat servers 
+
+==================================================
+PROJECT - Jenkins, Sonar, Nexus, S3 and Ansible Modules deployment to Tomcat
+====================================================
+
+Draw architecture diagram
+
+developers push code --> Jenkins(Ansible) --> deploy --> Nodes(tomcats)
+                     (CI = CodeBuild+ CodeTest)
+                           Artifacts
+
+checkout --> Build --> Test --> Artifacts --> Nexus/S3 --> Deploy(Tomcat)
+
+Step 1 --> Push code to GitHub
+Step 2 --> Generate Artifacts
+Step 3 --> Storing the Artifacts
+Step 4 --> Installing Tomcat
+Step 5 --> Deploy the artifacts to nodes using Ansible
+
+Pipelines will be integrated with Ansible Playbook
+
+use the same machines, install Jenkins on ansible server
+
+Total 5 machines
+---------------
+
+Launch EC2 instance t2.micro = Jenkins + Ansible
+Launch EC2 instance t2.medium = Nexus, 8081
+Launch EC2 instance t2.medium = Sonar ,9000
+Launch EC2 instance 2 t2.micro = worker nodes where we have application running with tomcat. tomcat1 and tomcat2
+
+Step 1 --> keep the code in GitHub (use java-project-new)
+----------------------------------------------------
+
+https://github.com/ReyazShaik/java-project-maven-new.git
+
+
+Step 2 -->  install Jenkins and ansible in server using script
+-----------------------------------------------------------
+Install Jenkins
+=====================================================
+#STEP-1: INSTALLING GIT JAVA-1.8.0 MAVEN
+yum install git java-1.8.0-openjdk maven -y
+
+#STEP-2: GETTING THE REPO (jenkins.io --> download -- > redhat)
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+
+#STEP-3: DOWNLOAD JAVA11 AND JENKINS
+amazon-linux-extras install java-openjdk11 -y
+yum install jenkins -y
+update-alternatives --config java
+
+#STEP-4: RESTARTING JENKINS (when we download service it will on stopped state)
+systemctl start jenkins.service
+systemctl status jenkins.service
+================================================================
+
+Setup Ansible and their worker nodes
+-----------------------------------
+Install Ansible
+----------------
+amazon-linux-extras install ansible2 -y
+
+yum install python3 python-pip python-dlevel -y
+
+ansible --version
+
+============================================================================================================
+SETUP:
+Login to Jenkins+Ansible Server and setup connections to 2 Worker Nodes(tomcat1 and tomcat2)
+
+EXECUTE THE BELOW COMMANDS ON ALL SERVERS:
+sudo -i
+hostnamectl set-hostname ansible/dev-1/dev-2/test-1/test-2
+sudo -i
+
+## first set the password for root
+passwd root  
+
+set new password: reyaz123
+
+## enable all server to login as root
+
+vi /etc/ssh/sshd_config (38 & 61 uncomment both lines)
+systemctl restart sshd
+systemctl status sshd
+hostname -i
+
+
+Inventory file
+=============
+
+vi /etc/ansible/hosts
+# Ex 1: Ungrouped hosts, specify before any group headers.
+[Prod]
+172.31.20.40
+172.31.21.25
+
+Lets Generate SSH Keys, using this KEY Ansible server will communicate with worker nodes
+
+ssh-keygen
+
+ssh-copy-id root@private ip of prod-1
+ssh-copy-id root@private ip of prod-2
+
+========================================================================================================
+
+Step 3: Setup SonarQube and Nexus and S3
+
+
+Install Plugins
+--------------
+SonarQube Scanner,
+Maven Integration plugins
+Sonar Scanner Quality Gates
+Nexus
+Ansible
+deploy to container,
+S3 Publisher
+
+     
+
+
+
+==================================================================================================================================
+Step 5 : Create a Jenkins pipeline
+-----------------------------------
+
+First install plugins - Nexus and Ansible, sonar, maven, deploy to container, S3 Publisher
+---------------------
+
+Jenkins --> Manage Jenkins --> plugins --> nexus artifact upload, SonarQube Scanner, Maven Integration, deploy to container and ansible --> install --> restart jenkins
+
+Manage Jenkins --> tools --> Add ansible --> Name=ansible, path = /bin
+
+pipeline code till artifacts and run the pipeline --> it will generate war file
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! START !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+pipeline {
+    agent any
+   
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/ReyazShaik/java-project-maven-new.git"
+            }
+        }
+        stage('build') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('artifact') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+    }
+}
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ENDS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+**Build now***
+
+Now Deployment to Production Nodes using Ansible
+----------------------------------------------------------------------------
+
+Go to Ansible master Server
+
+Install tomcat in all Production nodes using Ansible
+---------------------------------------------------
+
+vi tomcat.yml
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! START !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+---
+- name: Setup Tomcat
+  hosts: all
+  become: yes
+  tasks:
+    - name: Download tomcat from dlcdn
+      get_url:
+        url: "https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.35/bin/apache-tomcat-10.1.35.tar.gz"
+        dest: "/root/"
+
+    - name: untar the apache file
+      command: tar -zxvf apache-tomcat-10.1.35.tar.gz
+
+    - name: Rename the tomcat
+      command: mv apache-tomcat-10.1.35 tomcat
+
+    - name: Install the latest available Java (OpenJDK)
+      yum:
+        name: java-17-amazon-corretto
+        state: present
+
+    - name: Setting the roles in tomcat-users.xml file
+      template:
+        src: tomcat-users.xml
+        dest: /root/tomcat/conf/tomcat-users.xml
+
+    - name: Delete two lines in context.xml
+      template:
+        src: context.xml
+        dest: /root/tomcat/webapps/manager/META-INF/context.xml
+    - name: Create Tomcat systemd Service File
+      copy:
+        dest: /etc/systemd/system/tomcat.service
+        content: |
+          [Unit]
+          Description=Apache Tomcat Server
+          After=network.target
+
+          [Service]
+          User=root
+          Group=root
+          Type=forking
+          Environment="JAVA_HOME=/usr/lib/jvm/jre"
+          Environment="CATALINA_HOME=/root/tomcat"
+          ExecStart=/root/tomcat/bin/startup.sh
+          ExecStop=/root/tomcat/bin/shutdown.sh
+          Restart=on-failure
+
+          [Install]
+          WantedBy=multi-user.target
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+    - name: Start tomcat Service
+      service:
+        name: tomcat
+        state: started
+        enabled: yes
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ENDS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!!!!!! NOTE 1: we are uing tomcat verion 10.1.42   so replace the tomcat version in the tomcat.yml file
+
+	sed -i 's/35/42/g' tomcat.yml  -- if required
+
+!!!!! NOTE 2: 
+
+	--> instead changing tomcat-user.xml and context.xml in all nodes just create files locally and replace in worker nodes
+
+	--> vi tomcat-users.xml
+	   this file is in git-hub copy paste the content --it has all changed usernames etc
+	--> vi context.xml
+	   this file is in git-hub copy paste the content --it has all changed usernames etc
+
+ansible-playbook tomcat.yml
+
+run the playbook --> it will install tomcat in all worker nodes
+check with workernodes ip, tomcat is working or not
+
+Now artifacts are in /var/lib/Jenkins/workspace/project/targets
+
+cd /var/lib/Jenkins/workspace/project/target
+
+now create another playbook
+
+Note: In below playbook, change the source to your target project directory
+
+vi deploy.yml
+---
+- name: Deploy war to tomcat servers
+  hosts: all
+  tasks:
+    - name: task1
+      copy:
+        src: /var/lib/jenkins/workspace/project/target/myapp.war
+        dest: /root/tomcat/webapps
+
+RUn the playbook
+
+ansible-playbook deploy.yml
+
+--------> this is manual work, not good, now use pipelines
+
+Integrate ansible to Jenkins
+===========================
+
+Manage Jenkins --> TOOLS --> Ansible --> name = ansible, path = /bin
+
+Manage Jenkins --> Credentials --> username and password --username = root , password = rooot123456 (password while setting up ssh connection to tomcat servers from ansible ssh) , ID = linuxcreds
+
+or
+
+Manage Jenkins --> Credentials --> SSH username with Private Key --username = ec2-user , id = linuxcreds
+Private Key -> Enter Directly--> Add --> pem file key
+
+
+mv deploy.yml /etc/ansible
+
+cd /etc/ansible --> all ansible files are in this folder
+   
+open pipeline --> add deploy stage --> generate pipeline syntax -->
+
+        stage('Run Ansible Playbook') {
+            steps {
+               
+            }
+ 
+
+Sample Step = ansibleplaybook:invoke an ansible playbook
+
+Ansible tool : ansible  
+Playbook file path in workspace = /etc/ansible/deploy.yml
+Inventory file path in workspace =  /etc/ansible/hosts
+SSH connection credentials = linuxcreds
+disable ssh host key check --> check it --> rest all defaults
+
+Below code will come
+-------------------
+ansiblePlaybook credentialsId: 'linuxcreds', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: '/etc/ansible/deploy.yml', vaultTmpPath: ''
+
+
+Optional:
+(host subset - we can give test or dev or prod , no need to give in playbook host: dev)
+(in host subset give $server = prod)
+copy the script and put in deploy section in pipeline --> in pipeline ansible stage  see limit : '$server' will come
+
+Below code will come
+-------------------
+ansiblePlaybook credentialsId: 'tomcatcreds', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', limit: '$server = prod', playbook: '/etc/ansible/deploy.yml', vaultTmpPath: ''
+
+
+before executing pipeline, undeploy application from tomcat by going to browser of workernodes
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! PIPELINE STARTS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+pipeline {
+    agent any
+   
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/ReyazShaik/java-project-maven-new.git&#39;
+            }
+        }
+        stage('build') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar'
+                }
+            }
+        }
+
+        stage('artifact') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+        stage('Run Ansible Playbook') {
+            steps {
+                ansiblePlaybook credentialsId: 'linuxcreds', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', playbook: '/etc/ansible/deploy.yml', vaultTmpPath: ''
+            }
+        }
+    }
+}
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! PIPELINE ENDS  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
