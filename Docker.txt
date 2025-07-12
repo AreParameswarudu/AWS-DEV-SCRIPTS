@@ -1,0 +1,1248 @@
+Docker Installation
+-------------------
+
+Launch AL2 EC2 instance
+
+-- yum install docker -y
+
+-- systemctl start docker
+
+-- systemctl status docker
+
+-- docker -v
+
+
+Commands
+--------
+
+-- docker images        [ To show list of images ]
+
+-- docker ps             [To Show list of Running Containers]
+
+-- docker ps -a    [To list all running and stopped containers]
+
+There are two ways to get images
+
+   1. Create image from Dockerfile
+
+   2. Pull the images from dockerhub
+
+
+-- docker pull amazonlinux    [ To get image amazonlinux or ubuntu from dockerhub ]
+
+-- docker pull ubuntu           [ To get image ubuntu from dockerhub ]
+
+-- docker images
+
+-- docker ps -a  [To list all running and stopped containers]
+
+
+
+A Docker image is made up of multiple layers, which are stacked on top of each other. Each layer represents a set of file changes (like adding, modifying, or deleting files) and helps in optimizing storage and reusability.
+
+
+Now, lets try creating a container using this images. Below command will directly login to contains as we are using -it
+
+-- docker run -it --name amazonlinuxcontainer amazonlinux   [ To create container , -it = interactive(go inside container), amazonlinuxcontainer is a container name , amazonlinux is image ]
+      -- ls
+      -- yum install git maven tree httpd -y
+      -- check the version
+      -- touch file{1..10}
+
+      -- ctrl p q   [ To exit from container]
+
+If you dont want to login to container and just want to create a container and run in detach mode use -d
+
+-- docker run -it -d --name ubuntucontainer ubuntu
+
+-- docker ps -a  [To list all running and stopped containers]
+
+-- docker ps    [ To list only running containers ]
+
+If you want to access the container
+
+-- docker attach ubuntucontainer
+   apt update
+   apt install nginx -y
+ 
+      -- ctrl p q
+
+If you want to run direct commands on container use exec
+
+-- docker exec -it 1275f407dc04 /bin/bash
+
+        -- apt update -y
+        -- apt install git -y
+        -- apt install apache2 -y
+        -- service apache2 start
+        -- service apache2 status
+
+        -- ctrl p q
+
+Docker attach and exec will help to access the container
+
+-- docker attach 1275f407dc04
+
+       -- ctrl p q
+
+-- docker ps -a
+
+docker attach
+-------------
+is used to attach your terminal to the standard input, output, and error streams of the main process running inside a container.
+It allows you to interact with the container's main process as if you were running it directly in your terminal.
+
+docker exec
+-----------
+
+is used to run a new command in an already running container.
+This command allows you to start additional processes inside the container independently of the main process.
+
+docker attach interacts with the container's main process (PID 1).
+docker exec starts a new, separate process inside the container.
+
+EXEC is preferred
+
+Summary
+-------
+
+docker images
+docker pull ubuntu
+docker run -it --name ubuntucontainer ubuntu
+docker pull amazonlinux
+docker run -it -d --name amazoncontainer amazonlinux
+docker exec -it 1275f407dc04 /bin/bash
+docker attach 1275f407dc04
+
+Few container commands
+----------------------
+
+docker search ubuntu        : to search images
+docker ps -a            : to list all containers
+docker ps             : to list runnings containers
+docker stop testcontainer    : to stop the container , it will be in exit state
+docker start testcontainer    : to start the container
+docker restart [container]    : To Restart Container
+docker pause testcontainer    : Pause processes in a running container. you cannot connect to this container,
+          try docker exec -it contid /bin/bash
+docker unpause cont_name        : Resume processes in a running container
+docker attach testcontainer    : to go inside the container
+docker inspect testcontainer    : to get the complete info container
+docker kill testcontainer       : to kill the container or forcibly stop the container
+docker rm testcontainer         : TO delete the container
+docker rm -f [container]        : Forcefully remove even if it is running
+docker logs [container]        : View logs for a running container:
+docker top  [container]        : Show running processes in a container:
+docker stats [container]    : View live resource usage statistics for a container:
+docker diff [container]        : Show changes to files or directories on the filesystem:
+
+docker cp [file-path] CONTAINER:[path] : Copy a local file to a directory in a container:
+         
+             docker cp hello.txt cont1:/tmp
+
+docker save IMAGE > IMAGE.tar   : Save an Image to tar file
+
+             docker save ubuntu > ubuntu.tar
+
+docker load -i IMAGE.tar    : Load an image from tar file
+
+              docker load -i ubuntu.tar
+
+docker history IMAGE        : Shows image history
+
+docker image prune        : Delete unused images
+
+docker stop containerid/containername
+
+STOP: will wait to finish all process running inside container
+KILL: wont wait to finish all process running inside container
+
+=============================================================================================================
+
+TASK: Pull ubuntu image and install apache and mysql server software's
+------------
+
+docker images
+docker pull ubuntu
+docker run -it --name ubuntucontainer ubuntu
+  -- apt update -y
+  -- apt install apache2 python3 mysql-server -y
+  -- ctrl p q
+
+Now we have container with name ubuntucontainer with apache2 and mysql server, lets create our image with this container ubuntucontainer
+This command is used to create a image what ever data we have in the container
+
+-- docker commit ubuntucontainer myimagewithapachenmysql
+
+-- docker images
+
+If you want to create a new container with this image myimagewithapachenmysql
+
+-- docker run -it -d --name mycontwithapachemysql myimagewithapachenmysql
+
+-- docker attach mycontwithapachemysql          [Access the container and check the version]
+        -- mysql --version
+
+ctrl pq --> after exit, container is still running
+ctrl d --> container will  be stopped if you use ctl d
+
+docker ps -a  [See container is in exit state]
+docker start cont-name
+docker ps -a
+
+What we did?
+
+Ubuntu image from dockerhub -> create a container -> Take image(custom image) -> From this images create containers again
+                                 install softwares     this image
+                               contains software's
+manually downloaded  --> Manually created container and installed
+
+This is not a good practise , this is manual
+
+Clean up
+---------
+
+docker ps -a
+
+Delete all containers
+----------------------
+
+docker ps -aq  [List only container-ids]
+
+docker kill $(docker ps -aq)  
+
+docker ps -a   [ All containers are in exit state ]
+
+docker rm $(docker ps -aq)
+
+docker ps -a
+
+Delete all the images
+---------------------
+
+docker images -q
+
+docker rmi -f $(docker images -q)
+
+docker images
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+DOCKERFILE
+---------------------
+It is used to automate image creation.
+Inside Dockerfile we use components to do our works.
+Components will be on Capital Letter.
+In Dockerfile D will be capital.
+We can create image directly without container help
+To create image from file we need to build it.
+
+COMPONENTS:
+----------
+
+FROM        : used to get base image
+RUN        : used to run linux commands (During image creation)
+CMD        : used to run linux commands (After container creation)
+ENTRYPOINT    : high priority than cmd
+COPY        : to copy local files to container
+ADD        : to copy internet files to container
+WORKDIR        : to open req directory
+LABEL        : to add labels for docker images
+ENV        : to set env variables (inside container)
+ARGS        : to pass env variables (outside containers)
+EXPOSE        : to give port number
+
+Dockerfile --> Docker Build -->  Image --> Container
+
+
+Example 1
+=========
+vi Dockerfile
+
+FROM ubuntu
+RUN apt update -y
+RUN apt install git maven tree apache2 -y
+RUN touch file1
+
+-- docker build -t reyaz:v1 .    [  . represent current directory where we have dockerfile ]
+
+-- docker run -it --name cont1 reyaz:v1   [ You will be now in container and see versions of softwares installed ]
+
+   -- ctrl pq
+
+Example 2
+===========
+RUN will execute while image creation
+CMD will exeute after container creation
+
+vi Dockerfile
+
+FROM ubuntu
+RUN apt update -y
+RUN apt install git maven tree apache2 -y
+RUN touch file1
+RUN apt install python3 -y
+CMD apt install mysql-server -y
+
+Note already first few lines are execute, it will not execute again, it will run last lines
+
+CMD will not executed, because it will execute after container creation
+
+-- docker build -t reyaz:v2 .
+
+-- docker run -it --name cont2 reyaz:v2   [dont use -d here for now to see the installation]
+
+--> now mysql-server is now installing because we used CMD command
+
+
+Example 3
+========
+COPY --> copy local files to container
+ADD --> copy internet files to container
+
+touch index.html
+
+vi Dockerfile
+
+FROM ubuntu
+COPY index.html /tmp
+ADD https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.35/bin/apache-tomcat-10.1.35.tar.gz /tmp
+
+
+-- docker build -t reyaz:v3 .
+-- docker run -it --name cont3 reyaz:v3
+
+now you are in container
+cd /tmp
+ls
+
+
+Example 4
+========
+WORKDIR --> by default , when you are in container it will be in /, if you want to have a default path WORKDIR will use
+LABEL --> just like a tag , we are labeling
+
+vi Dockerfile
+
+FROM ubuntu
+COPY index.html /tmp
+ADD https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.35/bin/apache-tomcat-10.1.35.tar.gz /tmp
+WORKDIR /tmp
+LABEL author Reyaz
+
+
+-- docker build -t reyaz:v4 .
+-- docker run -it --name cont4 reyaz:v4
+
+--> now see the path is /tmp
+--> to see the entire info about container
+
+-- docker inspect cont4
+-- docker inspect cont4 | grep Reyaz
+
+
+
+Example 5
+==========
+
+vi Dockerfile
+
+FROM ubuntu
+ENV course devops
+ENV trainer Reyaz
+EXPOSE 8080
+
+docker build -t reyaz:v5 .
+docker run -it --name cont5 reyaz:v5
+
+echo $course
+echo $trainer
+
+ctrl pq
+
+docker ps -a  [ Now you can see the port number for cont5 ]
+
+
+First Dockerfile Task for application Deployment
+===============================================
+
+Code - GitHub --> DockerFile --> Build Image --> Create Container --> Access application
+
+yum install git -y
+
+git clone https://github.com/ReyazShaik/website.git
+
+--> dont go inside website folder, create Dockerfile outside website
+
+vi Dockerfile
+
+FROM ubuntu
+RUN apt update
+RUN apt install apache2 -y
+RUN apt install apache2-utils -y
+RUN apt clean
+COPY website/ /var/www/html/
+RUN service apache2 restart
+EXPOSE 80
+CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+
+
+-D FOREGROUND → Runs Apache in the foreground mode, meaning:
+Apache does not daemonize (does not run in the background).
+Logs are printed to the container's stdout/stderr, making it visible with docker logs.
+The process stays alive, preventing the container from exiting immediately.
+Containers stop when the main process exits. Running Apache in foreground mode ensures the container remains active.
+
+
+-- docker build -t firstproject:v1 .
+
+-- docker run -itd --name newwebcont1 -p 80:80 firstproject:v1
+
+In AWS SG , allow All traffic
+
+http://ip
+
+Note: docker rmi firstimage:v1 [if required]
+
+Another example
+----------------
+Tomcat installation on Container
+-------------------------------
+
+vi Dockerfile
+
+# Use the official Tomcat image as the base
+FROM tomcat:latest
+
+# Set environment variables (optional)
+ENV CATALINA_HOME /usr/local/tomcat
+ENV PATH $CATALINA_HOME/bin:$PATH
+
+# Remove default webapps (optional: keeps Tomcat clean)
+RUN rm -rf $CATALINA_HOME/webapps/*
+
+# Copy your application WAR file into the Tomcat webapps directory
+COPY jenkins.war $CATALINA_HOME/webapps/jenkins.war
+
+# Expose Tomcat's default HTTP port
+EXPOSE 8080
+
+# Start Tomcat
+CMD ["catalina.sh", "run"]
+
+
+-- docker build -t tomcatimage:v1 .
+
+-- docker run -itd --name tomcont -p 8080:8080 tomcatimage:v1
+                                     host:container
+
+docker exec -it 1275f407dc04 /bin/bash
+
+http://ip:8080
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+VOLUME:
+--------------
+Docker volumes are a way to persist data generated by and used by Docker containers.
+
+Volumes are stored on the host filesystem outside of the container's filesystem, which means they are not deleted when the container stops.
+
+This makes them ideal for managing persistent data.
+
+In Short
+-----------
+
+If you want to store the data in container use volumes
+volume is just a folder in container
+containers use host resources (cpu, ram, )
+volume can be shared to multiple containers.
+At a time we can share single volume.
+data inside volume will store on local.
+
+Method 1 -- creating volume from Dockerfile
+---------------------------------------------------------------
+
+vi Dockerfile
+
+FROM ubuntu
+VOLUME ["volume1"]
+
+
+-- docker build -t reyaz:v1 .
+
+-- docker run -it --name cont1 reyaz:v1
+
+ls --> you will be in container automatically and do ls -- you can see volume1
+
+cd volume1
+
+touch file{1..5}
+
+--> what ever data you have created in container in volume1 the same data will be in docker host and vice versa
+it is bidirectional -- if you create data in docker host it will be available in container also
+
+comeout of the container ctrl pq and go to the below path
+
+/var/lib/docker/volumes -- is the place where volume data is stored
+
+touch python{1..5}  --> create some sample files, it should be visible inside container
+
+-- docker attach cont1
+
+if stopped docker start cont1
+
+docker attach cont1
+
+cd volume1
+
+ls
+
+------------------ SHARE THE VOLUME ------------------
+
+If you want to get the same volume to another container
+
+-- docker run -it --name cont2 --volumes-from cont1 ubuntu
+
+Optional
+docker run -it --name cont2 --volumes-from cont1 --privileged=true  ubuntu
+
+ls
+
+cd volume1
+
+
+come out of the container ctrl pq
+
+docker ps -a
+
+--> Ex: create a new container with same volume : just an example
+
+docker run -it --name cont3 --volumes-from cont2 ubuntu
+
+
+Method 2 - Creating volume from the command directly
+-------
+
+docker images
+
+docker run -it --name cont4 -v /volume2 ubuntu
+
+cd volume2/
+
+touch python{1..5}
+
+ctrl pq
+
+--> now share the volume from cont4 to cont5
+
+docker run -it --name cont5 --volumes-from cont4 ubuntu
+ls
+cd volume2
+now you can see the same data
+create files here , we can see the same data in cont4 also
+touch python{6..10}
+
+ctrl pq
+
+docker attach cont4  --> connect to cont4 to see the data , same data available
+ls
+
+--> you can see the same data also in docker host /var/lib/docker/volumes/
+
+
+
+Method 3 -- Volume Mounting  
+--------
+Now you are in docker host
+
+docker volume ls
+
+docker volume create volume3
+
+docker volume inspect volume3
+
+cd /var/lib/docker/volumes/volume3/_data  -- in docker host
+
+touch html{1..5}
+
+docker run -it --name cont6 --mount source=volume3,destination=/volume3 ubuntu
+
+now you are in container 6 , cd /volume3 and ls
+
+now create files here , it will be available on docker host
+
+if you delete, everywhere it is deleted
+
+
+4. SHARING LOCAL FILES to Container
+----------------------------------
+
+be in docker host
+touch reyaz{1..10}
+docker volume inspect volume3
+cp * /var/lib/docker/volumes/volume3/_data
+docker attach cont6
+cd volume3
+
+
+Use AWS EBS Volumes to docker containers
+---------------------------------------
+
+Create 20GB EBS volume in AWS Console
+
+Attach to the EC2 instance as /dev/xvdb
+
+lsblk
+sudo mkfs -t ext4 /dev/xvdb        ----- format the disk before use
+sudo mkdir /mnt/ebs-volume
+sudo mount /dev/xvdb /mnt/ebs-volume
+docker images
+docker run -it  --name my-container1 -v /mnt/ebs-volume:/mynewebsvolume ubuntu
+  -- ls
+  -- cd mynewebsvolume
+  -- touch hello
+
+-- create a another container with new name from before container
+
+docker run -it --name mynewcont2 --volumes-from my-container1  ubuntu
+
+  -- ls
+  -- cd mynewebsvolume
+
+you see the same data in all containers
+
+
+
+DOCKER SYSTEM COMMANDS:
+----------------------
+to know the docker components resource utilization
+docker system df
+docker system df -v
+
+docker ps -a
+
+docker inspect cont5
+
+docker inspect cont5 | grep volume -i
+
+RESOURCE MANAGEMENT:
+--------------------
+By default, docker containers will not have any limits for the resources like cpu ram and memory so we need to restrict resource use for container.
+
+By default docker containers will use host resources(cpu, ram, rom)
+Resource limits of docker container should not exceed the docker host limits.
+
+docker stats  --> to check live cpu and memory
+
+docker run -it --name cont7 --cpus="0.1" --memory="300mb" ubuntu
+docker update cont7 --cpus="0.7" --memory="300mb"
+
+JENKINS SETUP BY DOCKER:
+docker run -it -d --name jenkins -p 8080:8080 jenkins/jenkins:lts
+-- docker exec -it jenkins /bin/bash
+
+
+======== Delete all container ============
+docker kill $(docker ps -aq)  
+
+docker rm $(docker ps -aq)
+
+docker ps -a
+
+======== Delete images =====================
+docker rmi -f $(docker images -q)
+
+=========================================
+
+======================================================
+Docker Compose
+======================================================
+
+Before docker compose how we use to do?
+
+
+
+Lets Use HDFC Bank example : internetbanking, MobileBanking, Insurance and Loans
+
+We need to create for all modules a separate containers with some webserver to run, for this write Dockerfile
+
+Create a directory called internetbanking , MobileBanking, Insurance and Loans
+
+In Every directory have index.html and Dockerfile.
+
+Create a image and container with that index.html
+
+how?
+
+yum install -y git
+
+git clone https://github.com/ReyazShaik/hdfcwebsite.git
+
+-- cd hdfcwebsite
+
+-- cd internmo	metbanking
+
+Here already index.html is available, just create a Dockerfile
+
+vi Dockerfile
+
+FROM ubuntu
+RUN apt update -y
+RUN apt install apache2 -y
+COPY index.html /var/www/html
+CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+
+-- docker build -t internetbanking:v1 .
+
+-- docker run -itd --name cont1 -p 81:80 internetbanking:v1
+
+-- docker ps -a
+
+http://instanceip:81
+
+-- docker logs cont1 [If required]
+
+-----------
+
+MobileBanking
+------------
+
+cd ..
+
+cd mobilebanking
+
+vi Dockerfile
+
+
+FROM ubuntu
+RUN apt update -y
+RUN apt install apache2 -y
+COPY index.html /var/www/html
+CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+
+
+-- docker build -t mobilebanking:v1 .
+
+-- docker run -itd --name cont2 -p 82:80 mobilebanking:v1
+
+http://instanceip:82
+
+------------
+
+Insurance
+---------
+cd ..
+cd insurance
+
+vi Dockerfile
+
+
+FROM ubuntu
+RUN apt update -y
+RUN apt install apache2 -y
+COPY index.html /var/www/html
+CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+
+
+docker build -t insurance:v1 .
+
+docker run -itd --name cont3 -p 83:80 insurance:v1
+
+http://instanceip:83
+
+docker ps -a
+
+docker images
+--------------------------------------------------
+
+Loans
+---------
+cd ..
+cd loans
+
+vi Dockerfile
+
+
+FROM ubuntu
+RUN apt update -y
+RUN apt install apache2 -y
+COPY index.html /var/www/html
+CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+
+
+docker build -t loan:v1 .
+
+docker run -itd --name cont4 -p 83:80 loan:v1
+
+http://instanceip:83
+
+docker ps -a
+
+docker images
+
+
+What ever we did is not good process and not used in realtime - use docker compose
+
+
+Docker Compose
+-------------
+
+Docker Compose is a tool that allows you to define and run multi-container Docker applications using a YAML file (docker-compose.yml). Instead of running multiple docker run commands manually, you can define everything in one file and start your services with a single command.
+
+Docker Compose is a tool for defining and running multi-container Docker applications.
+
+With Docker Compose, you can use a YAML file to define the services, networks, and volumes required for your application, and then bring up the entire stack with a single command.
+
+It is a tool used to create multiple containers.
+
+It will work on single host.
+
+we can create, stop, start and delete all containers together
+
+we can write a file called docker-compose which will be on yaml format.
+
+Docker Compose Installation
+---------------------------
+
+vi dockercompose.sh
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+ls /usr/local/bin/
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose version
+
+sh dockercompose.sh
+
+
+First, lets kill all containers
+
+docker kill $(docker ps -a -q)
+
+docker rm $(docker ps -a -q)
+
+
+vi docker-compose.yml
+
+version: '3.8'
+services:
+  internetbanking:
+    image: internetbanking:v1
+    ports:
+      - "81:80"
+  mobilebanking:
+    image: mobilebanking:v1
+    ports:
+      - "82:80"
+  insurance:
+    image: insurance:v1
+    ports:
+      - "83:80"
+  loan:
+    image: loans:v1
+    ports:
+      - "84:80"
+
+docker ps -a ---> No containers
+
+docker-compose up -d  --> detach mode
+
+docker-compose ps
+
+refresh http://IP:81 and all in browser
+
+docker-compose stop
+docker-compose start
+docker-compose kill -- to stop, use stop or kill
+docker-compose start
+docker-compose
+
+TO remove containers first kill and rm
+
+docker-compose kill
+docker-compose rm
+
+To create container again
+
+docker-compose up -d
+docker-compose ps
+docker-compose pause
+docker-compose unpause
+
+docker-compose logs
+
+docker-compose images --> these images are managed by docker-images , docker images shows managed by docker
+
+docker-compose top
+
+docker-compose restart
+
+docker-compose scale loan=10  --> it will create but port conflict will come , if you want to scale we have dockerswarm
+
+docker-compose down --> it will stop and kill automatically
+
+
+CHANGING THE DEFULT FILE:
+
+by default the docker-compose will support the following names
+docker-compose.yml, docker-compose.yaml, compose.yml, compose.yaml
+
+mv docker-compose.yml reyaz.yml
+docker-compose up -d    : throws an error
+
+docker-compose -f reyaz.yml up -d
+docker-compose -f reyaz.yml ps
+docker-compose -f reyaz.yml down
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Load Balancing Project with Docker-Compose
+==========================================
+📌 Nginx Load Balancer - Dockerfile Setup
+--------------------------------------
+
+
+                     Container    			--- Container1- backend1
+User --------> Nginx Load Balancer    	--- Container2- backend2
+                                 			--- Container3- backend3
+
+We need image for Nginx LB, for that we need Dockerfile, and we take other account dockerhub image for backend
+
+This Dockerfile will set up Nginx as a Load Balancer for multiple backend services inside Docker.
+
+Step 1: Create a Dockerfile to generate image for Nginx LB
+Step 2: Create nginx.conf locally and copy to containers through docker-compose
+Step 3: Create docker-compose file to create containers in one shot
+
+1️⃣ Create the Dockerfile
+---------------------
+
+vi Dockerfile
+# Use the official Nginx image
+FROM nginx:latest
+
+# Remove default config and copy custom nginx.conf
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/
+
+# Expose port 80
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+
+
+is used to keep Nginx running in the foreground when running inside a Docker container.
+🔹 Why is daemon off; Needed?
+By default, Nginx runs as a background (daemon) process.
+In a Docker container, the main process must stay in the foreground.
+If Nginx runs as a daemon, Docker thinks the container has exited.
+Setting "daemon off;" prevents it from running in the background, keeping the container alive
+
+
+
+2️⃣ Create the Nginx Load Balancer Config (nginx.conf)
+------------------------------------------
+
+vi nginx.conf
+
+# Define the upstream backend servers
+upstream backend {
+    server backend1:5000;
+    server backend2:5001;
+    server backend3:5002;
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+3️⃣ Create a docker-compose.yml (Optional)
+-------------------------------------
+
+First install docker-compose
+
+vi dockercompose.sh
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+ls /usr/local/bin/
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose version
+
+sh dockercompose.sh
+
+
+
+vi docker-compose.yml
+
+version: '3.8'
+services:
+  nginx:
+    build: .
+    container_name: nginx-lb
+    ports:
+      - "80:80"
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+
+  backend1:
+    image: ghcr.io/benc-uk/python-demoapp
+    container_name: backend1
+    expose:
+      - "5000"
+
+  backend2:
+    image: ghcr.io/benc-uk/python-demoapp
+    container_name: backend2
+    expose:
+      - "5001"
+
+  backend3:
+    image: ghcr.io/benc-uk/python-demoapp
+    container_name: backend3
+    expose:
+      - "5002"
+
+
+docker-compose up --build -d
+docker-compose ps
+
+(or)
+
+docker build -t nginx-lb .
+docker run -d -p 80:80 --name nginx-lb nginx-lb
+
+http://IP
+
+
+✅ Explanation:
+
+Nginx Load Balancer (nginx-lb) forwards traffic to backend1, backend2, and backend3.
+Each backend service listens on different ports.
+
+================================================================
+📌 Docker Load Balancing with Python Application using Nginx
+===============================================================
+
+✅ Deploy multiple Python Flask applications as backend services.
+✅ Use Nginx as a load balancer to distribute traffic.
+✅ Use Docker Compose for easy deployment.
+
+
+1️⃣ Create the Python Flask App (app.py)
+==================================
+vi app.py
+
+from flask import Flask
+import socket
+
+app = Flask(__name__)
+
+@app.route('/')
+def hello():
+    return f"Hello from {socket.gethostname()}!"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+2️⃣ Create requirements.txt
+====================
+
+vi requirements.txt
+flask
+
+3️⃣ Create the Python App Dockerfile
+==============================
+
+vi Dockerfile
+
+# Use Python base image
+FROM python:3.9
+
+# Set working directory
+WORKDIR /app
+
+# Copy and install dependencies
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Copy the application code
+COPY . .
+
+# Expose the port Flask runs on
+EXPOSE 5000
+
+# Start the Flask app
+CMD ["python", "app.py"]
+
+
+4️⃣ Create Nginx Load Balancer Config (nginx.conf)
+=======================================
+vi nginx.conf
+
+# Define the upstream backend servers
+upstream backend {
+    server backend1:5000;
+    server backend2:5000;
+    server backend3:5000;
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+
+5️⃣ Create docker-compose.yml
+=========================
+
+vi docker-compose.yml
+
+version: '3'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx-lb
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+
+  backend1:
+    build: .
+    container_name: backend1
+    expose:
+      - "5000"
+
+  backend2:
+    build: .
+    container_name: backend2
+    expose:
+      - "5000"
+
+  backend3:
+    build: .
+    container_name: backend3
+    expose:
+      - "5000"
+
+
+docker-compose up -d --build
+
+docker ps -a
+
+http://IP
+
+
+
+=======================
+DOCKERHUB
+=======================
+
+
+docker images
+
+instead storing images in local docker host , push to dockerhub
+
+go to docker and signup
+
+First lets have all Internetbanking, mobilebanking, Insurance and Loans images locally
+
+yum install -y git
+
+git clone https://github.com/ReyazShaik/hdfcwebsite.git
+
+-- cd hdfcwebsite
+
+-- cd internetbanking
+
+Here already index.html is available, just create a Dockerfile
+
+vi Dockerfile
+
+FROM ubuntu
+RUN apt update -y
+RUN apt install apache2 -y
+COPY index.html /var/www/html
+CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+
+-- docker build -t internetbanking:v1 .
+
+
+Do the same for Mobilebanking, Insurance and Loans
+
+
+[Lets first tag our image]
+
+-- docker tag internetbanking:v1 trainerreyaz/ib-image
+
+-- docker push trainerreyaz/ib-image --> it will fail, no authentication
+
+-- docker login
+
+    username:
+    password:
+
+-- docker push trainerreyaz/ib-image
+
+**** Now see the images in dockerhub
+*** One time docker login is enough
+
+docker tag mobilebanking:v1 trainerreyaz/mb-image
+docker push trainerreyaz/mb-image
+
+docker tag insurance:v1 trainerreyaz/insurance-image
+docker push trainerreyaz/insurance-image
+
+docker tag loans:v1 trainerreyaz/loans-image
+docker push trainerreyaz/loans-image
+
+--- Now all your images are in dockerhub, just delete the images from local docker host and you can get them from dockerhub again
+
+-- docker rmi -f $(docker images -aq)
+
+-- docker pull trainerreyaz/ib-image
+-- docker pull trainerreyaz/mb-image
+-- docker pull trainerreyaz/insurance-image
+-- docker pull trainerreyaz/loans-image
+
+Now pull images from dockerhub
+
+-- docker pull trainerreyaz/ib-image:latest
+
+-- docker run -itd --name cont1 -p 80:80 trainerreyaz/ib-image:latest
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+DOKER SWARMS
+---------------------------
+		Orchestration tool for containers.
+		
