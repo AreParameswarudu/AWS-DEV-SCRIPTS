@@ -1,25 +1,25 @@
 Docker Installation
 -------------------
 
-Launch AL2 EC2 instance
-
--- yum install docker -y
-
--- systemctl start docker
-
--- systemctl status docker
-
--- docker -v
+	Launch AL2 EC2 instance
+	
+	-- yum install docker -y
+	
+	> systemctl start docker
+	
+	> systemctl status docker
+	
+	> docker -v
 
 
 Commands
 --------
 
--- docker images        [ To show list of images ]
-
--- docker ps             [To Show list of Running Containers]
-
--- docker ps -a    [To list all running and stopped containers]
+	> docker images        [ To show list of images ]
+	
+	> docker ps             [To Show list of Running Containers]
+	
+	> docker ps -a    [To list all running and stopped containers]
 
 There are two ways to get images
 
@@ -28,13 +28,13 @@ There are two ways to get images
    2. Pull the images from dockerhub
 
 
--- docker pull amazonlinux    [ To get image amazonlinux or ubuntu from dockerhub ]
-
--- docker pull ubuntu           [ To get image ubuntu from dockerhub ]
-
--- docker images
-
--- docker ps -a  [To list all running and stopped containers]
+	> docker pull amazonlinux    [ To get image amazonlinux or ubuntu from dockerhub ]
+	
+	> docker pull ubuntu           [ To get image ubuntu from dockerhub ]
+	
+	> docker images
+	
+	> docker ps -a  [To list all running and stopped containers]
 
 
 
@@ -43,49 +43,49 @@ A Docker image is made up of multiple layers, which are stacked on top of each o
 
 Now, lets try creating a container using this images. Below command will directly login to contains as we are using -it
 
--- docker run -it --name amazonlinuxcontainer amazonlinux   [ To create container , -it = interactive(go inside container), amazonlinuxcontainer is a container name , amazonlinux is image ]
-      -- ls
-      -- yum install git maven tree httpd -y
-      -- check the version
-      -- touch file{1..10}
+	> docker run -it --name amazonlinuxcontainer amazonlinux   [ To create container , -it = interactive(go inside container), amazonlinuxcontainer is a container name , amazonlinux is image ]
+      > ls
+      > yum install git maven tree httpd -y
+      > check the version
+      > touch file{1..10}
 
-      -- ctrl p q   [ To exit from container]
+      > ctrl p q   [ To exit from container]
 
 If you dont want to login to container and just want to create a container and run in detach mode use -d
 
--- docker run -it -d --name ubuntucontainer ubuntu
+> docker run -it -d --name ubuntucontainer ubuntu
 
--- docker ps -a  [To list all running and stopped containers]
+> docker ps -a  [To list all running and stopped containers]
 
--- docker ps    [ To list only running containers ]
+> docker ps    [ To list only running containers ]
 
 If you want to access the container
 
--- docker attach ubuntucontainer
+> docker attach ubuntucontainer
    apt update
    apt install nginx -y
  
-      -- ctrl p q
+      > ctrl p q
 
 If you want to run direct commands on container use exec
 
--- docker exec -it 1275f407dc04 /bin/bash
+> docker exec -it 1275f407dc04 /bin/bash
 
-        -- apt update -y
-        -- apt install git -y
-        -- apt install apache2 -y
-        -- service apache2 start
-        -- service apache2 status
+        > apt update -y
+        > apt install git -y
+        > apt install apache2 -y
+        > service apache2 start
+        > service apache2 status
 
-        -- ctrl p q
+        > ctrl p q    #to exit out of interactive mode safely.
 
 Docker attach and exec will help to access the container
 
--- docker attach 1275f407dc04
+> docker attach 1275f407dc04
 
-       -- ctrl p q
+       > ctrl p q
 
--- docker ps -a
+> docker ps -a
 
 docker attach
 -------------
@@ -117,36 +117,36 @@ docker attach 1275f407dc04
 Few container commands
 ----------------------
 
-docker search ubuntu        : to search images
-docker ps -a            : to list all containers
-docker ps             : to list runnings containers
-docker stop testcontainer    : to stop the container , it will be in exit state
-docker start testcontainer    : to start the container
-docker restart [container]    : To Restart Container
-docker pause testcontainer    : Pause processes in a running container. you cannot connect to this container,
+docker search ubuntu       	: to search images
+docker ps -a           		: to list all containers
+docker ps            		: to list runnings containers
+docker stop testcontainer   	: to stop the container , it will be in exit state
+docker start testcontainer   	: to start the container
+docker restart [container]   	: To Restart Container
+docker pause testcontainer   	: Pause processes in a running container. you cannot connect to this container,
           try docker exec -it contid /bin/bash
-docker unpause cont_name        : Resume processes in a running container
-docker attach testcontainer    : to go inside the container
+docker unpause cont_name      	: Resume processes in a running container
+docker attach testcontainer    	: to go inside the container
 docker inspect testcontainer    : to get the complete info container
 docker kill testcontainer       : to kill the container or forcibly stop the container
 docker rm testcontainer         : TO delete the container
 docker rm -f [container]        : Forcefully remove even if it is running
-docker logs [container]        : View logs for a running container:
-docker top  [container]        : Show running processes in a container:
-docker stats [container]    : View live resource usage statistics for a container:
-docker diff [container]        : Show changes to files or directories on the filesystem:
+docker logs [container]         : View logs for a running container:
+docker top  [container]         : Show running processes in a container:
+docker stats [container]   	: View live resource usage statistics for a container:
+docker diff [container]      	: Show changes to files or directories on the filesystem:
 
-docker cp [file-path] CONTAINER:[path] : Copy a local file to a directory in a container:
+docker cp [file-path] CONTAINER:[path] 		: Copy a local file to a directory in a container:
          
-             docker cp hello.txt cont1:/tmp
+        ex:     docker cp hello.txt cont1:/tmp
 
 docker save IMAGE > IMAGE.tar   : Save an Image to tar file
 
-             docker save ubuntu > ubuntu.tar
+         ex:    docker save ubuntu > ubuntu.tar
 
 docker load -i IMAGE.tar    : Load an image from tar file
 
-              docker load -i ubuntu.tar
+          ex:    docker load -i ubuntu.tar
 
 docker history IMAGE        : Shows image history
 
@@ -165,23 +165,23 @@ TASK: Pull ubuntu image and install apache and mysql server software's
 docker images
 docker pull ubuntu
 docker run -it --name ubuntucontainer ubuntu
-  -- apt update -y
-  -- apt install apache2 python3 mysql-server -y
-  -- ctrl p q
+  > apt update -y
+  > apt install apache2 python3 mysql-server -y
+  > ctrl p q
 
 Now we have container with name ubuntucontainer with apache2 and mysql server, lets create our image with this container ubuntucontainer
 This command is used to create a image what ever data we have in the container
 
--- docker commit ubuntucontainer myimagewithapachenmysql
+> docker commit ubuntucontainer myimagewithapachenmysql
 
--- docker images
+> docker images
 
 If you want to create a new container with this image myimagewithapachenmysql
 
--- docker run -it -d --name mycontwithapachemysql myimagewithapachenmysql
+> docker run -it -d --name mycontwithapachemysql myimagewithapachenmysql
 
--- docker attach mycontwithapachemysql          [Access the container and check the version]
-        -- mysql --version
+> docker attach mycontwithapachemysql          [Access the container and check the version]
+        > mysql --version
 
 ctrl pq --> after exit, container is still running
 ctrl d --> container will  be stopped if you use ctl d
@@ -262,11 +262,11 @@ RUN apt update -y
 RUN apt install git maven tree apache2 -y
 RUN touch file1
 
--- docker build -t reyaz:v1 .    [  . represent current directory where we have dockerfile ]
+> docker build -t reyaz:v1 .    [  . represent current directory where we have dockerfile ]
 
--- docker run -it --name cont1 reyaz:v1   [ You will be now in container and see versions of softwares installed ]
+> docker run -it --name cont1 reyaz:v1   [ You will be now in container and see versions of softwares installed ]
 
-   -- ctrl pq
+   > ctrl pq
 
 Example 2
 ===========
@@ -286,9 +286,9 @@ Note already first few lines are execute, it will not execute again, it will run
 
 CMD will not executed, because it will execute after container creation
 
--- docker build -t reyaz:v2 .
+> docker build -t reyaz:v2 .
 
--- docker run -it --name cont2 reyaz:v2   [dont use -d here for now to see the installation]
+> docker run -it --name cont2 reyaz:v2   [dont use -d here for now to see the installation]
 
 --> now mysql-server is now installing because we used CMD command
 
@@ -307,8 +307,8 @@ COPY index.html /tmp
 ADD https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.35/bin/apache-tomcat-10.1.35.tar.gz /tmp
 
 
--- docker build -t reyaz:v3 .
--- docker run -it --name cont3 reyaz:v3
+> docker build -t reyaz:v3 .
+> docker run -it --name cont3 reyaz:v3
 
 now you are in container
 cd /tmp
@@ -329,14 +329,14 @@ WORKDIR /tmp
 LABEL author Reyaz
 
 
--- docker build -t reyaz:v4 .
--- docker run -it --name cont4 reyaz:v4
+> docker build -t reyaz:v4 .
+> docker run -it --name cont4 reyaz:v4
 
 --> now see the path is /tmp
 --> to see the entire info about container
 
--- docker inspect cont4
--- docker inspect cont4 | grep Reyaz
+> docker inspect cont4
+> docker inspect cont4 | grep Reyaz
 
 
 
@@ -392,9 +392,9 @@ The process stays alive, preventing the container from exiting immediately.
 Containers stop when the main process exits. Running Apache in foreground mode ensures the container remains active.
 
 
--- docker build -t firstproject:v1 .
+> docker build -t firstproject:v1 .
 
--- docker run -itd --name newwebcont1 -p 80:80 firstproject:v1
+> docker run -itd --name newwebcont1 -p 80:80 firstproject:v1
 
 In AWS SG , allow All traffic
 
@@ -429,9 +429,9 @@ EXPOSE 8080
 CMD ["catalina.sh", "run"]
 
 
--- docker build -t tomcatimage:v1 .
+> docker build -t tomcatimage:v1 .
 
--- docker run -itd --name tomcont -p 8080:8080 tomcatimage:v1
+> docker run -itd --name tomcont -p 8080:8080 tomcatimage:v1
                                      host:container
 
 docker exec -it 1275f407dc04 /bin/bash
@@ -467,11 +467,11 @@ FROM ubuntu
 VOLUME ["volume1"]
 
 
--- docker build -t reyaz:v1 .
+> docker build -t reyaz:v1 .
 
--- docker run -it --name cont1 reyaz:v1
+> docker run -it --name cont1 reyaz:v1
 
-ls --> you will be in container automatically and do ls -- you can see volume1
+ls --> you will be in container automatically and do ls --> you can see volume1
 
 cd volume1
 
@@ -482,7 +482,7 @@ it is bidirectional -- if you create data in docker host it will be available in
 
 comeout of the container ctrl pq and go to the below path
 
-/var/lib/docker/volumes -- is the place where volume data is stored
+/var/lib/docker/volumes --> is the place where volume data is stored
 
 touch python{1..5}  --> create some sample files, it should be visible inside container
 
@@ -500,10 +500,10 @@ ls
 
 If you want to get the same volume to another container
 
--- docker run -it --name cont2 --volumes-from cont1 ubuntu
+> docker run -it --name cont2 --volumes-from cont1 ubuntu
 
 Optional
-docker run -it --name cont2 --volumes-from cont1 --privileged=true  ubuntu
+> docker run -it --name cont2 --volumes-from cont1 --privileged=true  ubuntu
 
 ls
 
@@ -522,26 +522,26 @@ docker run -it --name cont3 --volumes-from cont2 ubuntu
 Method 2 - Creating volume from the command directly
 -------
 
-docker images
+> docker images
 
-docker run -it --name cont4 -v /volume2 ubuntu
+> docker run -it --name cont4 -v /volume2 ubuntu
 
-cd volume2/
+> cd volume2/
 
-touch python{1..5}
+> touch python{1..5}
 
-ctrl pq
+> ctrl pq
 
 --> now share the volume from cont4 to cont5
 
-docker run -it --name cont5 --volumes-from cont4 ubuntu
-ls
-cd volume2
+> docker run -it --name cont5 --volumes-from cont4 ubuntu
+> ls
+> cd volume2
 now you can see the same data
 create files here , we can see the same data in cont4 also
 touch python{6..10}
 
-ctrl pq
+> ctrl pq
 
 docker attach cont4  --> connect to cont4 to see the data , same data available
 ls
@@ -554,17 +554,17 @@ Method 3 -- Volume Mounting
 --------
 Now you are in docker host
 
-docker volume ls
+> docker volume ls
 
-docker volume create volume3
+> docker volume create volume3
 
-docker volume inspect volume3
+> docker volume inspect volume3
 
-cd /var/lib/docker/volumes/volume3/_data  -- in docker host
+> cd /var/lib/docker/volumes/volume3/_data  -- in docker host
 
-touch html{1..5}
+> touch html{1..5}
 
-docker run -it --name cont6 --mount source=volume3,destination=/volume3 ubuntu
+> docker run -it --name cont6 --mount source=volume3,destination=/volume3 ubuntu
 
 now you are in container 6 , cd /volume3 and ls
 
@@ -577,11 +577,11 @@ if you delete, everywhere it is deleted
 ----------------------------------
 
 be in docker host
-touch reyaz{1..10}
-docker volume inspect volume3
-cp * /var/lib/docker/volumes/volume3/_data
-docker attach cont6
-cd volume3
+> touch reyaz{1..10}
+> docker volume inspect volume3
+> cp * /var/lib/docker/volumes/volume3/_data
+> docker attach cont6
+> cd volume3
 
 
 Use AWS EBS Volumes to docker containers
@@ -591,22 +591,22 @@ Create 20GB EBS volume in AWS Console
 
 Attach to the EC2 instance as /dev/xvdb
 
-lsblk
-sudo mkfs -t ext4 /dev/xvdb        ----- format the disk before use
-sudo mkdir /mnt/ebs-volume
-sudo mount /dev/xvdb /mnt/ebs-volume
-docker images
-docker run -it  --name my-container1 -v /mnt/ebs-volume:/mynewebsvolume ubuntu
-  -- ls
-  -- cd mynewebsvolume
-  -- touch hello
+> lsblk
+> sudo mkfs -t ext4 /dev/xvdb        ----- format the disk before use
+> sudo mkdir /mnt/ebs-volume
+> sudo mount /dev/xvdb /mnt/ebs-volume
+> docker images
+> docker run -it  --name my-container1 -v /mnt/ebs-volume:/mynewebsvolume ubuntu
+  > ls
+  > cd mynewebsvolume
+  > touch hello
 
--- create a another container with new name from before container
+--> create a another container with new name from before container
 
-docker run -it --name mynewcont2 --volumes-from my-container1  ubuntu
+> docker run -it --name mynewcont2 --volumes-from my-container1  ubuntu
 
-  -- ls
-  -- cd mynewebsvolume
+  > ls
+  > cd mynewebsvolume
 
 you see the same data in all containers
 
@@ -631,14 +631,14 @@ By default, docker containers will not have any limits for the resources like cp
 By default docker containers will use host resources(cpu, ram, rom)
 Resource limits of docker container should not exceed the docker host limits.
 
-docker stats  --> to check live cpu and memory
+> docker stats  --> to check live cpu and memory
 
-docker run -it --name cont7 --cpus="0.1" --memory="300mb" ubuntu
-docker update cont7 --cpus="0.7" --memory="300mb"
+> docker run -it --name cont7 --cpus="0.1" --memory="300mb" ubuntu
+> docker update cont7 --cpus="0.7" --memory="300mb"
 
 JENKINS SETUP BY DOCKER:
-docker run -it -d --name jenkins -p 8080:8080 jenkins/jenkins:lts
--- docker exec -it jenkins /bin/bash
+> docker run -it -d --name jenkins -p 8080:8080 jenkins/jenkins:lts
+> docker exec -it jenkins /bin/bash
 
 
 ======== Delete all container ============
@@ -677,9 +677,9 @@ yum install -y git
 
 git clone https://github.com/ReyazShaik/hdfcwebsite.git
 
--- cd hdfcwebsite
+> cd hdfcwebsite
 
--- cd internmo	metbanking
+> cd internmo	metbanking
 
 Here already index.html is available, just create a Dockerfile
 
@@ -691,15 +691,15 @@ RUN apt install apache2 -y
 COPY index.html /var/www/html
 CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
 
--- docker build -t internetbanking:v1 .
+> docker build -t internetbanking:v1 .
 
--- docker run -itd --name cont1 -p 81:80 internetbanking:v1
+> docker run -itd --name cont1 -p 81:80 internetbanking:v1
 
--- docker ps -a
+> docker ps -a
 
 http://instanceip:81
 
--- docker logs cont1 [If required]
+> docker logs cont1 [If required]
 
 -----------
 
@@ -720,9 +720,9 @@ COPY index.html /var/www/html
 CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
 
 
--- docker build -t mobilebanking:v1 .
+> docker build -t mobilebanking:v1 .
 
--- docker run -itd --name cont2 -p 82:80 mobilebanking:v1
+> docker run -itd --name cont2 -p 82:80 mobilebanking:v1
 
 http://instanceip:82
 
@@ -1223,18 +1223,18 @@ docker push trainerreyaz/loans-image
 
 --- Now all your images are in dockerhub, just delete the images from local docker host and you can get them from dockerhub again
 
--- docker rmi -f $(docker images -aq)
+> docker rmi -f $(docker images -aq)
 
--- docker pull trainerreyaz/ib-image
--- docker pull trainerreyaz/mb-image
--- docker pull trainerreyaz/insurance-image
--- docker pull trainerreyaz/loans-image
+> docker pull trainerreyaz/ib-image
+> docker pull trainerreyaz/mb-image
+> docker pull trainerreyaz/insurance-image
+> docker pull trainerreyaz/loans-image
 
 Now pull images from dockerhub
 
--- docker pull trainerreyaz/ib-image:latest
+> docker pull trainerreyaz/ib-image:latest
 
--- docker run -itd --name cont1 -p 80:80 trainerreyaz/ib-image:latest
+> docker run -itd --name cont1 -p 80:80 trainerreyaz/ib-image:latest
 
 
 
