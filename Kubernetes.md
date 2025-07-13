@@ -199,8 +199,8 @@ By default, one pod has one container, if required we can create, if you create 
 
   ```kubectl logs pod1```              [Logs command only works on PODS (pods centric command), and need to mention pod_name as well.]
 
-  ```kubectl exec -it pod1 -- /bin/bash```   [to connect to the pod1 inside]
-  ```cd /usr/share/nginx/html```  
+  ```kubectl exec -it pod1 -- /bin/bash```   [to connect to the pod1 inside]  
+  ```cd /usr/share/nginx/html```    
   ```cat index.html```    
 
 ```kubectl delete pod pod1```        [This will delete the pod named pod1]
