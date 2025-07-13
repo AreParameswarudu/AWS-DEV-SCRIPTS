@@ -625,7 +625,7 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 
 
 3.1 RollOut Few commands
-
+----------------
 ```kubectl rollout history deploy/ib-deployment```
 
 ```kubectl rollout undo deploy/ib-deployment```   [It will go back to previous application / image ]
@@ -646,6 +646,7 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 
 
 3.2 Deployment has 2 Strategies:  
+------------
 * _Rolling update_: This is **Default**, When you update the application, Rolling update will delete one pod and create . One by one
 * _Recreate_: Delete all pods and create again- Downtime. Not recommended
 * _Blue-Green Deployment_: 🟦 Blue = old version, 🟩 Green = new version, Switch traffic only when the new version is fully ready
@@ -692,15 +693,15 @@ ports:
 
 🔹 Explanation of Changes
 ---------------------------
-✅ containerPort: 8080 → The app runs inside the container on port 8080.
-✅ hostPort: 8080 → The container maps its 8080 port to the same port on the host machine.
+✅ containerPort: 8080 → The app runs inside the container on port 8080.  
+✅ hostPort: 8080 → The container maps its 8080 port to the same port on the host machine.  
 
 🔹 Important Notes on hostPort
 ----------------------------------
-hostPort directly binds the container port to the host.
-It works only on worker nodes where the pod runs.
-If multiple pods run on the same node, you cannot use the same hostPort for all of them.
-Recommended alternative: Instead of hostPort, use a Kubernetes Service (NodePort or LoadBalancer) to expose the Deployment.
+hostPort directly binds the container port to the host.  
+It works only on worker nodes where the pod runs.  
+If multiple pods run on the same node, you cannot use the same hostPort for all of them.  
+Recommended alternative: Instead of hostPort, use a Kubernetes Service (NodePort or LoadBalancer) to expose the Deployment.  
 ------------------------
 
 By default, a ReplicaSet (RS) only ensures that a specific number of Pods are running. However, it does not provide network access to those Pods externally.
@@ -733,7 +734,7 @@ spec:
 ```
 
 
-_-c:_ Tells sh to execute the following string command
+**-c:** Tells sh to execute the following string command
 
 ```kubectl apply -f pod-two-containers.yaml```
 
@@ -759,13 +760,15 @@ They ensure that a specified number of Pods successfully complete a task before 
 Jobs are crucial for executing one-time or recurring tasks, such as data migrations, backups, or batch processing.  
 
 4.1 Types of Kubernetes Jobs:
-
+------------
 4.1.1 Non-parallel Jobs:
+-----
 These Jobs execute tasks sequentially /one by one, with only one Pod started unless it fails.   
 The Job completes as soon as its Pod terminates successfully.   
 It has completions parameter, Like _completions: 3_. The Job completes only when 3 Pods have successfully run
 
 4.1.2 Parallel Jobs with a Fixed Completion Count:
+-----
 In these Jobs, multiple Pods run simultaneously to complete a task.  
 The Job is considered complete when a specified number of Pods successfully complete their tasks.  
 It has completions and Parallelism.
@@ -776,7 +779,7 @@ In the above example three pods are executing at a time, since we mentioned Para
 
 
 4.1.3 Parallel Jobs with a Work Queue:
-
+----------
 These Jobs dynamically scale Pods based on workload.  
 Pods coordinate with each other or external services to fetch and process tasks from a shared queue.
 
@@ -811,11 +814,11 @@ _completions: 3_ → The Job completes only when 3 Pods have successfully run.
 
 --> _restartPolicy_: Always, OnFailure, Never
 
-	| Header 1     	| Explanation    	|	Usage    |
-	| ------------ 	| ----------------------|----------------|
-	| Always 	|  Always restarts the container if it exits|Default for Deployments & ReplicaSets |
-	| OnFailure 	|Restarts the container only if it exits with an error (non-zero exit code).| Jobs & CronJobs |
-        |   Never       |Never restarts the container, even if it fails. | Jobs & CronJobs (One-time execution) |                                     
+| Header 1     	| Explanation    	|	Usage    |
+| ------------ 	| ----------------------|----------------|
+| Always 	|  Always restarts the container if it exits|Default for Deployments & ReplicaSets |
+| OnFailure 	|Restarts the container only if it exits with an error (non-zero exit code).| Jobs & CronJobs |
+|   Never       |Never restarts the container, even if it fails. | Jobs & CronJobs (One-time execution) |                                     
 
 ```kubectl apply -f nonparallel.yml```
 
@@ -833,6 +836,7 @@ In above example the pods are executing one by one.
 
 
 4.1.4 Parallel Jobs with a Fixed Completion Count: 
+--------------
 Use the below simple manifest file for testing Parallel Jobs with a Fixed Completion Count jobs:
 
 `vi parallelfixed.yml`
@@ -873,7 +877,8 @@ _parallelism: 3_ → Runs 3 Pods at the same time.
 
 In the above example three pods are executing at a time, since we mentioned Parallelism = 3, so once the three pods are completed their tasks then next three will start execution.
 
-4.1.5 Parallel Jobs with a Work Queue  
+4.1.5 Parallel Jobs with a Work Queue 
+-------------------
 Use the below simple manifest file for testing Parallel Jobs with a Work Queue jobs:
 
 `vi parallel-work-queue-job.yaml`
