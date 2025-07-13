@@ -337,7 +337,9 @@ Even if one pod is deleted automatically it will create another pod. It has self
 
 Depends on requirement we can scale the pods.
 
-We create rs --> rs wil create pods
+_**Working flow:**_ :  
+Create replica sets, replicasets will take care of the pods, pods will take care of the containers.  
+i.e. Replicasets ----> Pods -----> Containers.
 
 2.1 LABELS:
 -------
@@ -436,13 +438,15 @@ In the original terminal,
 
 ```kubectl delete pods -l app=bank```  [To delete all the pods wit label bank]
 
-> [!NOTE]:
-> Replicaset will take image details from manifest file -- replicaset.yml
+> [!NOTE]
+> Replicaset will take image details from manifest file -- replicaset.yml.
+
 ----------------------------------
 
-2.3 SCALE REPLICAS - 
-	* Scale Out 
- 	* Scale In
+2.3 SCALE REPLICAS :
+--------
+* Scale Out 
+* Scale In
 
 2.3.1 Scale Out
 --------
@@ -454,41 +458,26 @@ First open anotherwindows live
 
 2.3.2 Scale In
 --------
-	> kubectl scale rs/ib-rs --replicas=5  [Now see pods creating live]
+```kubectl scale rs/ib-rs --replicas=5```  [Now see pods creating live]
 
-	LIFO: LAST IN FIRST OUT.
-	IF A POD IS CREATED LASTLY IT WILL DELETE FIRST WHEN SCALE IN
+LIFO: LAST IN FIRST OUT.  
+IF A POD IS CREATED LASTLY IT WILL DELETE FIRST WHEN SCALE IN
 
-> [!Note]:
+> [!NOTE]
 > This Scale out and in is manual, later we learn how to automate.
 
 
 2.4 Roll out concept:  (wont work with replicasets object kinds)
 -----------------
-Now, all pods are running with ib-image:latest image , but if i want to change the image to mobilebanking and update the POD, not possible in ReplicaSet
+Lets say that I have a _manifist.yml_ file that was defined to use nginx image.  
+But now we need to update it to apache2 iamge.  
+There are 2 ways we can think of doing this.
+	1. Edit the _manistfist.yml_ file directly, and re-run the file. This will throws and error saying the object already exist. (NOT RECOMMENDED).
+ 	2. To edit the replica (not .yml file).
+  	```kubectl edit rs/ib-rs```  ---> command to edit the ib-rs replicaset (not .yml file).  
+   	we can edit it as needed and save it. This is the **recommended way** as it wont give any errors.  
 
-```kubectl describe pod -l app=bank | grep -i ID```   [ALl pods are using ib-image:latest]  
-
-Update the image in the replicaset, you cannot update in yml file, it will create a new replicaSet so there is a command to edit current replicaset
-
-```kubectl edit rs/ib-rs ```   [change internetbankingrepo to insurance]
-
-```kubectl describe pod -l app=bank | grep -i ID```  [Still it shows internetbanking, image is not change , that's the problem with Replica SET, We cannot update the application]
-
-
-```vi replicaset.yml```   -- change to insurance
-
-```kubectl apply -f replicaset.yml```    [This will give error that ib-rs already exits. So need to create a new RS again]
-
-```kubectl get pods --show-labels```
-
-```kubectl describe pod -l app=bank | grep -i ID```   [you still see old image internetbanking ]
-
-But if you scale out, new pods will contains insurance repo
-
-```kubectl scale rs/ib-rs --replicas=5```
-```kubectl describe pod -l app=bank | grep -i ID```  
-[you see mobilebanking . only new image are insurance. This is the drawback of replicaset]  
+But the actual issue of image update will not reflected on the pods. Even if we scale out the replica set, the new pods will contain the same old image.  
 
 Using ReplicaSet we cannot roll out the application
 
@@ -502,8 +491,6 @@ _**Drawbacks**_:
 _**Working flow:**_ :  
 Create replica sets, replicasets will take care of the pods, pods will take care of the containers.  
 i.e. Replicasets ----> Pods -----> Containers.
-
-```kubectl delete rs ib-rs```	[Deleting replicasets need to specify the replicaset's name].
 
 -------------------------------------------------------------------------------------------------------------------
 
