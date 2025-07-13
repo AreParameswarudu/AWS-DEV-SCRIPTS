@@ -323,7 +323,7 @@ _Problem with using or defining only pods:_
   
 -------------------------------------------------------------------------------------
 
-## REPLICASET
+## 2. REPLICASET :
 
 This is used for managing multiple replicas of pod to perform activities like load balancing and autoscaling
 
@@ -339,7 +339,7 @@ Depends on requirement we can scale the pods.
 
 We create rs --> rs wil create pods
 
-LABELS:
+2.1 LABELS:
 -------
 
 As we are creating multiple pods with same application, all these pods have different names but how to group all of them as we have 1 application with multiple pods. So we can give a label to group them  
@@ -347,7 +347,7 @@ As we are creating multiple pods with same application, all these pods have diff
 Individual pods are difficult to manage because they have different names  
 so we can give a common label to group them and work with them together
 
-SELECTOR
+2.2 SELECTOR
 --------
 
 It is used to select pods with same labels  
@@ -422,25 +422,25 @@ template:
 
 If you delete any pod, automatically new pod will be created, if you want to watch live, open another terminate and give.
 
-		> kubectl get pods --watch
+```kubectl get pods --watch```
 
-		> kubectl get pods
+```kubectl get pods```
 
-		> kubectl delete pods pod-id      [First new pod create and the existing pod will be deleted]
+```kubectl delete pods pod-id```      [First new pod create and the existing pod will be deleted]
 
-		> kubectl get pods --show-labels  [New pod got created, this is called ReplicaSet, if one pod delete , another pod will get created automatically]
+```kubectl get pods --show-labels``` [New pod got created, this is called ReplicaSet, if one pod delete , another pod will get created automatically]
 
-		> kubectl get pods -l app=bank  [This will list all the pods with label bank, l = label]
+```kubectl get pods -l app=bank```  [This will list all the pods with label bank, l = label]
 
-		> kubectl delete pods -l app=bank  [To delete all the pods wit label bank]
+```kubectl delete pods -l app=bank```  [To delete all the pods wit label bank]
 
-		Note: Replicaset will take image details from manifest file -- replicaset.yml
+[!Note] : Replicaset will take image details from manifest file -- replicaset.yml
 ---------------------------
 
-SCALE REPLICAS - Scale Out and Scale In
+2.3 SCALE REPLICAS - Scale Out and Scale In
 -----------
 
-Scale Out
+2.3.1 Scale Out
 --------
 First open anotherwindows live
 
@@ -448,7 +448,7 @@ First open anotherwindows live
 > kubectl get rs   							#[To list the replicasets]
 > kubectl scale rs/ib-rs --replicas=10  	#[Now see pods creating live]
 
-Scale In
+2.3.2 Scale In
 --------
 	> kubectl scale rs/ib-rs --replicas=5  [Now see pods creating live]
 
@@ -458,53 +458,53 @@ Scale In
 [!Note]: This Scale out and in is manual, later we learn how to automate.
 
 
-Roll out concept:  (wont work with replicasets object kinds)
+2.4 Roll out concept:  (wont work with replicasets object kinds)
 -----------------
-	Now, all pods are running with ib-image:latest image , but if i want to change the image to mobilebanking and update the POD, not possible in ReplicaSet
+Now, all pods are running with ib-image:latest image , but if i want to change the image to mobilebanking and update the POD, not possible in ReplicaSet
 
-	> kubectl describe pod -l app=bank | grep -i ID   [ALl pods are using ib-image:latest]
+```kubectl describe pod -l app=bank | grep -i ID```   [ALl pods are using ib-image:latest]  
 
-	Update the image in the replicaset, you cannot update in yml file, it will create a new replicaSet so there is a command to edit current replicaset
+Update the image in the replicaset, you cannot update in yml file, it will create a new replicaSet so there is a command to edit current replicaset
 
-	> kubectl edit rs/ib-rs    [change internetbankingrepo to insurance]
+```kubectl edit rs/ib-rs ```   [change internetbankingrepo to insurance]
 
-	> kubectl describe pod -l app=bank | grep -i ID  [Still it shows internetbanking, image is not change , that's the problem with Replica SET, We cannot update the application]
+```kubectl describe pod -l app=bank | grep -i ID```  [Still it shows internetbanking, image is not change , that's the problem with Replica SET, We cannot update the application]
 
 
-	vi replicaset.yml  -- change to insurance
+```vi replicaset.yml```   -- change to insurance
 
-	> kubectl apply -f replicaset.yml    [This will give error that ib-rs already exits. So need to create a new RS again]
+```kubectl apply -f replicaset.yml```    [This will give error that ib-rs already exits. So need to create a new RS again]
 
-	> kubectl get pods --show-labels
+```kubectl get pods --show-labels```
 
-	> kubectl describe pod -l app=bank | grep -i ID   [you still see old image internetbanking ]
+```kubectl describe pod -l app=bank | grep -i ID```   [you still see old image internetbanking ]
 
-	But if you scale out, new pods will contains insurance repo
+But if you scale out, new pods will contains insurance repo
 
-	> kubectl scale rs/ib-rs --replicas=5
-	> kubectl describe pod -l app=bank | grep -i ID  [you see mobilebanking . only new image are insurance.
-													This is the drawback of replicaset]
+```kubectl scale rs/ib-rs --replicas=5```
+```kubectl describe pod -l app=bank | grep -i ID```  
+[you see mobilebanking . only new image are insurance. This is the drawback of replicaset]  
 
-	Using ReplicaSet we cannot roll out the application
+Using ReplicaSet we cannot roll out the application
 
-	Advantage
-		--> self healing
-		--> scaling
+_**Advantage**_
+* self healing
+* scaling
 
-	Drawbacks
-		--> we cannot roll in and roll out, we cant update the applications using ReplicaSet, lets use DEPLOYMENT
+_**Drawbacks**_:  
+* we cannot roll in and roll out, we cant update the applications using ReplicaSet, lets use DEPLOYMENT
 
-	rs ---> pods
+_**Working flow:**_ :  
+Create replica sets, replicasets will take care of the pods, pods will take care of the containers.  
+i.e. Replicasets ----> Pods -----> Containers.
 
-	> kubectl delete rs ib-rs
+```kubectl delete rs ib-rs```	[Deleting replicasets need to specify the replicaset's name].
 
- 
-Initial version of ReplicaSET:
------------------------------
-	ReplicationController:
-	=======================
+-------------------------------------------------------------------------------------------------------------------
 
-		Same as ReplicaSet. It also used for handling multiple replicas of specific pod. But it doesn't contain selector and its child field matchField. matchField where it will search for pods based on a specific label name and adds them to Cluster
+### Optional / For knowledge:
+2.5 Initial version of ReplicaSET  = ReplicationController :  
+Same as ReplicaSet. It also used for handling multiple replicas of specific pod. But it doesn't contain selector and its child field matchField. matchField where it will search for pods based on a specific label name and adds them to Cluster
 																									
 
 		Kind : ReplicationController
@@ -530,24 +530,433 @@ Initial version of ReplicaSET:
 				image: trainerreyaz/ib-image:latest
 
 
-	Replication Controller
-	---------------------
+Replication Controller
+---------------------
 
-		The Replication Controller is the original form of replication in Kubernetes
+The Replication Controller is the original form of replication in Kubernetes
 
-		The Replication Controller uses equality-based selectors to manage the pods.
+The Replication Controller uses equality-based selectors to manage the pods.
 
-		The rolling-update command works with Replication Controllers
+The rolling-update command works with Replication Controllers
 
-		Replica Controller is deprecated and replaced by ReplicaSets.
+Replica Controller is deprecated and replaced by ReplicaSets.
 
-	Replica Set  
-	------------
+Replica Set  
+------------
 
-		ReplicaSets are a higher-level API that gives the ability to easily run multiple instances of a given pod
+ReplicaSets are a higher-level API that gives the ability to easily run multiple instances of a given pod
 
-		ReplicaSets Controller uses set-based selectors to manage the pods.
+ReplicaSets Controller uses set-based selectors to manage the pods.
 
-		The rolling-update command won’t work with ReplicaSets.
+The rolling-update command won’t work with ReplicaSets.
 
-		Deployments are recommended over ReplicaSets.
+Deployments are recommended over ReplicaSets.
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+## 3. Deployment
+---------------------
+Kubernetes deployment is a high-level resource object by which you can manage the deployment and scaling of the applications while maintaining the desired state of the application. You can scale the containers with the help of Kubernetes deployment up and down depending on the incoming traffic.   
+If you have performed any rolling updates with the help of deployment and after some time if you find any bugs in it then you can perform rollback also. Kubernetes deployments are deployed with the help of CLI like Kubectl it can be installed on any platform.  
+
+Working strategy: Create deployments, deployments take care of replica sets, replica-sets take are of PODS and PODS  will take care of Containers.  
+i.e. Deployments ----> Replica sets ----> PODS ----> Containers
+
+So on the whole,   
+	we mostly works on the deployment layer as it can take care of the layers under it
+
+The manifest.yml file is as similar as for replicasets, the only major difference is that we mention kind as deployment rather than replicaset.  
+Just change  "kind: Deployment" and "name: ib-deployment"
+
+Create a manifist file with name deployment.yml
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+```
+
+```kubectl create -f deployment.yml``` [To run the manifist file named as deployment.yml]
+
+```kubectl get deploy```   or  ```kubectl get deployments```
+
+```kubectl get deploy -o wide```
+
+```kubectl get rs```  [As the deployment also creates replica sets, to list that replicasets].
+
+```kubectl describe deploy ib-deployment```
+
+```kubectl get pods```
+
+Now lets scale out and Scale IN
+Scale Out
+---------
+
+```kubectl scale deploy/ib-deployment --replicas=10```  
+```kubectl get pods```  [Check the no.of pods].
+
+
+Scale In
+--------
+
+```kubectl scale deploy/ib-deployment --replicas=5```  
+```kubectl get pods```
+
+What ever Replica set is doing Deployment is also doing the same thing
+
+if you delete any pod, it will create immediately automatically
+```kubectl get pods```  
+```kubectl delete pod pod-id```  
+```kubectl describe pod -l app=bank | grep -i ID```  
+(or)  
+```kubectl describe pods | grep -i image```   [It shows all internetbankingrepo image]
+
+***************** Now what Deployment do additional thing is to change the application ***************
+
+First watch pods in another terminal  
+```kubectl get po --watch```
+```kubectl edit deploy/ib-deployment```   [change to mobilebanking]  
+
+watch pods in another terminal , first it will create a new pods and then terminate old ones
+```kubectl describe pods | grep -i image``` [you can see now mobilebanking image]
+
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+
+
+3.1 RollOut Few commands
+
+```kubectl rollout history deploy/ib-deployment```
+
+```kubectl rollout undo deploy/ib-deployment```   [It will go back to previous application / image ]
+
+```kubectl get pods```  [Pods are terminating and creating new pods with new image, this was not possible in ReplicaSet]
+
+```kubectl describe pods | grep -i image```
+
+```kubectl rollout pause deploy/ib-deployment```  --- it is like lock, cannot undo, cannot rollout to previous
+
+```kubectl rollout undo deploy/ib-deployment```  -- not possible
+
+```kubectl rollout resume deploy/ib-deployment```
+
+```kubectl rollout undo deploy/ib-deployment``` -- now possible
+
+```kubectl rollout status deploy/ib-deployment```
+
+
+3.2 Deployment has 2 Strategies:  
+* _Rolling update_: This is **Default**, When you update the application, Rolling update will delete one pod and create . One by one
+* _Recreate_: Delete all pods and create again- Downtime. Not recommended
+* _Blue-Green Deployment_: 🟦 Blue = old version, 🟩 Green = new version, Switch traffic only when the new version is fully ready
+* _Canary Deployment_:  Roll out new version to a small set of users, then gradually increase.
+
+Out of these, Rolloing and Recreating were Kubernetes native, meaning that K8S will do that without manual intermention.  
+While Blue-Green and Canary deployments require manual work.
+
+Example: see strategy: Recreate
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: trainerreyaz/ib-image:latest
+```
+If you want port to expose , use below code
+```
+spec:
+containers:
+- name: cont1
+image: trainerreyaz/ib-image:latest
+ports:
+- containerPort: 8080   # Port inside the container
+  hostPort: 8080        # Port on the host machine
+```
+
+🔹 Explanation of Changes
+---------------------------
+✅ containerPort: 8080 → The app runs inside the container on port 8080.
+✅ hostPort: 8080 → The container maps its 8080 port to the same port on the host machine.
+
+🔹 Important Notes on hostPort
+----------------------------------
+hostPort directly binds the container port to the host.
+It works only on worker nodes where the pod runs.
+If multiple pods run on the same node, you cannot use the same hostPort for all of them.
+Recommended alternative: Instead of hostPort, use a Kubernetes Service (NodePort or LoadBalancer) to expose the Deployment.
+------------------------
+
+By default, a ReplicaSet (RS) only ensures that a specific number of Pods are running. However, it does not provide network access to those Pods externally.
+
+✅ To access your application from the internet, you need a Kubernetes Service.
+
+**Example files for exercise:**
+---------------------------
+
+*1.🚀 Kubernetes Manifest: 1 Pod with 2 Containers*  
+In Kubernetes, a Pod can run multiple containers that share the same network and storage. Here’s how to create a single Pod with two containers inside it.
+
+`vi pod-two-containers.yaml`
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: two-container-pod
+  labels:
+    app: multi-container
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+    ports:
+    - containerPort: 80
+  - name: busybox-container
+    image: busybox
+    command: ["sh", "-c", "while true; do echo 'Hello from BusyBox'; sleep 10; done"]
+```
+
+
+_-c:_ Tells sh to execute the following string command
+
+```kubectl apply -f pod-two-containers.yaml```
+
+```kubectl get pods```    [we get single pod but 2/2 meaning, 2 containers]
+
+```kubectl logs two-container-pod -c busybox-container```
+
+```kubectl logs two-container-pod -c nginx-container```
+
+```kubectl exec -it two-container-pod -c nginx-container -- sh```       [-c: container]
+
+   `cd /usr/share/nginx/html`
+
+```kubectl exec -it two-container-pod -c busybox-container -- sh```
+   `ls`
+
+
+
+## 4. Kubernetes JOBS:
+   
+Kubernetes Jobs are resources used to run batch tasks in a Kubernetes cluster.   
+They ensure that a specified number of Pods successfully complete a task before marking the Job as done.   
+Jobs are crucial for executing one-time or recurring tasks, such as data migrations, backups, or batch processing.  
+
+4.1 Types of Kubernetes Jobs:
+
+4.1.1 Non-parallel Jobs:
+These Jobs execute tasks sequentially /one by one, with only one Pod started unless it fails.   
+The Job completes as soon as its Pod terminates successfully.   
+It has completions parameter, Like _completions: 3_. The Job completes only when 3 Pods have successfully run
+
+4.1.2 Parallel Jobs with a Fixed Completion Count:
+In these Jobs, multiple Pods run simultaneously to complete a task.  
+The Job is considered complete when a specified number of Pods successfully complete their tasks.  
+It has completions and Parallelism.
+  _completions: 6
+  parallelism: 3_
+
+In the above example three pods are executing at a time, since we mentioned Parallelism = 3, so once the three pods are completed their tasks then next three will start execution.
+
+
+4.1.3 Parallel Jobs with a Work Queue:
+
+These Jobs dynamically scale Pods based on workload.  
+Pods coordinate with each other or external services to fetch and process tasks from a shared queue.
+
+ **_Real-world Use Cases_**: 
+	* _Non-parallel Jobs_: Running one-time administrative tasks, such as database migrations or system updates.
+	* _Parallel Jobs with a Fixed Completion Count_: Processing large datasets, where data is split into chunks and processed concurrently by multiple Pods.
+	* _Parallel Jobs with a Work Queue:_ Handling variable workloads, such as incoming requests in a web application, where Pods scale dynamically based on demand.
+
+```
+vi nonparallel.yml
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: non-parallel-job
+spec:
+  template:
+    metadata:
+      name: non-parallel-pod
+    spec:
+      containers:
+      - name: non-parallel-container
+        image: busybox
+        command: ["echo", "Hello from the non-parallel job"]
+      restartPolicy: Never
+  completions: 3
+```
+
+_busybox:_ BusyBox is a single executable that bundles multiple Unix utilities (like sh, ls, cat, echo, wget, grep, etc.). It is widely used in minimal containers because of its small size (~1MB) and fast startup time.
+
+_completions: 3_ → The Job completes only when 3 Pods have successfully run.
+
+--> _restartPolicy_: Always, OnFailure, Never
+
+	| Header 1     	| Explanation    	|	Usage    |
+	| ------------ 	| ----------------------|----------------|
+	| Always 	|  Always restarts the container if it exits|Default for Deployments & ReplicaSets |
+	| OnFailure 	|Restarts the container only if it exits with an error (non-zero exit code).| Jobs & CronJobs |
+        |   Never       |Never restarts the container, even if it fails. | Jobs & CronJobs (One-time execution) |                                     
+
+```kubectl apply -f nonparallel.yml```
+
+```kubectl get pods```
+
+```kubectl get jobs```
+
+```kubectl logs -l job-name=non-parallel-job```
+
+```kubectl logs podname```     Ex: kubectl logs non-parallel-job-2vvf9
+
+```kubectl delete job jobname```
+
+In above example the pods are executing one by one.
+
+
+4.1.4 Parallel Jobs with a Fixed Completion Count: 
+Use the below simple manifest file for testing Parallel Jobs with a Fixed Completion Count jobs:
+
+`vi parallelfixed.yml`
+```
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: parallel-fixed-count-job
+spec:
+  template:
+    metadata:
+      name: parallel-fixed-count-pod
+    spec:
+      containers:
+      - name: parallel-fixed-count-container
+        image: busybox
+        command: ["echo", "Hello from the parallel-fixed-count job"]
+      restartPolicy: Never
+  completions: 6
+  parallelism: 3
+```
+
+_completions: 6 _→ The Job completes only when 6 Pods have successfully run.
+_parallelism: 3_ → Runs 3 Pods at the same time.
+
+
+```kubectl apply -f parallelfixed.yml```
+
+```kubectl get pods```
+
+```kubectl get jobs```
+
+```kubectl logs -l job-name=<job-name>```
+
+```kubectl logs parallel-job-2vvf9```	parallel-job-2vvf9 = Pod-name of one of my pods.
+
+```kubectl delete job jobname```
+
+In the above example three pods are executing at a time, since we mentioned Parallelism = 3, so once the three pods are completed their tasks then next three will start execution.
+
+4.1.5 Parallel Jobs with a Work Queue  
+Use the below simple manifest file for testing Parallel Jobs with a Work Queue jobs:
+
+`vi parallel-work-queue-job.yaml`
+```
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: parallel-work-queue-job
+spec:
+  template:
+    metadata:
+      name: parallel-work-queue-pod
+    spec:
+      containers:
+      - name: parallel-work-queue-container
+        image: busybox
+        command: ["echo", "Hello from the parallel-work-queue job"]
+      restartPolicy: Never
+  parallelism: 3
+```
+
+```kubectl apply -f parallel-work-queue-job.yaml```
+
+```kubectl get pods```
+
+In the above example 3 pods are started executing at a time since we mentioned Parallelism = 3 and we didn’t mention any specified number of Completions.
+                           
+
+## 5. 🚀 Kubernetes CronJob Example
+
+A Kubernetes CronJob is used to schedule jobs to run at specific times, just like a Linux cron job. It is useful for tasks such as backups, periodic data processing, or sending scheduled reports.
+
+This CronJob prints "Hello from Kubernetes!" every minute.
+
+`vi cron.yml`
+```
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello-cronjob
+spec:
+  schedule: "*/1 * * * *"  # Runs every minute
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: hello-container
+            image: busybox
+            command: ["sh", "-c", "echo Hello from Kubernetes!"]
+          restartPolicy: Never  # Ensure job runs only once per schedule
+```
+
+```kubectl apply -f cron.yaml```
+
+```kubectl get cronjobs```
+
+```kubectl describe cronjob cron```
+
+
+🔹 View Logs of Last Run
+---------------------------
+
+```kubectl get pods```  # Get the latest pod name
+
+```kubectl logs <POD_NAME>```
+
+```kubectl get cronjob```
+
+```kubectl delete cronjob```
