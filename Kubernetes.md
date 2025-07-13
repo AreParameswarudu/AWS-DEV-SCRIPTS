@@ -420,9 +420,11 @@ template:
 
 
 
-If you delete any pod, automatically new pod will be created, if you want to watch live, open another terminate and give.
+If you delete any pod, automatically new pod will be created, if you want to watch live, open aother duplicat terminal 
 
-```kubectl get pods --watch```
+```kubectl get pods --watch```  --> run this on duplicate terminal and watch this everytime you perform any operations/actions.
+
+In the original terminal, 
 
 ```kubectl get pods```
 
@@ -434,11 +436,13 @@ If you delete any pod, automatically new pod will be created, if you want to wat
 
 ```kubectl delete pods -l app=bank```  [To delete all the pods wit label bank]
 
-[!Note] : Replicaset will take image details from manifest file -- replicaset.yml
----------------------------
+> [!NOTE]:
+> Replicaset will take image details from manifest file -- replicaset.yml
+----------------------------------
 
-2.3 SCALE REPLICAS - Scale Out and Scale In
------------
+2.3 SCALE REPLICAS - 
+	* Scale Out 
+ 	* Scale In
 
 2.3.1 Scale Out
 --------
@@ -455,7 +459,8 @@ First open anotherwindows live
 	LIFO: LAST IN FIRST OUT.
 	IF A POD IS CREATED LASTLY IT WILL DELETE FIRST WHEN SCALE IN
 
-[!Note]: This Scale out and in is manual, later we learn how to automate.
+> [!Note]:
+> This Scale out and in is manual, later we learn how to automate.
 
 
 2.4 Roll out concept:  (wont work with replicasets object kinds)
