@@ -287,7 +287,7 @@ containers:
   name: cont1
 ```
 
-```kubectl create -f pod.yml```    [ To create a pod using manifest]
+```kubectl create -f pod.yml```    [ To create a pod using manifest]  
 ```kubectl get pods -o wide```     [ To get more details about pods]
 
 ```kubectl describe pod pod1```    [ To describe a specific pod ]
