@@ -170,7 +170,7 @@ The configuration of kubectl is in the $HOME/.kube directory.
 
 `kubectl get pods`
 
-## PODS :
+## 1. PODS :
 It is a smallest unit of deployment in K8's.  
 It is a group of containers.  
 Pods are ephemeral (short living objects)  
@@ -186,7 +186,7 @@ We can create this pod in two ways,
 By default, one pod has one container, if required we can create, if you create multiple containers in a single pod, all containers inside the pods will share the same volume
 
 
-### 1. Imperative(command)
+### 1.1. Imperative(command)
   ``` kubectl run pod1 --image nginx ```   [Creating  pod with name pod1 with image nginx]
 
   ```kubectl get pods```          [To get the pods , can use pods/po/pods also]
@@ -207,7 +207,7 @@ By default, one pod has one container, if required we can create, if you create 
    
 The above approach is not advised, because don't create PODS manually , declarative approach is preffered all the time.
 
-### 2. Declarative (Manifest file)
+### 1.2. Declarative (Manifest file)
 In manifest file we have these mandatory parameters  
 
 ```
@@ -217,7 +217,7 @@ metadata:
 spec:
 ```
 
-  What is apiVersion?
+  1.2.1. What is apiVersion?
   -------------------
   apiVersion: 
         * Specifies the API version used for the Deployment object. apps/v1 is the stable API version for managing deployments.
@@ -236,7 +236,7 @@ jobs: batch/v1
   ``` kubectl api-versions```   -->to get api versions
 
 
-  What is kind ?
+  1.2.2. What is kind ?
   --------------
   Refers to Kubernetes object which we want to create.
 ```
@@ -246,7 +246,7 @@ kind: Service
 kind: Ingress
 kind: job
 ```
-  What is metadata?
+  1.2.3. What is metadata?
   ----------------
   Additional information about the Kubernetes object like name, labels etc  
 
@@ -254,7 +254,7 @@ kind: job
   _labels_ : Key-value pairs used for organizing and selecting objects
 
 
-  What is spec?
+  1.2.4. What is spec?
   ------------
   Contains docker container related information like, image name, environment variables , port mapping etc
 
@@ -339,89 +339,88 @@ Depends on requirement we can scale the pods.
 
 We create rs --> rs wil create pods
 
-	LABELS:
-	-------
+LABELS:
+-------
 
-		As we are creating multiple pods with same application, all these pods have different names but how to group all of them as we have 1 application with multiple pods. So we can give a label to group them
+As we are creating multiple pods with same application, all these pods have different names but how to group all of them as we have 1 application with multiple pods. So we can give a label to group them  
 
-		Individual pods are difficult to manage because they have different names
-		so we can give a common label to group them and work with them together
+Individual pods are difficult to manage because they have different names  
+so we can give a common label to group them and work with them together
 
-	SELECTOR
-	--------
+SELECTOR
+--------
 
-		It is used to select pods with same labels
+It is used to select pods with same labels  
 
-		For replicaset use apiversion as apps/v1
+For replicaset use apiversion as apps/v1  
 
-		how to find the apiresources to write in manifest file
-
-	> kubectl api-resources
-
-	vi replicaset.yml
-
-		apiVersion: apps/v1
-		kind: ReplicaSet
-		metadata:
-		name: ib-rs    ---------- Name of the Replicaset
-		labels:
-			app: bank
-		spec:     ------------- this spec is for PODS
-		replicas: 3   --------- how many number of pods
-		selector:
-			matchLabels:  -Ensures only pods with label app: bank are part of this Replicaset. if there is any pod with label bank, it will be a part of this replicaset
-			app: bank
-		template:            ------------ Ensures the pods get labeled as app: bank
-			metadata:
-			labels:
-				app: bank
-			spec:  ----------------- this spec is for containers
-			containers:
-			- name: cont1
-				image: trainerreyaz/ib-image:latest
+how to find the apiresources to write in manifest file  
 
 
+Template:  
+```
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+name: ib-rs    ---------- Name of the Replicaset
+labels:
+	app: bank
+spec:     ------------- this spec is for PODS
+replicas: 3   --------- how many number of pods
+selector:
+	matchLabels:  -Ensures only pods with label app: bank are part of this Replicaset. if there is any pod with label bank, it will be a part of this replicaset
+	app: bank
+template:            ------------ Ensures the pods get labeled as app: bank
+	metadata:
+	labels:
+		app: bank
+	spec:  ----------------- this spec is for containers
+	containers:
+	- name: cont1
+		image: trainerreyaz/ib-image:latest
+```
 
 
-		apiVersion: apps/v1
-		kind: ReplicaSet
-		metadata:
-		name: ib-rs
-		labels:
-			app: bank
-		spec:
-		replicas: 3
-		selector:
-			matchLabels:
-			app: bank
-		template:  
-			metadata:
-			labels:
-				app: bank
-			spec:  
-			containers:
-			- name: cont1
-				image: trainerreyaz/ib-image:latest
+```
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+name: ib-rs
+labels:
+	app: bank
+spec:
+replicas: 3
+selector:
+	matchLabels:
+	app: bank
+template:  
+	metadata:
+	labels:
+		app: bank
+	spec:  
+	containers:
+	- name: cont1
+		image: trainerreyaz/ib-image:latest
+```
 
 
+```kubectl create -f replicaset.yml```		# to run the replicaset inorder to creats pods with desired replicas.
 
-	> kubectl create -f replicaset.yml		# to run the replicaset inorder to creats pods with desired replicas.
-
-	> kubectl get replicaset				# to list the replicasets
+```kubectl get replicaset```				# to list the replicasets
 		(or)
-	> kubectl get rs
+  ```kubectl get rs```
 
-	> kubectl get rs -o wide  				# [This command will get more details about ReplciaSets]
+```kubectl get rs -o wide``` 				# [This command will get more details about ReplciaSets]
 
-	> kubectl describe rs ib-rs  			# [This will describe about internetbanking-rs ]
+```kubectl describe rs ib-rs```  			# [This will describe about internetbanking-rs ]
 
-	> kubectl get pods
+```kubectl get pods```
 
-	> kubectl get pods --show-labels   		# [This will list the pods with Labels]
+```kubectl get pods --show-labels```   		# [This will list the pods with Labels]
 
 
 
-	If you delete any pod, automatically new pod will be created, if you want to watch live, open another terminate and give.
+If you delete any pod, automatically new pod will be created, if you want to watch live, open another terminate and give.
 
 		> kubectl get pods --watch
 
@@ -436,27 +435,27 @@ We create rs --> rs wil create pods
 		> kubectl delete pods -l app=bank  [To delete all the pods wit label bank]
 
 		Note: Replicaset will take image details from manifest file -- replicaset.yml
+---------------------------
 
-	==============
-	SCALE REPLICAS - Scale Out and Scale In
-	==============
+SCALE REPLICAS - Scale Out and Scale In
+-----------
 
-		Scale Out
-		--------
-			First open anotherwindows live
+Scale Out
+--------
+First open anotherwindows live
 
-			> kubectl get pods --watch
-			> kubectl get rs   							#[To list the replicasets]
-			> kubectl scale rs/ib-rs --replicas=10  	#[Now see pods creating live]
+> kubectl get pods --watch
+> kubectl get rs   							#[To list the replicasets]
+> kubectl scale rs/ib-rs --replicas=10  	#[Now see pods creating live]
 
-		Scale In
-		--------
-			> kubectl scale rs/ib-rs --replicas=5  [Now see pods creating live]
+Scale In
+--------
+	> kubectl scale rs/ib-rs --replicas=5  [Now see pods creating live]
 
-			LIFO: LAST IN FIRST OUT.
-			IF A POD IS CREATED LASTLY IT WILL DELETE FIRST WHEN SCALE IN
+	LIFO: LAST IN FIRST OUT.
+	IF A POD IS CREATED LASTLY IT WILL DELETE FIRST WHEN SCALE IN
 
-		Note: This Scale out and in is manual, later we learn how to automate.
+[!Note]: This Scale out and in is manual, later we learn how to automate.
 
 
 Roll out concept:  (wont work with replicasets object kinds)
