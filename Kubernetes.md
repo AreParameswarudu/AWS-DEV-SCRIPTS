@@ -445,23 +445,16 @@ In the original terminal,
 
 2.3 SCALE REPLICAS :
 --------
-* Scale Out 
-* Scale In
+* Scale Out   
+``` kubectl get pods --watch```   ---> Do this in another terminal for watch.  
+```kubectl get rs```  				#[To list the replicasets]  
+```kubectl scale rs/ib-rs --replicas=10```  	#[Now see pods creating live]  
 
-2.3.1 Scale Out
---------
-First open anotherwindows live
+* Scale In  
+```kubectl scale rs/ib-rs --replicas=5```  [Now see pods creating live]  
 
-> kubectl get pods --watch
-> kubectl get rs   							#[To list the replicasets]
-> kubectl scale rs/ib-rs --replicas=10  	#[Now see pods creating live]
-
-2.3.2 Scale In
---------
-```kubectl scale rs/ib-rs --replicas=5```  [Now see pods creating live]
-
-LIFO: LAST IN FIRST OUT.  
-IF A POD IS CREATED LASTLY IT WILL DELETE FIRST WHEN SCALE IN
+_LIFO: LAST IN FIRST OUT.    
+IF A POD IS CREATED LASTLY IT WILL DELETE FIRST WHEN SCALE IN_
 
 > [!NOTE]
 > This Scale out and in is manual, later we learn how to automate.
@@ -471,26 +464,23 @@ IF A POD IS CREATED LASTLY IT WILL DELETE FIRST WHEN SCALE IN
 -----------------
 Lets say that I have a _manifist.yml_ file that was defined to use nginx image.  
 But now we need to update it to apache2 iamge.  
-There are 2 ways we can think of doing this.
-	1. Edit the _manistfist.yml_ file directly, and re-run the file. This will throws and error saying the object already exist. (NOT RECOMMENDED).
- 	2. To edit the replica (not .yml file).
-  	```kubectl edit rs/ib-rs```  ---> command to edit the ib-rs replicaset (not .yml file).  
-   	we can edit it as needed and save it. This is the **recommended way** as it wont give any errors.  
+There are 2 ways we can think of doing this.  
+	1. Edit the _manistfist.yml_ file directly, and re-run the file. This will throws and error saying the object already exist. (NOT RECOMMENDED).    
+ 	2. To edit the replica (not .yml file).    
+  	```kubectl edit rs/ib-rs```  ---> command to edit the ib-rs replicaset (not .yml file).     
+   	we can edit it as needed and save it. This is the **recommended way** as it wont give any errors.    
 
 But the actual issue of image update will not reflected on the pods. Even if we scale out the replica set, the new pods will contain the same old image.  
 
-Using ReplicaSet we cannot roll out the application
-
-_**Advantage**_
-* self healing
-* scaling
-
+So with REPLICA SETS,   
+_**Advantage**_  
+	* self healing  
+	* scaling  
 _**Drawbacks**_:  
-* we cannot roll in and roll out, we cant update the applications using ReplicaSet, lets use DEPLOYMENT
-
+	* we cannot roll in and roll out, we cant update the applications using ReplicaSet, lets use DEPLOYMENT  
 _**Working flow:**_ :  
-Create replica sets, replicasets will take care of the pods, pods will take care of the containers.  
-i.e. Replicasets ----> Pods -----> Containers.
+	Create replica sets, replicasets will take care of the pods, pods will take care of the containers.  
+	i.e. Replicasets ----> Pods -----> Containers.
 
 -------------------------------------------------------------------------------------------------------------------
 
@@ -548,7 +538,7 @@ Deployments are recommended over ReplicaSets.
 -----------------------------------------------------------------------------------------------------------------------------
 
 ## 3. Deployment
----------------------
+
 Kubernetes deployment is a high-level resource object by which you can manage the deployment and scaling of the applications while maintaining the desired state of the application. You can scale the containers with the help of Kubernetes deployment up and down depending on the incoming traffic.   
 If you have performed any rolling updates with the help of deployment and after some time if you find any bugs in it then you can perform rollback also. Kubernetes deployments are deployed with the help of CLI like Kubectl it can be installed on any platform.  
 
@@ -596,7 +586,8 @@ spec:
 
 ```kubectl get pods```
 
-Now lets scale out and Scale IN
+Now lets scale out and Scale IN  
+
 Scale Out
 ---------
 
@@ -607,8 +598,8 @@ Scale Out
 Scale In
 --------
 
-```kubectl scale deploy/ib-deployment --replicas=5```  
-```kubectl get pods```
+```kubectl scale deploy/ib-deployment --replicas=5```   
+```kubectl get pods```  
 
 What ever Replica set is doing Deployment is also doing the same thing
 
@@ -617,18 +608,19 @@ if you delete any pod, it will create immediately automatically
 ```kubectl delete pod pod-id```  
 ```kubectl describe pod -l app=bank | grep -i ID```  
 (or)  
-```kubectl describe pods | grep -i image```   [It shows all internetbankingrepo image]
+```kubectl describe pods | grep -i image```   [It shows all internetbankingrepo image]  
 
 ***************** Now what Deployment do additional thing is to change the application ***************
 
 First watch pods in another terminal  
-```kubectl get po --watch```
-```kubectl edit deploy/ib-deployment```   [change to mobilebanking]  
+```kubectl get po --watch```  
+
+```kubectl edit deploy/ib-deployment```   [Edit the deployment object to use another image]    
 
 watch pods in another terminal , first it will create a new pods and then terminate old ones
-```kubectl describe pods | grep -i image``` [you can see now mobilebanking image]
+```kubectl describe pods | grep -i image``` [you can see now mobilebanking image]  
 
-kubectl get events --sort-by=.metadata.creationTimestamp
+kubectl get events --sort-by=.metadata.creationTimestamp  
 
 
 
