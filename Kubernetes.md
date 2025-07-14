@@ -217,8 +217,8 @@ metadata:
 spec:
 ```
 
-  1.2.1. What is apiVersion?
-  -------------------
+ #### 1.2.1. What is apiVersion?
+  
   apiVersion: 
         * Specifies the API version used for the Deployment object. apps/v1 is the stable API version for managing deployments.
         * Depending on Kubernetes object we want to create, there is a corresponding  code library we want to use.
@@ -236,8 +236,8 @@ jobs: batch/v1
   ``` kubectl api-versions```   -->to get api versions
 
 
-  1.2.2. What is kind ?
-  --------------
+ #### 1.2.2. What is kind ?
+  
   Refers to Kubernetes object which we want to create.
 ```
 kind: Pod
@@ -246,16 +246,16 @@ kind: Service
 kind: Ingress
 kind: job
 ```
-  1.2.3. What is metadata?
-  ----------------
+ #### 1.2.3. What is metadata?
+  
   Additional information about the Kubernetes object like name, labels etc  
 
   _name_ : The name of the Deployment.  
   _labels_ : Key-value pairs used for organizing and selecting objects
 
 
-  1.2.4. What is spec?
-  ------------
+ #### 1.2.4. What is spec?
+  
   Contains docker container related information like, image name, environment variables , port mapping etc
 
   How many number of pods (Replica)  
@@ -341,16 +341,16 @@ _**Working flow:**_ :
 Create replica sets, replicasets will take care of the pods, pods will take care of the containers.  
 i.e. Replicasets ----> Pods -----> Containers.
 
-2.1 LABELS:
--------
+### 2.1 LABELS:
+
 
 As we are creating multiple pods with same application, all these pods have different names but how to group all of them as we have 1 application with multiple pods. So we can give a label to group them  
 
 Individual pods are difficult to manage because they have different names  
 so we can give a common label to group them and work with them together
 
-2.2 SELECTOR
---------
+### 2.2 SELECTOR
+
 
 It is used to select pods with same labels  
 
@@ -443,8 +443,8 @@ In the original terminal,
 
 ----------------------------------
 
-2.3 SCALE REPLICAS :
---------
+### 2.3 SCALE REPLICAS :
+
 * Scale Out   
 ``` kubectl get pods --watch```   ---> Do this in another terminal for watch.  
 ```kubectl get rs```  				#[To list the replicasets]  
@@ -460,8 +460,8 @@ IF A POD IS CREATED LASTLY IT WILL DELETE FIRST WHEN SCALE IN_
 > This Scale out and in is manual, later we learn how to automate.
 
 
-2.4 Roll out concept:  (wont work with replicasets object kinds)
------------------
+### 2.4 Roll out concept:  (wont work with replicasets object kinds)
+
 Lets say that I have a _manifist.yml_ file that was defined to use nginx image.  
 But now we need to update it to apache2 iamge.  
 There are 2 ways we can think of doing this.  
@@ -588,15 +588,13 @@ spec:
 
 Now lets scale out and Scale IN  
 
-Scale Out
----------
+### Scale Out
 
 ```kubectl scale deploy/ib-deployment --replicas=10```  
 ```kubectl get pods```  [Check the no.of pods].
 
 
-Scale In
---------
+### Scale In
 
 ```kubectl scale deploy/ib-deployment --replicas=5```   
 ```kubectl get pods```  
@@ -624,8 +622,8 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 
 
 
-3.1 RollOut Few commands
-----------------
+### 3.1 RollOut Few commands
+
 ```kubectl rollout history deploy/ib-deployment```
 
 ```kubectl rollout undo deploy/ib-deployment```   [It will go back to previous application / image ]
@@ -645,8 +643,8 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 ```kubectl rollout status deploy/ib-deployment```
 
 
-3.2 Deployment has 2 Strategies:  
-------------
+### 3.2 Deployment has 2 Strategies:  
+
 * _Rolling update_: This is **Default**, When you update the application, Rolling update will delete one pod and create . One by one
 * _Recreate_: Delete all pods and create again- Downtime. Not recommended
 * _Blue-Green Deployment_: 🟦 Blue = old version, 🟩 Green = new version, Switch traffic only when the new version is fully ready
@@ -759,16 +757,16 @@ Kubernetes Jobs are resources used to run batch tasks in a Kubernetes cluster.
 They ensure that a specified number of Pods successfully complete a task before marking the Job as done.   
 Jobs are crucial for executing one-time or recurring tasks, such as data migrations, backups, or batch processing.  
 
-4.1 Types of Kubernetes Jobs:
-------------
-4.1.1 Non-parallel Jobs:
------
+### 4.1 Types of Kubernetes Jobs:
+
+#### 4.1.1 Non-parallel Jobs:
+
 These Jobs execute tasks sequentially /one by one, with only one Pod started unless it fails.   
 The Job completes as soon as its Pod terminates successfully.   
 It has completions parameter, Like _completions: 3_. The Job completes only when 3 Pods have successfully run
 
-4.1.2 Parallel Jobs with a Fixed Completion Count:
------
+#### 4.1.2 Parallel Jobs with a Fixed Completion Count:
+
 In these Jobs, multiple Pods run simultaneously to complete a task.  
 The Job is considered complete when a specified number of Pods successfully complete their tasks.  
 It has completions and Parallelism.
@@ -778,8 +776,8 @@ It has completions and Parallelism.
 In the above example three pods are executing at a time, since we mentioned Parallelism = 3, so once the three pods are completed their tasks then next three will start execution.
 
 
-4.1.3 Parallel Jobs with a Work Queue:
-----------
+#### 4.1.3 Parallel Jobs with a Work Queue:
+
 These Jobs dynamically scale Pods based on workload.  
 Pods coordinate with each other or external services to fetch and process tasks from a shared queue.
 
@@ -835,8 +833,8 @@ _completions: 3_ → The Job completes only when 3 Pods have successfully run.
 In above example the pods are executing one by one.
 
 
-4.1.4 Parallel Jobs with a Fixed Completion Count: 
---------------
+#### 4.1.4 Parallel Jobs with a Fixed Completion Count: 
+
 Use the below simple manifest file for testing Parallel Jobs with a Fixed Completion Count jobs:
 
 `vi parallelfixed.yml`
@@ -877,8 +875,8 @@ _parallelism: 3_ → Runs 3 Pods at the same time.
 
 In the above example three pods are executing at a time, since we mentioned Parallelism = 3, so once the three pods are completed their tasks then next three will start execution.
 
-4.1.5 Parallel Jobs with a Work Queue 
--------------------
+#### 4.1.5 Parallel Jobs with a Work Queue 
+
 Use the below simple manifest file for testing Parallel Jobs with a Work Queue jobs:
 
 `vi parallel-work-queue-job.yaml`
