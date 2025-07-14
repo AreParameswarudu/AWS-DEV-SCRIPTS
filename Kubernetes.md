@@ -947,3 +947,11 @@ spec:
 ```kubectl get cronjob```
 
 ```kubectl delete cronjob```
+
+# 6. Lets setup a multi node cluster 
+
+For single node cluster ==> MiniKube
+For multi node cluster ==> KOPS.
+
+We have several options for muticloud cluster, lets go with KOPS.
+
