@@ -951,7 +951,56 @@ spec:
 # 6. Lets setup a multi node cluster 
 
 For single node cluster ==> MiniKube
-For multi node cluster ==> KOPS.
+For multi node cluster ==> KOPS.  
 
 We have several options for muticloud cluster, lets go with KOPS.
+
+Go to AWS ec2 console,   
+	* Choose a t2.micro instance with Amazon Linux OS.  
+ 	* Attach an IAM role with trusted entity = EC2, and Permissions = Administrative permissions.
+create instance.
+> [!NOTE]
+> Use of IAM role:  
+> As this EC2 instance is going to create a cluster of a Master node and desired no. of worker nodes, and need to talk to the nodes in the cluster. so unless we have an IAM role with required permission, we cannot do that.  
+> The permission for IAM role can be fined tuned.  
+> The resources that this role going to create were, _Ec2 instances_, _dedicated VPC_, _ig = Instance group_, _CIDER block_.
+>
+> As Amazon Linux machine inherently contains Amazon CLI, we no need to install it additionaly.
+
+Login to the instance, now settup the KOPS and Kubectl in this machine.
+
+`sudo -s`   --> To elivate the permission to root user.  
+`hostnamectl set-hostname kops`   --> set hostname for machine.  
+`sudo -i`     --> Reflect the changes.  
+
+`vi .bashrc`    --> to edit the .bachrc file and add a path.
+`export PATH=$PATH:/usr/local/bin/`  --> add this pathe in the file.
+
+`source .bashrc`    ---> to reflect changes /compile the edit.  
+
+Now lets add a kops.sh file and run it to install kops, kubectl.
+
+`vi kops.sh`     --> create a shell script.  
+
+```
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot;
+wget https://github.com/kubernetes/kops/releases/download/v1.32.0/kops-linux-amd64
+chmod +x kops-linux-amd64 kubectl
+mv kubectl /usr/local/bin/kubectl
+mv kops-linux-amd64 /usr/local/bin/kops
+aws s3api create-bucket --bucket param-kops-testbkt143.k8s.local --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-1
+aws s3api put-bucket-versioning --bucket param-kops-testbkt143.k8s.local --region ap-south-1 --versioning-configuration Status=Enabled
+export KOPS_STATE_STORE=s3://param-kops-testbkt143.k8s.local
+kops create cluster --name param.k8s.local --zones ap-south-1a --image ami-0f918f7e67a3323f0  --control-plane-count=1 --control-plane-size t2.medium --node-count=2 --node-size t2.micro
+kops update cluster --name param.k8s.local --yes --admin
+```
+
+> [!NOTE]
+> 1. param-kops-testbkt143.k8s.local = is the bucket name, change it according to your needs and choose your region as needed.
+> 2. param.k8s.local = is the cluster name.
+> 3. In order to setup the main and worker nodes, iam using AMI machine image, **ami-0f918f7e67a3323f0** which is UBUNTU machine's AMI.
+> 4. For this setup we are uisng t2.medium for main node ( control plane) and t2.micro for worker node.
+
+
+
 
