@@ -1068,6 +1068,21 @@ lets see the nodes of the deployments.
 `kubectl get nodes -o wide`  
 
 
+#### Lets look how scaling works for multi node cluster
 
+**_Scale out_** :  
+`kubectl scale deployment/ib-deployment --replicas=10`    --> this will replicate the pods to 10.
+
+lets check the pods count,  
+`kubectl get pods -o wide`  
+
+**_Scale in_** :  
+`kubectl scale deployment/ib-deployment --replicas=4`
+
+check again the pods count and the nodes that pods belongs to.  
+
+
+
+ 
 
 
