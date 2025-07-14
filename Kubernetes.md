@@ -949,8 +949,11 @@ spec:
 ```kubectl delete cronjob```
 
 # 6. Lets setup a multi node cluster 
+> [!NOTE]
+> This multi node cluster setup using AWS instances will cost.
 
-For single node cluster ==> MiniKube
+
+For single node cluster ==> MiniKube.    
 For multi node cluster ==> KOPS.  
 
 We have several options for muticloud cluster, lets go with KOPS.
@@ -959,6 +962,8 @@ Go to AWS ec2 console,
 	* Choose a t2.micro instance with Amazon Linux OS.  
  	* Attach an IAM role with trusted entity = EC2, and Permissions = Administrative permissions.
 create instance.
+
+--------------
 > [!NOTE]
 > Use of IAM role:  
 > As this EC2 instance is going to create a cluster of a Master node and desired no. of worker nodes, and need to talk to the nodes in the cluster. so unless we have an IAM role with required permission, we cannot do that.  
@@ -966,15 +971,16 @@ create instance.
 > The resources that this role going to create were, _Ec2 instances_, _dedicated VPC_, _ig = Instance group_, _CIDER block_.
 >
 > As Amazon Linux machine inherently contains Amazon CLI, we no need to install it additionaly.
+--------------
 
 Login to the instance, now settup the KOPS and Kubectl in this machine.
 
-`sudo -s`   --> To elivate the permission to root user.  
-`hostnamectl set-hostname kops`   --> set hostname for machine.  
+`sudo -s`   --> To elivate the permission to root user.    
+`hostnamectl set-hostname kops`   --> set hostname for machine.    
 `sudo -i`     --> Reflect the changes.  
 
-`vi .bashrc`    --> to edit the .bachrc file and add a path.
-`export PATH=$PATH:/usr/local/bin/`  --> add this pathe in the file.
+`vi .bashrc`    --> to edit the .bachrc file and add a path.  
+`export PATH=$PATH:/usr/local/bin/`  --> add this pathe in the file.  
 
 `source .bashrc`    ---> to reflect changes /compile the edit.  
 
@@ -995,11 +1001,72 @@ kops create cluster --name param.k8s.local --zones ap-south-1a --image ami-0f918
 kops update cluster --name param.k8s.local --yes --admin
 ```
 
+------------
 > [!NOTE]
 > 1. param-kops-testbkt143.k8s.local = is the bucket name, change it according to your needs and choose your region as needed.
 > 2. param.k8s.local = is the cluster name.
 > 3. In order to setup the main and worker nodes, iam using AMI machine image, **ami-0f918f7e67a3323f0** which is UBUNTU machine's AMI.
 > 4. For this setup we are uisng t2.medium for main node ( control plane) and t2.micro for worker node.
+------------------
+
+Save and run the script.
+
+It may take a while to setup as it need to configure multiple things.  
+You can see the setup configuring in the your AWS account.  
+
+It is advised to run the following command again ( even though it was mentioned in the above script).  
+`export KOPS_STATE_STORE=s3://param-kops-testbkt143.k8s.local`  
+
+To verify the setup of cluster, use the following command  
+`kops validate cluster --wait 10m`  
+This command will return the status of cluster for a period of 10 mints.  
+The setup may take more than 10 mints. So Wait for untill setup was configured and you can see all 3 nodes up and healthy.  
+
+After sucessfull setup,  
+`kops get cluster`       --> to get the cluster details.  
+`kops get cluster -o wide`    --> to get more details of cluster.
+
+-------------------
+> [!NOTE]
+> kops edit cluster cluster_name   ---> to edit cluster (like replicas count etc).  
+> kops edit ig --name=cluster_name nodes-ap-south-1a ---> to edit worker nodes instance group.
+> kops edit ig --name=cluster_name control-plane-ap-south-1a    --> to edit control-plane (master) node instance group.  
+-------------------
+
+Lets try to create some nodes using deployment.
+
+`vi deployment.yml`
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ib-deployment
+  labels:
+    app: bank
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: bank
+  template:
+    metadata:
+      labels:
+        app: bank
+    spec:
+      containers:
+      - name: cont1
+        image: nginx
+```
+
+`kubectl create -f deployment.yml`    --> to run the deployment.
+
+lets see the nodes of the deployments.  
+`kubectl get pods`  	--> to get the pods of deployment.  
+`kubectl get pods -o wide`  
+`kubectl get nodes`    --> to get the nodes of the cluster.  
+`kubectl get nodes -o wide`  
+
 
 
 
