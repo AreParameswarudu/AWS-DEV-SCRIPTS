@@ -1366,6 +1366,223 @@ Create the deployment and service.
 describe the service.  
 `kubectl describe svc/nginxapp-service`  
 
-`kubectl get svc` 	--> note the loadbalancer url.  
+```
+kubectl get svc		  
+```
+note the loadbalancer url.   
 use the url and access the application.  
 
+## 10. Auto scaling with Kubernetes METRIC SERVER
+So far we hvae been doing scaling of pods, replicas, deployments manually.  
+```
+kubectl scale object --replicas=10
+```
+
+But we need auto scaling. This can be acheived by monitoring metrics like CPU, Memory etc.
+
+_**Kubernetes Metric Server**_, is a scalable efficient source for monitoring the overall health and performance of a kubernetes cluster, providing the data need for kubernetes features like **HORIZONTAL POD AUTOSCALING** **( HAP )** and Kubernetes Dashboard.  
+
+**Key features**:  
+#### 10.1 Resource Metrics:
+Collects CPU and memory usage metrics from kubelets and provides aggregated metrics at the node and pod level.  
+
+#### 10.2 Autoscaling:  
+Enables features like the Horizontal Pod Autoscaling (HPA), which automatically adjusts the no. of pods in a deplooyment based on the observed CPU or memory utilization.
+
+#### 10.3 Kubernetes Dashboard:  
+The metrics server provides the resources usage data dislayes in the kubernetes Dashboard.
+
+#### 10.4 Kubelets:  
+Each nodes in a kubernetes cluster runs a kubelet that periodically clooects resources usage statics from the node and the containers running on it.
+
+#### 10.5 Metrics server: 
+Metrics server collects these metrics from the kubelets and stores them in memory, aggregating them to be accessed by other components like HPA.
+
+_So in short:_  
+	Info like CPU, Memory from each PODS, Nodes -------> collected by Metrics Server in K8S.  
+	This will be done on every 15 sec.  ( we can say near real time.)  
+
+Well, the Metrics server is not default in K8S, its like a addon plugin.  
+We need to install in the master server.  
+
+Install the Metrics Server from github official repo's .yml file.    
+```
+kubectl create -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
+```
+
+
+Lets check the metrics of resources.  
+```
+kubectl top pods
+```
+
+```
+kubectl get nodes
+```
+
+
+With this lets acheive Autoscaling.
+
+**Auto-Scaling**:
+
+HPA - to scale no. of pods based on metrics usage.  The metric can be CPU, Memory or even custom metrics.  
+Remember that its PODS that we scale not NODES here.  
+
+Before scale In, process will wait for few mins to scale-in to complete the traffic requests this is called COOLING PERIOD   
+
+In Kubernetes, the cooling period for the Horizontal Pod Autoscaler (HPA) is the amount of time the HPA waits after a scale event before triggering another scale event.  
+
+Scaling can only be done on/for scalable objects like Deployments, Replicasets, Pods, Replication Controller.  
+
+_Replication controller is the older version of Replicasets._
+
+
+So lets create a deployment object and run it.
+```
+vi nginxapp.yml
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginxapp-deployemnt
+  labels:
+    app: nginxapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginxapp
+  template:
+    metadata:
+      labels:
+        app: nginxapp
+    spec:
+      containers:
+       - name: cont1
+         image: nginx
+```
+
+Create the deployment.  
+```
+kubectl create -f nginxapp.yml
+```
+
+Get the pods list.  
+```
+kubectl get pods
+```
+
+Get the Metrics of pods.  
+```
+kubectl top pods
+```
+
+Now lets auto scale the pods,  
+```
+kubectl autoscale deployment nginxapp-deployment --cpu-percent=20 --min=1 --max=10
+```
+The commad says, if the cpu percentage goes up more than 20 then use auto scaling to scale up to 10 pods.  
+
+```
+kubectl het hpa
+```
+This wil show cpu: 1% / 20% , now cpu percent is 1%, it will take time.  
+
+You can stress the pods by installing stress inside the pods.  
+First connect to a pod interactive mode.  
+```
+kubectl exec -it nginxapp-deployment-XXXXXX-XXXX -- /bin/bash
+```
+Install _STRESS_, inside the pod.  
+```
+apt update
+apt install stress
+stress --cpu 8 --io --vm 2 --vm-bytes 128M --timeout 60s
+exit
+```
+
+Meanwhile duplicate the present tab and watch the pods creation lively.
+
+Delete the stress or completely delete the deployment object's yml file.
+
+
+Lets do the same autoscaling but now with Manifist file ( declaretive mode) most used way.  
+---------------
+
+Create deployment.  
+```
+vi auto.yml
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginxapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginxapp
+  template:
+    metadata:
+      labels:
+        app: nginxapp
+    spec:
+      containers:
+      - name: cont1
+        image: nginx
+```
+
+```
+kubectl create -f auto.yml
+```
+
+```
+vi hpa.yml
+```
+
+```
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginxapp-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 20
+```
+
+NOTE: we can use a single yaml file to define the deployment and autoscaling as well.  
+
+In the scaleTargetRef section, the details of the target deployment file are to be mentioned.
+
+
+```
+kubectl apply -f hpa.yml
+```
+
+In the similar way as we did above, go to interactive mode into any pod, install stress and run the stress execution command.  
+and look for actoscaling aorking.  
+
+
+To delete the Metrics Server, 
+```
+kubectl delete -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
+```
+
+ 	
