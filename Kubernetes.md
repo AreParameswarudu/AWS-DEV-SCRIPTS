@@ -1194,12 +1194,127 @@ Services in k8s are created on top of deployment. so we cannot a standalone serv
 Services are defined with _manifist.yml_ file.
 
 
+Lets creat a deployment and then create service on top of it.  
+We can define both deployment and service in a single manifist.yml file.  
+
+For clusterIP exercise.    
+`vi nginxapp.yml`  
+
+```
+appVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginxapp
+spec:
+  replicas: 3
+  selector:
+     matchLabels:
+        app: nginxapp
+  template:
+    metadata:
+      labels:
+        app: nginxapp
+    spec:
+      containers:
+        - name: cont1
+          image: nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginxapp-service
+spec:
+  type: ClusterIP
+  selector:
+    app: nginxapp
+  ports:
+    - port: 80
+      targetPort: 80
+```
+
+In the file, -port: 80  = expose the service on port 80.   
+targetPort: 80  = Pod's container listens on 80, if you dont use this line, k8s will assign defalut 80 port.
 
 
+How Traffic Flows  
+	_Client connects to my-service:80  
+	Service forwards request to the Pod’s container at 8080 if 80 (because targetPort: 8080 / 80)  
+	The container in the Pod listens on 8080 / 80 and processes the request._  
 
 
+Run the nginxapp.yml file.  
+`kubectl create -f nginxapp.yml`  
+
+get list of services.  
+`kubectl get svc`  
+
+get list of pods.  
+`kubectl get pods -o wide`  
+
+describe the nginxapp-service that we have created.  
+`kubectl describe svc/nginxapp-service`   --> nginxapp-service is the name of the service that we have created.  
+
+As of now we have created clusterIP but with this we can anly estlabish internal communication but not outside world communication.  
+`kubectl delete -f nginxapp.yml`   --> to delete the created deployment and service.
 
 
+For NodePort service.  
+`vi nginxapp.yml`  
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginxapp-deployment
+  labels:
+    app: nginxapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginxapp
+  template:
+    metadata:
+      labels:
+        app: nginxapp
+    spec:
+      containers:
+      - name: cont1
+        image: nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginxapp-service
+spec:
+  type: NodePort   # Type Nodeport, but if you dont mention port number under ports section, K8s will assign random port
+  selector:
+    app: nginxapp
+  ports:
+    - port: 80
+      targetPort: 80  # Ensure this matches the container's port, if you dont use this line, K8s will assign default 80 port
+```
+
+create or run the file.  
+`kubectl create -f nginxapp.yml`  
+
+lets describe service that we have created.  
+`kubectl get svc`  
+ `kubectl describe svc/nginxapp-service`  
+
+ Lets connect to the nginxapp  
+ use `http://ip:portnumber`  
+ it may not woork as the cluster created new VPC and new SG for cluster, we need to allow the inblound rules for the port.  So go to respective Security Group, allown alltraffic for all IPs. 
+
+ If we want to explicitly mention the Nodeport, then edit the above file and add `nodePort: 3122` at the end of ports section.  
+ Remember the nodeports range should be between 30,000 to 32767.  
+
+How traffic flows: 
+	_Client accesses http://<NodeIP>:31234  
+	Traffic reaches Kubernetes Node on nodePort: 31234  
+	The service forwards it to port: 80 (internal Service port)  
+	Then it forwards the request to targetPort: 80 (inside the Pod’s container)._
  
 
 
