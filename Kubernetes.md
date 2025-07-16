@@ -956,7 +956,7 @@ spec:
 For single node cluster ==> MiniKube.    
 For multi node cluster ==> KOPS.  
 
-We have several options for muticloud cluster, lets go with KOPS.
+We have several options for mutinode cluster, lets go with KOPS.
 
 Go to AWS ec2 console,   
 	* Choose a t2.micro instance with Amazon Linux OS.  
@@ -1082,6 +1082,28 @@ lets check the pods count,
 check again the pods count and the nodes that pods belongs to.  
 
 
+-----------------------------------------------------------------------------------
+
+## 7. NAMESPACES.
+
+Name space is the means by which we segregate to differenciate different enviroments/teams.
+
+If we have multiple teams, say _Development team_, _Testing team_, _Prepod team_ and _prod team_. and all of these teams want to work with kuberetes, then instead of going with multiple clusters of kubernetes, we just create different **namespaces** for each team in a single cluster.
+
+
+Good thing about namespaces is that budefault, they cannot talk with each others. so complete isolation from each other.  
+
+In kubernetes, if we are using a cluster, there are few default namespaces already present. they are:  
+| Types  	|  Purpose or work |
+| ---------- | -----------------|
+| default 	|  This is default namespace. If no namespace is mentioned, all objects are created here |
+| kube-node-release |	It will store the object which is taken from one namespace to another |
+| kube-public	|All Public objects are stored here, generally namespace are private, if you want common public namespace |
+|kube-system	| By default K8S will create some object, those are stored here |
+
+> [!NOTE]
+> 1. Objects here refers to deployments, replica sets, pods, services. Every thing in K8S are treated as objects.  
+> 2. Default objects that K8S will createa are apiserver, controller manager, schedular, etcd, kubelet, kubeproxy.
 
  
 
