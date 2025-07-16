@@ -948,7 +948,7 @@ spec:
 
 ```kubectl delete cronjob```
 
-##  Lets setup a multi node cluster 
+#  Lets setup a multi node cluster 
 > [!NOTE]
 > This multi node cluster setup using AWS instances will cost.
 
@@ -1089,7 +1089,7 @@ check again the pods count and the nodes that pods belongs to.
 
 -----------------------------------------------------------------------------------
 
-## 6. NAMESPACES.
+# 6. NAMESPACES.
 
 > [!NOTE]
 > If you are very new to using multi node cluster and are not fine to go with multi node cluster, then go with minikube (single node cluster) than KOPs.
@@ -1150,9 +1150,9 @@ Also, we can shift from one namespcae to another namespace, then how come its a 
 
 In this case, anyone can access/delete/create pods in any namespace. Which is not good. for this we need restrict users to access namespaces using RBAC ( Role based Access Control ).
 
-## 7. RBAC.
+# 7. RBAC.
 
-## 8. SERVICES.
+# 8. SERVICES.
 
 The very use of services is to enable the communication.  
 When I say communication I mean two aspects,   
@@ -1372,7 +1372,7 @@ kubectl get svc
 note the loadbalancer url.   
 use the url and access the application.  
 
-## 9. Auto scaling with Kubernetes METRIC SERVER
+# 9. Auto scaling with Kubernetes METRIC SERVER
 So far we hvae been doing scaling of pods, replicas, deployments manually.  
 ```
 kubectl scale object --replicas=10
