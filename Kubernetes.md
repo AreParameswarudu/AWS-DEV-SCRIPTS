@@ -1315,6 +1315,57 @@ How traffic flows:
 	Traffic reaches Kubernetes Node on nodePort: 31234  
 	The service forwards it to port: 80 (internal Service port)  
 	Then it forwards the request to targetPort: 80 (inside the Pod’s container)._
- 
 
+`kubectl delete -f nginxapp.yml` 	--> to delete the deployment and services from file.  
+
+As we cannot provide the Ips to users, we need to use load balancers.  
+Along with load balancer, use Route53 to give the url a domani name.  
+
+
+ For LoadBalancer  
+ `vi nginxapp.yml`
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginxapp-deployment
+  labels:
+    app: nginxapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginxapp
+  template:
+    metadata:
+      labels:
+        app: nginxapp
+    spec:
+      containers:
+      - name: cont1
+        image: nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginxapp-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginxapp
+  ports:
+    - port: 80
+      targetPort: 80  # Ensure this matches the container's port, if you dont use this line, K8s will assign default 80 port
+      nodePort: 31433 # If you dont mention target and nodeports, K8s will generate random nodeport and target port 80
+```
+
+Create the deployment and service.  
+`kubectl create -f nginxapp.yml`  
+
+describe the service.  
+`kubectl describe svc/nginxapp-service`  
+
+`kubectl get svc` 	--> note the loadbalancer url.  
+use the url and access the application.  
 
