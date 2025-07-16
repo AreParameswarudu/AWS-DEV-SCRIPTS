@@ -130,7 +130,7 @@ Kubectl is the command line tool for Kubernetes
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-# Minikube Setup
+# Single Node (Minikube) Setup
 
 Requirement  
 Launch an EC2 instance with Ubuntu and t2.small having min 10GB volume.
@@ -170,7 +170,7 @@ The configuration of kubectl is in the $HOME/.kube directory.
 
 `kubectl get pods`
 
-## 1. PODS :
+# 1. PODS :
 It is a smallest unit of deployment in K8's.  
 It is a group of containers.  
 Pods are ephemeral (short living objects)  
@@ -323,7 +323,7 @@ _Problem with using or defining only pods:_
   
 -------------------------------------------------------------------------------------
 
-## 2. REPLICASET :
+# 2. REPLICASET :
 
 This is used for managing multiple replicas of pod to perform activities like load balancing and autoscaling
 
@@ -537,7 +537,7 @@ Deployments are recommended over ReplicaSets.
 
 -----------------------------------------------------------------------------------------------------------------------------
 
-## 3. Deployment
+# 3. Deployment
 
 Kubernetes deployment is a high-level resource object by which you can manage the deployment and scaling of the applications while maintaining the desired state of the application. You can scale the containers with the help of Kubernetes deployment up and down depending on the incoming traffic.   
 If you have performed any rolling updates with the help of deployment and after some time if you find any bugs in it then you can perform rollback also. Kubernetes deployments are deployed with the help of CLI like Kubectl it can be installed on any platform.  
@@ -751,7 +751,7 @@ spec:
 
 
 
-## 4. Kubernetes JOBS:
+# 4. Kubernetes JOBS:
    
 Kubernetes Jobs are resources used to run batch tasks in a Kubernetes cluster.   
 They ensure that a specified number of Pods successfully complete a task before marking the Job as done.   
@@ -905,7 +905,7 @@ spec:
 In the above example 3 pods are started executing at a time since we mentioned Parallelism = 3 and we didn’t mention any specified number of Completions.
                            
 
-## 5. 🚀 Kubernetes CronJob Example
+# 5. 🚀 Kubernetes CronJob Example
 
 A Kubernetes CronJob is used to schedule jobs to run at specific times, just like a Linux cron job. It is useful for tasks such as backups, periodic data processing, or sending scheduled reports.
 
@@ -948,7 +948,7 @@ spec:
 
 ```kubectl delete cronjob```
 
-## 6. Lets setup a multi node cluster 
+##  Lets setup a multi node cluster 
 > [!NOTE]
 > This multi node cluster setup using AWS instances will cost.
 
@@ -1089,7 +1089,7 @@ check again the pods count and the nodes that pods belongs to.
 
 -----------------------------------------------------------------------------------
 
-## 7. NAMESPACES.
+## 6. NAMESPACES.
 
 > [!NOTE]
 > If you are very new to using multi node cluster and are not fine to go with multi node cluster, then go with minikube (single node cluster) than KOPs.
@@ -1150,9 +1150,9 @@ Also, we can shift from one namespcae to another namespace, then how come its a 
 
 In this case, anyone can access/delete/create pods in any namespace. Which is not good. for this we need restrict users to access namespaces using RBAC ( Role based Access Control ).
 
-## 8. RBAC.
+## 7. RBAC.
 
-## 9. SERVICES.
+## 8. SERVICES.
 
 The very use of services is to enable the communication.  
 When I say communication I mean two aspects,   
@@ -1197,7 +1197,7 @@ Services are defined with _manifist.yml_ file.
 Lets creat a deployment and then create service on top of it.  
 We can define both deployment and service in a single manifist.yml file.  
 
-#### 9.1 For clusterIP exercise.    
+#### 8.1 For clusterIP exercise.    
 `vi nginxapp.yml`  
 
 ```
@@ -1260,7 +1260,7 @@ As of now we have created clusterIP but with this we can anly estlabish internal
 `kubectl delete -f nginxapp.yml`   --> to delete the created deployment and service.
 
 
-#### 9.2 For NodePort service.  
+#### 8.2 For NodePort service.  
 `vi nginxapp.yml`  
 ```
 apiVersion: apps/v1
@@ -1322,7 +1322,7 @@ As we cannot provide the Ips to users, we need to use load balancers.
 Along with load balancer, use Route53 to give the url a domani name.  
 
 
- #### 9.3 For LoadBalancer  
+ #### 8.3 For LoadBalancer  
  `vi nginxapp.yml`
 
 ```
@@ -1372,7 +1372,7 @@ kubectl get svc
 note the loadbalancer url.   
 use the url and access the application.  
 
-## 10. Auto scaling with Kubernetes METRIC SERVER
+## 9. Auto scaling with Kubernetes METRIC SERVER
 So far we hvae been doing scaling of pods, replicas, deployments manually.  
 ```
 kubectl scale object --replicas=10
@@ -1386,16 +1386,16 @@ _**Kubernetes Metric Server**_, is a scalable efficient source for monitoring th
 #### 10.1 Resource Metrics:
 Collects CPU and memory usage metrics from kubelets and provides aggregated metrics at the node and pod level.  
 
-#### 10.2 Autoscaling:  
+#### 9.2 Autoscaling:  
 Enables features like the Horizontal Pod Autoscaling (HPA), which automatically adjusts the no. of pods in a deplooyment based on the observed CPU or memory utilization.
 
-#### 10.3 Kubernetes Dashboard:  
+#### 9.3 Kubernetes Dashboard:  
 The metrics server provides the resources usage data dislayes in the kubernetes Dashboard.
 
-#### 10.4 Kubelets:  
+#### 9.4 Kubelets:  
 Each nodes in a kubernetes cluster runs a kubelet that periodically clooects resources usage statics from the node and the containers running on it.
 
-#### 10.5 Metrics server: 
+#### 9.5 Metrics server: 
 Metrics server collects these metrics from the kubelets and stores them in memory, aggregating them to be accessed by other components like HPA.
 
 _So in short:_  
