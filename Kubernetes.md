@@ -948,7 +948,7 @@ spec:
 
 ```kubectl delete cronjob```
 
-# 6. Lets setup a multi node cluster 
+## 6. Lets setup a multi node cluster 
 > [!NOTE]
 > This multi node cluster setup using AWS instances will cost.
 
@@ -1577,7 +1577,7 @@ kubectl apply -f hpa.yml
 ```
 
 In the similar way as we did above, go to interactive mode into any pod, install stress and run the stress execution command.  
-and look for actoscaling aorking.  
+and look for actoscaling working.  
 
 
 To delete the Metrics Server, 
