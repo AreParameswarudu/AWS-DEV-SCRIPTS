@@ -1081,11 +1081,18 @@ lets check the pods count,
 
 check again the pods count and the nodes that pods belongs to.  
 
+> [!NOTE]
+> Remember, not to exit the cluster without deleting it, if not you will be charged on a HUGE amount from AWS for using AWS resources as we are using AWS servers for setting up multinode cluster.
+
+**To delete the cluster**:  
+`kubectl delete cluster --name param.k8s.local`		--> param.k8s.local is the name that have used for the cluster.
 
 -----------------------------------------------------------------------------------
 
 ## 7. NAMESPACES.
 
+> [!NOTE]
+> If you are very new to using multi node cluster and are not fine to go with multi node cluster, then go with minikube (single node cluster) than KOPs.
 Name space is the means by which we segregate to differenciate different enviroments/teams.
 
 If we have multiple teams, say _Development team_, _Testing team_, _Prepod team_ and _prod team_. and all of these teams want to work with kuberetes, then instead of going with multiple clusters of kubernetes, we just create different **namespaces** for each team in a single cluster.
@@ -1103,7 +1110,55 @@ In kubernetes, if we are using a cluster, there are few default namespaces alrea
 
 > [!NOTE]
 > 1. Objects here refers to deployments, replica sets, pods, services. Every thing in K8S are treated as objects.  
-> 2. Default objects that K8S will createa are apiserver, controller manager, schedular, etcd, kubelet, kubeproxy.
+> 2. Default objects that K8S will createa are apiserver, controller manager, schedular, etcd, kubelet, kubeproxy or simply, every component of kubernetes cluster is going to create in the form of POD, All these PODS are stored in Kube-System Namespace.
+
+
+`kubectl get namespace`		--> to get the list of namespaces.  
+`kubectl get ns`		--> same as above.  
+
+Bydefault, pods will be created in default name space if no namespace is mentioned.  
+`kubectl describe pod`		--> can see the namespace details.  
+`kubectl get pods -A`		--> to get pods of all namespaces.  
+`kubectl get pods -n namespace_name` --> to get the pods of specific namespace, use default, kube-public as namespace.
+
+
+##### Lets create name spaces.
+`kubectl create ns dev`		--> creating a namespace named dev.  
+`kubectl get ns`		--> look for the created namespace in results.  
+
+How to check in which namespace you are currently are  
+`kubectl config view`  
+Bydefault we will be in default namespace and hence all pods are created here in the default namespace.
+
+Lets switch to dev namespace.  
+`kubectl config set-context --current --namespace=dev`  
+
+conform the switch was sucess.  
+`kubectl config view`  
+
+lets create pods in pod namespace.  
+`kubectl run dev1 --image nginx` 	--> creating nginx pod with pod name as dev1.
+`kubectl run dev2 --image nginx`	--> creating nginx pod with pod name as dev2.
+
+As we have pods in the default namespace and dev namespace, lets use _get pods_ command and see which pods will be listed  
+`kubectl get pods`  
+only the pods belongs to dev namespace are listed.  
+
+
+As I have mentioned that use of namespaces will have complete isolation from ine another, but with use of `kubectl get pods -A` we can get all pods of all namespaces.  
+Also, we can shift from one namespcae to another namespace, then how come its a complete isolation!!.  
+
+In this case, anyone can access/delete/create pods in any namespace. Which is not good. for this we need restrict users to access namespaces using RBAC ( Role based Access Control ).
+
+## 8. RBAC.
+
+## 9. SERVICES.
+
+
+
+
+
+
 
  
 
