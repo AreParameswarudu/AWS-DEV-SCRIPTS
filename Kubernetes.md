@@ -1154,6 +1154,46 @@ In this case, anyone can access/delete/create pods in any namespace. Which is no
 
 ## 9. SERVICES.
 
+The very use of services is to enable the communication.  
+When I say communication I mean two aspects,   
+* _**Communication in between cluster**_  
+	When two pods need to work depending on another ( say i have UI in one pod that connects to database in 		another POD) then the two pods need to connect or communicate and this is internal aommunication.  
+ * _**Communicatio to the outside world.**_  
+	I also need ot make the UI presented to my users to use it, to interact with it. This is outside the cluster communication.
+
+
+So services allow you to expose your application running on pods to other components within cluster or to the external users.  
+
+Services porvide a stable IP address and DNS name for the set of PODS, which might chnage over time due to scaling or updates.
+
+#### Key concepts of SERVICES in Kubernetes:
+1. **_Cluster IP_** :  
+   This is default type of service. It exposes the Service on a cluster-internal IP. Other services within the same Kubernetes cluster can access the Service, but it is not accessible from outside the cluster.  
+   This creates a connection using an internal Cluster IP address and a Port.
+
+2. **_NodePort_** :  
+   This type of Service exposes the Service on each Node’s IP at a static port. A NodePort Service is accessible from outside the cluster by hitting NOdeIP:NOdePort  
+   when node port is created, kube-proxy exposes a port in the range 30,000-32,767.  
+   We can explicitly mention the port no. else k8s takes are of assigning the port no. but anyhow, the port no. should be in same rangee.
+
+3. **_TargetPort_** :  
+   Pod Container port. Pod's container listens on applicationn port Ex: 80 or 8080, if you dont use this line, K8s will assign default 80 port.  
+
+4. **_LoadBalancer_** :  
+   This Service type exposes the Service externally using a cloud provider’s load balancer. It is typically used in cloud environments like AWS, GCP, or Azure.  
+   A LoadBalancer is a Kubernetes service that:  
+	* Creates a service like cluster IP,  
+	* Opens a port in every node like nodeport,  
+	* Uses a load balancer implementation from your cloud provider.
+
+> [!NOTE]
+> We dont need to explicitly mention the loadbalancer's url or to create a load balancer in aws account and copy paste the url. k8s will take care of this as it creates its own VPC and respective needed resources in this VPC.
+   
+
+Services in k8s are created on top of deployment. so we cannot a standalone service without any deployments.  
+Services are defined with _manifist.yml_ file.
+
+
 
 
 
