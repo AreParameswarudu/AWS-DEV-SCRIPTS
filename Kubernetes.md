@@ -1197,7 +1197,7 @@ Services are defined with _manifist.yml_ file.
 Lets creat a deployment and then create service on top of it.  
 We can define both deployment and service in a single manifist.yml file.  
 
-For clusterIP exercise.    
+#### 9.1 For clusterIP exercise.    
 `vi nginxapp.yml`  
 
 ```
@@ -1260,7 +1260,7 @@ As of now we have created clusterIP but with this we can anly estlabish internal
 `kubectl delete -f nginxapp.yml`   --> to delete the created deployment and service.
 
 
-For NodePort service.  
+#### 9.2 For NodePort service.  
 `vi nginxapp.yml`  
 ```
 apiVersion: apps/v1
@@ -1322,7 +1322,7 @@ As we cannot provide the Ips to users, we need to use load balancers.
 Along with load balancer, use Route53 to give the url a domani name.  
 
 
- For LoadBalancer  
+ #### 9.3 For LoadBalancer  
  `vi nginxapp.yml`
 
 ```
