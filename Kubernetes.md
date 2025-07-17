@@ -1131,7 +1131,7 @@ kops delete cluster --name param.k8s.local --yes
 _param.k8s.local_ is the name that I have used/mentioned for the cluster in the kops.sh script.  
 
 > [!Caution]
-> Do not delete any ec2 instance directly, if the KOPS cluster is lost without deleting the cluster, then its a huge problem.  
+> Do not delete any ec2 instance directly, if the KOPS instance is lost without deleting the cluster, then its a huge problem.  
 > Make sure you deleted the cluster fom CLI, with above mentioned command.  
 > Ensure that `kops get cluster`  should return no cluster found message. By that all the resources from cluster will be deleted automatically.  
 > Only the _**S3 bucket**_ and _**EC2 instance**_ we have created initially were left.  
