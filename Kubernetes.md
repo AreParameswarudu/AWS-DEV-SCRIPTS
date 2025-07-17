@@ -1109,6 +1109,13 @@ check again the pods count and the nodes that pods belongs to.
 ### **To delete the cluster**:  
 `kops delete cluster --name param.k8s.local --yes`	--> param.k8s.local is the name that have used for the cluster.
 
+> [!Caution]
+> Do not delete any ec2 instance directly, if the KOPS cluster is lost without deleting the cluster, then its a huge problem.
+> Make sure you deleted the cluster fom CLI, with `kops get cluster`  should return no cluster found message.
+> By that all the resources from cluster will be deleted automatically.
+> Only the **S3 bucket** and **EC2 instance** we have created initially were left.
+
+Delete the initially setup EC2 instance and S3 bucket.
 -----------------------------------------------------------------------------------
 
 # 6. NAMESPACES.
