@@ -1107,7 +1107,7 @@ check again the pods count and the nodes that pods belongs to.
 > Remember, not to exit the cluster without deleting it, if not you will be charged on a HUGE amount from AWS for using AWS resources as we are using AWS servers for setting up multinode cluster.
 
 ### **To delete the cluster**:  
-`kubectl delete cluster --name param.k8s.local`		--> param.k8s.local is the name that have used for the cluster.
+`kops delete cluster --name param.k8s.local --yes`	--> param.k8s.local is the name that have used for the cluster.
 
 -----------------------------------------------------------------------------------
 
