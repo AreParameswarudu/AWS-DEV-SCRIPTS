@@ -1003,8 +1003,8 @@ kops update cluster --name param.k8s.local --yes --admin
 
 ------------
 > [!NOTE]
-> 1. param-kops-testbkt143.k8s.local = is the bucket name, change it according to your needs and choose your region as needed.
-> 2. param.k8s.local = is the cluster name.
+> 1. _param-kops-testbkt143.k8s.local_ = is the bucket name, change it according to your needs and choose your region as needed.
+> 2. _param.k8s.local_ = is the cluster name.
 > 3. In order to setup the main and worker nodes, iam using AMI machine image, **ami-0f918f7e67a3323f0** which is UBUNTU machine's AMI.
 > 4. For this setup we are uisng t2.medium for main node ( control plane) and t2.micro for worker node.
 ------------------
@@ -1035,6 +1035,7 @@ is to edit the node (worker node) instace group.
 kops edit ig --name=param.k8s.local control-plane-ap-south-1a
 ```
 is to edit the control-plane (master node) instance type.
+
 ------------------------------------------
 
 
