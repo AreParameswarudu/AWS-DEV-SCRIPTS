@@ -989,7 +989,7 @@ Now lets add a kops.sh file and run it to install kops, kubectl.
 `vi kops.sh`     --> create a shell script.  
 
 ```
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl&quot;
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl";
 wget https://github.com/kubernetes/kops/releases/download/v1.32.0/kops-linux-amd64
 chmod +x kops-linux-amd64 kubectl
 mv kubectl /usr/local/bin/kubectl
