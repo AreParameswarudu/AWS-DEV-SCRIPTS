@@ -1150,6 +1150,32 @@ Bydefault, pods will be created in default name space if no namespace is mention
 
 How to check in which namespace you are currently are  
 `kubectl config view`  
+
+Responce will look like this, 
+```
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: DATA+OMITTED
+    server: https://api-param-k8s-local-ois0ae-597c9eddbfb36165.elb.ap-south-1.amazonaws.com
+    tls-server-name: api.internal.param.k8s.local
+  name: param.k8s.local
+contexts:
+- context:
+    cluster: param.k8s.local
+    user: param.k8s.local
+  name: param.k8s.local
+current-context: param.k8s.local
+kind: Config
+preferences: {}
+users:
+- name: param.k8s.local
+  user:
+    client-certificate-data: DATA+OMITTED
+    client-key-data: DATA+OMITTED
+```
+Note that it wont contain any namespace tag or section. That is the very sign that says we are in default namespace.  
+
 Bydefault we will be in default namespace and hence all pods are created here in the default namespace.
 
 Lets switch to dev namespace.  
