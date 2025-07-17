@@ -1348,12 +1348,23 @@ create or run the file.
 `kubectl create -f nginxapp.yml`  
 
 lets describe service that we have created.  
-`kubectl get svc`  
  `kubectl describe svc/nginxapp-service`  
 
- Lets connect to the nginxapp  
- use `http://ip:portnumber`  
- it may not woork as the cluster created new VPC and new SG for cluster, we need to allow the inblound rules for the port.  So go to respective Security Group, allown alltraffic for all IPs. 
+
+```
+kubectl get services
+```
+For this command, we can see the port numbers of nodes that K8S assigned on our behalf.  
+```
+NAME               TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+kubernetes         ClusterIP   100.64.0.1     <none>        443/TCP        45m
+nginxapp-service   NodePort    100.65.75.28   <none>        80:30301/TCP   4m34s
+```
+This is the responce in my case.  
+Note the Node portnumber assigned is 30301 in this case.  
+So, if I want to access the nginx application then i need to simply put,   
+ `http://ip:nodePortNumber`    ( ip is the node Ip  = worker nodes ec2 instance public IP ).    
+ It may not woork as the cluster created new VPC and new SG for cluster, we need to allow the inblound rules for the port.  So go to respective Security Group, allown alltraffic for all IPs. 
 
  If we want to explicitly mention the Nodeport, then edit the above file and add `nodePort: 3122` at the end of ports section.  
  Remember the nodeports range should be between 30,000 to 32767.  
