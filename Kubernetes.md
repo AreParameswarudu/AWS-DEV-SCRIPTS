@@ -1083,23 +1083,41 @@ spec:
 
 `kubectl create -f deployment.yml`    --> to run the deployment.
 
-lets see the nodes of the deployments.  
-`kubectl get pods`  	--> to get the pods of deployment.  
-`kubectl get pods -o wide`  
-`kubectl get nodes`    --> to get the nodes of the cluster.  
-`kubectl get nodes -o wide`  
-
+lets see the nodes of the deployments.   
+To get the pods of deployment use,
+```
+kubectl get pods
+```
+or  
+```
+kubectl get pods -o wide
+```
+To get the nodes of the cluster use,  
+```
+kubectl get nodes
+```
+or  
+```
+kubectl get nodes -o wide
+```  
 
 ##### Lets look how scaling works for multi node cluster
 
 **_Scale out_** :  
-`kubectl scale deployment/ib-deployment --replicas=10`    --> this will replicate the pods to 10.
+To replicate the pods to 10.  
+```
+kubectl scale deployment/ib-deployment --replicas=10
+```    
 
-lets check the pods count,  
-`kubectl get pods -o wide`  
+Lets check the pods count,  
+```
+kubectl get pods -o wide
+```
 
 **_Scale in_** :  
-`kubectl scale deployment/ib-deployment --replicas=4`
+```
+kubectl scale deployment/ib-deployment --replicas=4
+```
 
 check again the pods count and the nodes that pods belongs to.  
 
@@ -1107,15 +1125,19 @@ check again the pods count and the nodes that pods belongs to.
 > Remember, not to exit the cluster without deleting it, if not you will be charged on a HUGE amount from AWS for using AWS resources as we are using AWS servers for setting up multinode cluster.
 
 ### **To delete the cluster**:  
-`kops delete cluster --name param.k8s.local --yes`	--> param.k8s.local is the name that have used for the cluster.
+```
+kops delete cluster --name param.k8s.local --yes
+```
+_param.k8s.local_ is the name that I have used/mentioned for the cluster in the kops.sh script.  
 
 > [!Caution]
-> Do not delete any ec2 instance directly, if the KOPS cluster is lost without deleting the cluster, then its a huge problem.
-> Make sure you deleted the cluster fom CLI, with `kops get cluster`  should return no cluster found message.
-> By that all the resources from cluster will be deleted automatically.
-> Only the **S3 bucket** and **EC2 instance** we have created initially were left.
+> Do not delete any ec2 instance directly, if the KOPS cluster is lost without deleting the cluster, then its a huge problem.  
+> Make sure you deleted the cluster fom CLI, with above mentioned command.  
+> Ensure that `kops get cluster`  should return no cluster found message. By that all the resources from cluster will be deleted automatically.  
+> Only the _**S3 bucket**_ and _**EC2 instance**_ we have created initially were left.  
 
-Delete the initially setup EC2 instance and S3 bucket.
+Manually delete the initially setup EC2 instance and S3 bucket. 
+
 -----------------------------------------------------------------------------------
 
 # 6. NAMESPACES.
