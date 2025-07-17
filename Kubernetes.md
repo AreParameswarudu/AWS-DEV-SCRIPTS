@@ -1068,7 +1068,7 @@ lets see the nodes of the deployments.
 `kubectl get nodes -o wide`  
 
 
-#### Lets look how scaling works for multi node cluster
+##### Lets look how scaling works for multi node cluster
 
 **_Scale out_** :  
 `kubectl scale deployment/ib-deployment --replicas=10`    --> this will replicate the pods to 10.
@@ -1084,7 +1084,7 @@ check again the pods count and the nodes that pods belongs to.
 > [!NOTE]
 > Remember, not to exit the cluster without deleting it, if not you will be charged on a HUGE amount from AWS for using AWS resources as we are using AWS servers for setting up multinode cluster.
 
-**To delete the cluster**:  
+### **To delete the cluster**:  
 `kubectl delete cluster --name param.k8s.local`		--> param.k8s.local is the name that have used for the cluster.
 
 -----------------------------------------------------------------------------------
