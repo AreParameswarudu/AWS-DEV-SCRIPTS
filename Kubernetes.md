@@ -1010,6 +1010,33 @@ kops update cluster --name param.k8s.local --yes --admin
 ------------------
 
 Save and run the script.
+```
+sh kops.sh
+```
+NOTE:
+-----------------------------------
+During setup, it will suggest us about few commands under _suggestions_ section, make a note of them.  
+```
+kops get cluster
+```
+is to get the details of cluster.
+
+```
+kops edit cluster param.k8s.local
+```
+is to edit the cluster
+
+```
+kops edit ig --name=param.k8s.local nodes-ap-south-1a
+```
+is to edit the node (worker node) instace group.
+
+```
+kops edit ig --name=param.k8s.local control-plane-ap-south-1a
+```
+is to edit the control-plane (master node) instance type.
+------------------------------------------
+
 
 It may take a while to setup as it need to configure multiple things.  
 You can see the setup configuring in the your AWS account.  
@@ -1026,12 +1053,6 @@ After sucessfull setup,
 `kops get cluster`       --> to get the cluster details.  
 `kops get cluster -o wide`    --> to get more details of cluster.
 
--------------------
-> [!NOTE]
-> kops edit cluster cluster_name   ---> to edit cluster (like replicas count etc).  
-> kops edit ig --name=cluster_name nodes-ap-south-1a ---> to edit worker nodes instance group.
-> kops edit ig --name=cluster_name control-plane-ap-south-1a    --> to edit control-plane (master) node instance group.  
--------------------
 
 Lets try to create some nodes using deployment.
 
