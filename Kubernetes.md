@@ -1950,7 +1950,242 @@ kubectl get pv
 ```
 This lists both pv and pvc now.  
 
+#### StatefulSet
+
+A StatefulSet is a Kubernetes workload API object used to manage stateful applications. Unlike Deployments or ReplicaSets, which manage stateless pods, StatefulSets are designed for apps that require stable identities, persistent storage, and ordered deployment.  
+
+```
+vi deploy.yml
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pvdeploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+     app: nginxapp
+  template:
+    metadata:
+      labels:
+        app: nginxapp
+    spec:
+      containers:
+      - name: cont1
+        image: nginx
+        command: ["/bin/bash", "-c", "sleep 10000"]
+        volumeMounts:
+        - name: my-pvc
+          mountPath: "/tmp/persistent"
+      volumes:
+        - name: my-pvc
+          persistentVolumeClaim:
+            claimName: my-pvc
+```
+
+create the object,
+```
+kubectl create -f deploy.yml
+```
+
+Use interactive mode to get into pod and look for volume,
+```
+kubectl exec -it podid-dijfowefn -- /bin/bash
+```
+
+```
+cd /tmp
+ls
+```
+
+```
+cd persistent
+```
+
+create few files,
+```
+touch file{1..6}
+```
+add the contnent _this is from pod1_ to the file1.    
+and exit form interactive mode.  
+
+Now, delete the pod and K8S will automatically creates another pod becuase we mentioned replica (self healing).  
+Access the new pod with interactive mode and look for the files that we created from previous pod in the same path.  
 
 
+If we are able to see the files in the new pod, that says that deletion of pods doesnot delete the data in it === StateFull.   
 
 
+### 11.5 Dynamically Provisioning.
+
+📦 What is StorageClass!
+------------------------
+A StorageClass is a way to dynamically provision PersistentVolumes (PVs) in Kubernetes without manually creating them ahead of time.
+
+When you create a PersistentVolumeClaim (PVC) that refers to a StorageClass, Kubernetes:
+* Automatically creates an EBS (or other backend) volume.  
+* Binds that volume to your PVC.  
+* Mounts it to your Pod.
+
+
+To use EBS-backed dynamic PersistentVolumeClaim (PVC) in a KOPS-managed Kubernetes cluster on AWS, follow this practical example using the built-in gp2 or gp3 StorageClass provided by AWS and KOPS.  
+
+Note: If you directly create pvc without pv ... KOPS will create pv automatically. pv meaning , kops will create a EBS volume automatically.  
+
+Note:  dynamic provisioning is enabled by default in KOPS
+
+🔹 1. Verify StorageClass
+--------------------------
+```
+kubectl get storageclass
+```
+
+🔹 2. Create a PVC  -- no need to create pv. pv(ebs volume) will create automatically
+---------------------
+```
+vi ebs-pvc.yml:
+```
+
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: gp2  # or gp3 if available
+```
+
+```
+kubectl apply -f ebs-pvc.yml
+```
+
+🔹 3. Pod Using the PVC
+-----------------------
+```
+vi ebs-pod.yml
+```
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ebs-nginx
+spec:
+  containers:
+    - name: web
+      image: nginx
+      volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: ebs-volume
+  volumes:
+    - name: ebs-volume
+      persistentVolumeClaim:
+        claimName: ebs-pvc
+```
+
+```
+kubectl apply -f ebs-pod.yml
+```
+
+```
+kubectl get pvc  
+
+kubectl get pv  
+
+kubectl get pod ebs-nginx
+```
+
+You should see that the PVC is Bound, and a PV is dynamically created.  
+You can also check EBS volumes in AWS Console → EC2 → Volumes — it will show as "in-use".
+
+
+Delete PVC (PersistentVolumeClaim)
+---------------------------------
+```
+kubectl get pv  
+
+kubectl get pvc  
+
+kubectl delete pvc my-pvc -n default
+```
+
+Delete PV (PersistentVolume)
+---------------------------
+```
+kubectl delete pv my-pv
+```
+
+
+📘 Example: StatefulSet for NGINX with Persistent Storage
+-----------------------------------------------------------
+
+StatefulSet YAML
+
+```
+vi nginxstateful.yml
+```
+
+```
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: web
+spec:
+  serviceName: "nginx"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+```
+
+RWO = ReadWriteOnce
+ROX  ReadOnly Many
+RWX ReadWriteMany
+
+```
+kubectl create -f nginxstateful.yml  [It creates 1GB volume pv is AWS EBS and automatically mount pvc to pods ]
+```
+
+```
+kubectl get pv
+
+kubectl get pvc
+
+kubectl get pods
+
+Delete pvc
+
+kubectl get pvc
+
+kubectl delete pvc www-web-0 www-web-1 www-web-2
+```
