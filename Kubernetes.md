@@ -1460,7 +1460,7 @@ kubectl get svc
 note the loadbalancer url.   
 use the url and access the application.  
 
-# 9. Auto scaling with Kubernetes METRIC SERVER
+# 9. Auto scaling with Kubernetes METRIC SERVER  (HPA Horizontal Pods Autoscaling).
 So far we hvae been doing scaling of pods, replicas, deployments manually.  
 ```
 kubectl scale object --replicas=10
@@ -1471,7 +1471,7 @@ But we need auto scaling. This can be acheived by monitoring metrics like CPU, M
 _**Kubernetes Metric Server**_, is a scalable efficient source for monitoring the overall health and performance of a kubernetes cluster, providing the data need for kubernetes features like **HORIZONTAL POD AUTOSCALING** **( HAP )** and Kubernetes Dashboard.  
 
 **Key features**:  
-#### 10.1 Resource Metrics:
+#### 9.1 Resource Metrics:
 Collects CPU and memory usage metrics from kubelets and provides aggregated metrics at the node and pod level.  
 
 #### 9.2 Autoscaling:  
@@ -1673,4 +1673,161 @@ To delete the Metrics Server,
 kubectl delete -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
 ```
 
- 	
+ # 10. Resource Quota.
+
+In K8S, we seprate different teams using same cluster with _NAMESPACES_.  
+By default pods that every team create will run without any limitations of **Memory** and **CPU**.  
+And that not advised, it may leads to unethical over usages of resources and leads to problems like availability of resources to PROD section etc.  
+
+We need to limit the resources with Resource Quota.  
+It can limit the objects that can be created in a namespace and total amount of resources.  
+pod schedular in master will check the worker nodes on cpu and memory and create a pod in it.  
+we can set limits to CPU, Memory and storage aspects.  
+
+CPU is measrured on Cores and Memory on Bytes.  
+1CPU = 1000 milliCPUs.  
+
+Limits can be given to pods and nodes also.  
+Th default limit is 0.  
+
+Requests refer to how much we want and   
+Limit refer to how much max we want.  
+
+_if you mention Request and limit, everthing will work fine.  
+if you dont mention Request but mentions limit then Request = limit.    
+if you dont mention Request dont mention limit , Request ! = limit_.  
+
+
+Every pod in the namespace must have CPU limit, no need to mention memory, if you dont mention cpu, pod will take all cpu.  
+The amount of CPU used by all pods inside namespace must not exceed specified limit.  
+
+###### Lets create a team namde _dev_ and limit the resources to it.
+1. Create a namespace.
+```
+kubectl create ns dev
+```
+
+2. Switch to dev namespace.
+```
+kubectl config set-context --current --namespace=dev
+```
+
+verify that we are in dev namespace.
+```
+kubectl config view
+```
+
+Resource quotas are assigned thorugh manifest.yml files, same as deployments, services, replicasets.  
+
+3. Creating resource quota for dev team.  
+create a dev-quota manifest file.  
+```
+vi dev-quota.yml
+```
+
+```
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: dev-quota
+  namespace: dev
+spec:
+  hard:
+    pods: '5'
+    limits.cpu: '1'
+    limits.memory: 1Gi
+```
+
+Compherend the dev-quota.yml file:  
+	1. _kind: ResourceQuota_.  
+ 	2. _namespace: dev_, represents that we are refering the dev namespace.  
+  	3. _pods: '1'_, represents that we are limiting the pods count to max of 5.  
+   	4. _limits.cpu: '1'_, represents that we are limiting the CPU across all containers of that namespace to 1CPU.  
+    	5. _limits.memory: 1Gi_, similar to CPU limit, memory is limited to 1Gb for the whole namespace.  
+
+
+Run the file.  
+```
+kubectl create -f dev-quota.yml
+```
+
+
+lets look at the usage quota of that name space.  
+```
+kubectl get quota
+```
+
+resluts will look like this,   
+```
+NAME        AGE   REQUEST     LIMIT
+dev-quota   69s   pods: 0/5   limits.cpu: 0/1, limits.memory: 0/1Gi
+```
+It is because that we have not created any pods in that namespace.  
+
+
+4. Lets create a deployment object,   
+```
+vi deploy.yml
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginxapp-deployment
+  labels:
+    app: nginxapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginxapp
+  template:
+    metadata:
+      labels:
+        app: nginxapp
+    spec:
+      containers:
+        - name: nginx-cont
+          image: nginx
+          resources:
+            limits:
+              cpu: '1'
+              memory: 512Mi
+```
+
+Note:  
+we have mentioned limits to the container as to use 1 cpu and 512 mb of size and it is necessesary to do so.    
+Running this deployment object, will create only 1 pod eventhough we have mentioned replicas as 3.  
+It is because that a single container/pod takes up 1 cpu and 512 mb of size then the remaining resources _(0 cpus, and 488Mb memory)_ is not sufficient to set up another POD.  
+
+So it is vital to check the resource limits and define the pods limits and replica counts.  
+
+so edit the above file to _cpu: 0.3_ and _memory: 300Mi_.  
+Now create the object.  
+```
+kubectl create -f deploy.yml
+```
+
+Now list pods  
+```
+kubectl get pods
+```
+
+Check the quota usage  
+```
+kubectl get quota
+```
+
+##### Cleanup
+At last delete the deployment, delete the resource quota, and the namespace.  
+```
+kubectl delete -f deploy.yml
+```
+```
+kubectl delete quota/dev-quota
+```
+```
+kubectl delete namespace/dev
+```
+
