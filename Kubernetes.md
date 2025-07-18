@@ -1831,3 +1831,126 @@ kubectl delete quota/dev-quota
 kubectl delete namespace/dev
 ```
 
+# 11. Persistent Volumes (PV) in Kubernetes.
+
+### 11.1 Stateless and Statefull.
+
+------------------------------------------------------------
+
+#### Stateless:
+If we delete the pods, the data in those pods will be lost for ever.  
+It is because the data was stored locally in the pods ans instances.  
+
+#### Stateful:
+If we delete the pod, and still data is persistent because we can store the data in external storages lik AWS EBS.  
+
+--------------------------------------------------------------------
+
+### 11.2 Persistent volumes: 
+
+K8S Persistent Volumes (PVs) provide a way to manage durable storage for applications running in a K8S cluster.  
+Unlike ephemeral storage tied to the lifecycle of a pod, Persistent Volumes exist independently of pods and remain intact even after pods are deleted.  
+
+This makes PVs ideal for stateful applications that require persistent storage, such as databases.  
+Persistent meaning permanent.  
+
+
+It is created by administrator or dynamically created by storage class.  
+Once a PV is created , it can be bound to a Persistent Volume Claim (PVC), which is a request for storage by a pod.  
+When a pod requests storage via PVC , K8S will search for a suitable PV to satisfy the requests.  
+
+PV is bound to the PVC and the pod can use the storage.  
+If no suitable PV is found, K8S will either dynamically create a new one (if the storage class support dynamic provisioning ) or the PVC will remain unbound.  
+
+
+> PV will maintain total storage , PV Is bound to PVC, Pods will ask PVC, PVC will get from PV.
+
+ 
+### 11.3 Persistent Volume Claims (PVC)
+
+To use PV we need to claim the volume using PVC.  
+PVC request a PV with your desired specification(size, access, modes & speed etc) from K8S and once a suitable PV is found it will bound to PVC.  
+
+After bounding is done to pod you can mount it as a volume.  
+Once user finished work, the attached PV can be released the underlying PV can be reclaimed and recycled for future.  
+
+if you create volume in cluster , if cluster is delete , storage is also deleted. SO use AWS EBS Volumes.  
+
+
+| Component | Purpose                          |
+| --------- | -------------------------------- |
+| **PV**    | Admin-provisioned storage        |
+| **PVC**   | User request for storage (claim) |
+| **Pod**   | Uses the PVC to mount the PV     |
+
+### 11.4 Lets exercise our learnings. 
+
+#### 11.4.1 First, create a EBS volume from AWS with 20GB and magnetic, note the volume ID.
+
+#### 11.4.2 Lets create a Persistent Volume with the created EBS volume.
+```
+vi pv.yml
+```
+
+```
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+     - ReadWriteOnce
+  awsElasticBlockStore:
+     volumeID: vol-9812360128yn128yb
+     fsType: ext4
+```
+
+create the pv object.  
+```
+kubectl create -f pv.yml
+```
+
+
+```
+kubectl get pv
+```
+
+
+
+Remember just a PV is not enough to access the volume by pods, we need PVC as well.  
+
+#### 11.4.3 Lets create PVC
+
+```
+vi pvc.yml
+```
+
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+```
+
+```
+kubectl create pvc.yml
+```
+
+get pv list  
+```
+kubectl get pv
+```
+This lists both pv and pvc now.  
+
+
+
+
+
