@@ -2189,3 +2189,161 @@ kubectl get pvc
 
 kubectl delete pvc www-web-0 www-web-1 www-web-2
 ```
+
+
+
+# 12. ENV Variables.
+
+It is a way to pass configuration information to containers running within pods. To set Env vars it include the **env** or **envFrom** field in the configuration file.  
+
+### 12.1 **ENV**:  
+Allows you to set environment variables for a container, specifying a value directly through CLI/ Command prompt.  
+
+##### Example with ENV.
+The following command will create a deployment object directly from CLI.  
+```
+kubectl create deploy newdb --image=mariadb
+```
+Deployment name is newdb, has only 1 pod, that too with image of mariadb ( a database image ).  
+
+Check the pods created.  
+```
+kubectl get pos
+```
+
+The pod encounter in a CrashLoopBackOff, its an error, by getting the logs, we can see that its because mariadb needs password setup to run.  
+```
+kubectl logs newdb-79067ot-78tg
+```
+Error looks like this,  
+>
+
+Lets pass/set the password from CLI.  
+```
+kubectl set deploy newdb MYSQL_ROOT_PASSWORD=root123123
+```
+
+Now get  the pods, it will be running normally now.  
+
+
+### 12.2 **ENVFORM**:  
+Allows us to set the environmental variables and pass them to containers with use of _FORM FILES_ (not directly from CLI).  
+FORM FILEs are 2 types:  
+	* Configmaps  
+ 	* Secrets  
+
+#### 12.2.1 ConfigMaps
+
+Stores the data in key-value pair, files, or command-line arguments that can be used by pods/containers in cluster.  
+
+Data stored in the ConfigMaps is not confidential, it provide neither any security nor any encryption.  
+This is drawback of ConfigMaps and this can be overcomed by Secrtes.  
+
+Other limitation of ConfigMaps is that it cannot be more than 1Mb size.  
+If need to have more size then go for mounting volumes or use a seprate DB or file service.  
+
+##### Example with ComfigMaps
+
+Lets do the same example as above but now passing the password from configMap file.
+
+Firstly, delete the deployment object created earlier if not done earlier.  
+```
+kubectl delete deploy newdb
+```
+
+Create a file called vars. (no file extention)  
+```
+vi vars
+```
+
+```
+MYSQL_ROOT_PASSWORD=root123123
+MYSQL_USER=admin
+```
+
+Use this file to create a CONFIGMAPS named as dbvars.  
+```
+kubectl create cm dbvars --from-env-file=vars
+```
+
+```
+kubectl get cm
+```
+
+Use this created configmap ( dbvars ) to pass the username and pass to the mariadb pod.  
+```
+kubectl create deploy newdb --from=configmapps/dbvars
+```
+
+> [!NOTE]
+> We can pass/mention the config file in the manifist.yml file while creating a deployment object using manifist file.
+
+Lets check the pods creation, 
+```
+kubectl get pods
+```
+The single pod created should be running without error or retry.  
+
+
+ConfigMaps are not encrypted, not have any security, lets see how.  
+```
+kubectl describe cm/dbvars
+```
+The responce for above command will return the username and password that we mention directly without any encryption.  
+This is why they were preferred very less to no prefference.
+
+Cleanup, --> delete deployment, ---> delete the cm.  
+Do not erase the vars file on machine, we will use the same in secrets.
+
+#### 12.2.2 Secretes
+
+To store sensitive data in an unencrypted format like passwords, ssh-keys etc it uses base64 encoded format
+If i save `password=root123123` then this will be encoded by k8s and if need we can decode as well.
+
+By default k8s will create some Secrets these are useful from me to create communicate inside the cluster used to communicate with one resource to another in cluster.  
+These are system created secrets, we need not to delete
+
+
+	TYPES:  (to be used when creating sceret)
+	Generic: creates secrets from files, dir, literal (direct values)  
+	TLS: Keys and certs  
+	Docker Registry: used to get private images by using the password
+
+Lets use the same example of mariadb image and vars file that we created earlier in configmaps section.  
+
+Create secret from vars file.  
+```
+kubectl create secret generic my-secret --from-env-file=vars
+```
+_my-secret_ is the name of the secret.  
+
+Lets create mariadb pod using the secret.  
+```
+kubectl create deploy newdb --from=secret/my-secret
+```
+List the pod and check whether it was running without any error.  
+
+
+Lets check whether secret is encoded or not if yes, then how to decode.  
+```
+kubectl get secret
+```
+
+!!! 
+```
+kubectl describe secret/my-secret 
+```
+
+```
+kubectl get secrets my-secret -o yaml
+```
+This will gives us the keys but values as encrypted.  
+Decode the keys, 
+```
+echo -n "LIOIGPOBbn8ybp" | base64 -d
+```
+`LIOIGPOBbn8ybp` is the encoded username from the `kubectl get secrets my-secret -o yaml` command results.  
+Use the same command to get the decoded value of password as well.  
+
+CleanUp --> delete the deployment object, ---> delete the secret, ---> delete the vars in the machine.
+
