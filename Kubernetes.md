@@ -2347,3 +2347,100 @@ Use the same command to get the decoded value of password as well.
 
 CleanUp --> delete the deployment object, ---> delete the secret, ---> delete the vars in the machine.
 
+# 13. SIDE CAR
+
+In motorcycle terms, the sidecar is the small passenger pod attached to the main bike — enhancing its function without steering the ride.  
+So as similar to this,   
+​A sidecar container is a secondary container that runs alongside the main application container within the same Kubernetes Pod.  
+This design pattern allows you to extend or enhance the functionality of the main application without modifying its code.  
+Common use cases include _log aggregation_, _data synchronization_, and _proxying network traffic_.​  
+
+
+Kinds of sidecars:  
+* _Adapter Design Pattern_ -- standardize the output pattern of main container.  
+* _Ambassador Design Pattern_ -- used to connect containers with the outside world.
+* _Init Container_ -- It initialize the first eork and exits later.
+
+
+ **EXAMPLE: Log aggregation with a sidecar.**
+ ------------------------
+
+In this example, the main application container writes log data to a shared volume, and the sidecar container serves these logs over HTTP using Nginx.  
+
+```
+vi sidecar.yml
+```
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: log-aggregator-pod
+spec:
+  containers:
+    - name: app-container
+      image: alpine
+      command: ["/bin/sh", "-c"]
+      args: ["while true; do date >> /var/log/app.log; sleep 5; done"]
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log
+    - name: sidecar-container
+      image: nginx
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /usr/share/nginx/html
+  volumes:
+    - name: shared-logs
+      emptyDir: {}
+```
+
+Lets comprehend the yml file.  
+
+1. Main application (app-container):
+-----------
+Alpine (a linux based bare minimal image) was used.  
+A command/arg was passed that says, for every 5 sec, append the date to the `app.log` file in the path `/var/log`.  
+It mounts a shared volume at `/var/log` to store log data.  
+
+2. Side Container  (sidecar):
+----------------
+Uses Nginx image to serve content over HTTP.  
+Also mounts the same shared volume at `/usr/share/nginx/html`.  
+Hence, Nginx serves the app.log files, allowing access to the application's log data via HTTP.
+
+3. Shared Volume (shared-logs):
+-----------------------------
+An emptyDir volume that is created when the Pod is assigned to a node and exists as long as the Pod is running.​  
+Provides a shared storage space accessible to both containers for log data.​  
+
+emptyDir a temporary directory that exists as long as the Pod runs.  
+
+
+```
+kubectl apply -f sidecar.yml
+```
+
+```
+kubectl get pods
+```
+
+Step into the sidecar-container in interactive mode.
+```
+kubectl exec -it log-aggregated-pod -c sidecar-container --sh
+```
+
+```
+cd /usr/share/nginx/html
+cat app.log
+```
+we can see app.logs which is generated in app-container but can be accessed from side-car container using shared volumes  
+
+
+```
+kubectl delete -f sidecar.yml
+```
+
+
+
+
