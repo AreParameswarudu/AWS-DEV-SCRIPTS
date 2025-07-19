@@ -2040,14 +2040,15 @@ Note: If you directly create pvc without pv ... KOPS will create pv automaticall
 
 Note:  dynamic provisioning is enabled by default in KOPS
 
-🔹 1. Verify StorageClass
---------------------------
+#### 11.5.1 Verify StorageClass
+
 ```
 kubectl get storageclass
 ```
 
-🔹 2. Create a PVC  -- no need to create pv. pv(ebs volume) will create automatically
----------------------
+#### 11.5.2 Create a PVC  
+No need to create pv. With use of storageclass set,  pv (ebs volume) will create automatically.  
+
 ```
 vi ebs-pvc.yml:
 ```
@@ -2070,8 +2071,8 @@ spec:
 kubectl apply -f ebs-pvc.yml
 ```
 
-🔹 3. Pod Using the PVC
------------------------
+#### 11.5.3 Pod Using the PVC
+
 ```
 vi ebs-pod.yml
 ```
