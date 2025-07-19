@@ -1577,7 +1577,7 @@ kubectl autoscale deployment nginxapp-deployment --cpu-percent=20 --min=1 --max=
 The commad says, if the cpu percentage goes up more than 20 then use auto scaling to scale up to 10 pods.  
 
 ```
-kubectl het hpa
+kubectl get hpa
 ```
 This wil show cpu: 1% / 20% , now cpu percent is 1%, it will take time.  
 
