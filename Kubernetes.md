@@ -2644,6 +2644,25 @@ kubectl delete services ingress-nginx-controller --namespace=ingress-nginx
 
 ---> Delete deployments and services one by one.
 
+##### Lets compherend the section of Ingress used above.
 
+Annotations:
+------------
+`nginx.ingress.kubernetes.io/ssl-redirect: "false"`: Disables automatic redirection from HTTP to HTTPS.​  
+`nginx.ingress.kubernetes.io/use-regex: "true"`: Enables the use of regular expressions in path matching. ​  
+`nginx.ingress.kubernetes.io/rewrite-target: /$2`: Rewrites the matched URI to the specified target.​  
 
+Rules:
+------
+Traffic matching /nginx, optionally followed by a / or end of the string, and any subsequent characters ((.*)), is directed to the nginx service.​  
+Traffic matching /httpd, following the same pattern, is directed to the httpd service.​  
+All other traffic (/(.*)) is directed to the nginx service.​  
+ ​
+Rewrite Target:
+---------------
+The `nginx.ingress.kubernetes.io/rewrite-target: /$2` annotation rewrites the incoming request path to the specified target before forwarding it to the backend service. Ensure that this behavior aligns with your application's routing logic.
 
+Path Matching:
+-------------
+The pathType: ImplementationSpecific allows the Ingress controller to interpret the path matching rules, including regular expressions. Ensure that your Ingress controller supports this path type and regex patterns.
+ ​
