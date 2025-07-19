@@ -2487,7 +2487,7 @@ kubectl get ingress
 Deployment and service for nginx application.
 
 ```
-vi nginxapp.yml
+vi nginx.yml
 ```
 
 
@@ -2628,8 +2628,9 @@ kubectl create -f ingress.yml
 
 Lets access the applications,  go and grab the ELB from AWS ec2 console or use folowing command and note the ELB url,    
 ```
-kubectl service ingress-nginx-controller --namespace=ingress-nginx
+kubectl get ingress
 ```
+This will give you the ALB url.  
 In the Security group of respective ELB, allow the alltraffic inbound rule. 
 
 
