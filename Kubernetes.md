@@ -2669,7 +2669,7 @@ The pathType: ImplementationSpecific allows the Ingress controller to interpret 
  ​
 
 
-#### Different states of a pod
+# Different states of a pod
 ##### 1. Running
 ##### 2. Terminating
 ##### 3. ImagePullBackOff
