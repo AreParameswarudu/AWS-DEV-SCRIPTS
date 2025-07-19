@@ -27,7 +27,7 @@ Reflect the changes
 sudo -i
 ```
 
-## Install git and verify the installation.
+## 1. Install git and verify the installation.
 
 ```
 yum install git -y
