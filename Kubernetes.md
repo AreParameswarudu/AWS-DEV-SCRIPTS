@@ -958,6 +958,9 @@ For multi node cluster ==> KOPS.
 
 We have several options for mutinode cluster, lets go with KOPS.
 
+<img width="753" height="406" alt="image" src="https://github.com/user-attachments/assets/afcd2cf0-6a22-44fb-9b29-46b7f56bb35c" />
+
+
 Go to AWS ec2 console,   
 	* Choose a t2.micro instance with Amazon Linux OS.  
  	* Attach an IAM role with trusted entity = EC2, and Permissions = Administrative permissions.
