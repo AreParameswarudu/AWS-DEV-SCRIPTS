@@ -2454,6 +2454,9 @@ so,
 * Ingress supports Host based and Path bsed routing.
 * Ingress also supports load balancing and SSL termination.
 
+  <img width="758" height="497" alt="image" src="https://github.com/user-attachments/assets/453ec443-c62e-4638-a622-1a078807309f" />
+
+
 IT redirect the incoming requests to the right services based on the web url or path in the address.  
 Ingress provides encryption feature and helps to balance the load of the applications.  
 
@@ -2463,13 +2466,180 @@ Ingress provides encryption feature and helps to balance the load of the applica
 Only Ingress provides these features, not any other aspects of service ( clusterIP, Nodeport, Loadbalancer).
 
 
-#### 14.1 Installing Ingress.
+####  Installing Ingress controller.
 
-Ingress in not default service/object present in K8S, it need to be installed form the official K8S's github repo.  
+To work with ingress, We need to install ingress controller.
 ```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml
 ```
 
+Use following commands to see what it have done.  
+```
+kubectl get services
+kubectl get ingress
+```
+
+####  Lets create 2 deplyments.  
+Deployment and service for nginx application.
+
+```
+vi nginxapp.yml
+```
+
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        env:
+        - name: TITLE
+          value: "NGINX APP1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx  
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: nginx
+
+```
+
+
+Deployment and service for apache app.  
+```
+vi httpd.yml
+```
+
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpd
+  template:
+    metadata:
+      labels:
+        app: httpd
+    spec:
+      containers:
+      - name: httpd
+        image: httpd
+        ports:
+        - containerPort: 80
+        env:
+        - name: TITLE
+          value: "APACHE APP2"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpd  
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: httpd
+```
+
+
+#### Yaml file for Ingress  
+
+```
+vi ingress.yml
+```
+
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: k8s-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /nginx(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80
+          - path: /httpd(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: httpd
+                port:
+                  number: 80
+          - path: /(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80
+```
+Lets create those deployments and ingerss.  
+
+```
+kubectl create -f httpd.yml
+
+kubectl create -f nginx.yml
+
+kubectl create -f ingress.yml
+```
+
+
+Lets access the applications,  go and grab the ELB from AWS ec2 console or use folowing command and note the ELB url,    
+```
+kubectl service ingress-nginx-controller --namespace=ingress-nginx
+```
+In the Security group of respective ELB, allow the alltraffic inbound rule. 
+
+
+use the url, `http://elb/nginx`   and in new tab `http://elb/httpd`  
+You may be able to access the applications with path based routing.  
+
+
+Cleanup :  
+--> delete the ingress controller  
+```
+kubectl delete services ingress-nginx-controller --namespace=ingress-nginx
+```
+
+---> Delete deployments and services one by one.
 
 
 
