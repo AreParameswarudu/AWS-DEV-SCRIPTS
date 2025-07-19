@@ -1,6 +1,33 @@
+# Install git and verify installation.
+
+Iam going to use AWS EC2 instance with RedHat linux machine to work with git.  
+We can also go with local machine, or any other cloud providers as well.  
+
 Instal gitbash or Launch RedHat EC2 instance and login
 
+#### Initial steps to setup EC2 instance,  
+
+> [!NOTE]
+> If you are using local machine then no need of this setups.
+
+This steps is only when you are using any instances from any Cloud services.
+
+First elivate permissions to sudo
+```
 sudo -s
+```
+
+Set hostname  ( I am using gituser as name, you can choose as you wish).  
+```
+hostnamectl set-hostname gituser
+```
+
+Reflect the changes
+```
+sudo -i
+```
+
+
 
 mkdir gitproject
 
