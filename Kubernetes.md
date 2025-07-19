@@ -2444,3 +2444,33 @@ kubectl delete -f sidecar.yml
 
 
 # 14. INGRESS
+
+Services in K8S are to expose the application in pods to the external users or for internal communication.  
+These services are for pods that have strightforward access, meaning no path based routing.  
+
+If we want **path based routing** then we need **INGRESS**.  
+so,  
+* Ingress helps to expose HTTP and HTTPS routes from outside of the cluster.
+* Ingress supports Host based and Path bsed routing.
+* Ingress also supports load balancing and SSL termination.
+
+IT redirect the incoming requests to the right services based on the web url or path in the address.  
+Ingress provides encryption feature and helps to balance the load of the applications.  
+
+> Host based routing ==> `example.com`, `api.example.com`, `admin.example.com`.
+> Psth based routing ==>  `bookmyshow.com/login`, `bookmyshow.com/home`, `bookmyshow.com/theathers`, `bookmyshow.com/salarmovie`.
+
+Only Ingress provides these features, not any other aspects of service ( clusterIP, Nodeport, Loadbalancer).
+
+
+#### 14.1 Installing Ingress.
+
+Ingress in not default service/object present in K8S, it need to be installed form the official K8S's github repo.  
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml
+```
+
+
+
+
+
