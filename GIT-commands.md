@@ -1,4 +1,4 @@
-# Install git and verify installation.
+# GITHUB
 
 Iam going to use AWS EC2 instance with RedHat linux machine to work with git.  
 We can also go with local machine, or any other cloud providers as well.  
@@ -27,22 +27,29 @@ Reflect the changes
 sudo -i
 ```
 
+## Install git and verify the installation.
 
-
-mkdir gitproject
-
-cd gitproject
-
+```
 yum install git -y
-
+```
+```
 git -v
+```
 
-git status --> You get error, because this is not initialized yet
-
-git init  --> initialize git , this is local repo. .git directory will be create which contain files/dir maintained by git. The .git directory contains metadata and the entire history of the project,
-
+```
 git status
+```
+You get error, because this is not initialized yet.  
 
+```
+
+git init
+```
+Initialize git , this is local repo. .git directory will be create which contain files/dir maintained by git. The .git directory contains metadata and the entire history of the project,
+
+```
+git status
+```
 
 touch index.html
 --> it has created locally, now move from working directory to staging area
