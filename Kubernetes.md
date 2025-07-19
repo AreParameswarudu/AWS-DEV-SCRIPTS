@@ -2652,17 +2652,18 @@ Annotations:
 `nginx.ingress.kubernetes.io/use-regex: "true"`: Enables the use of regular expressions in path matching. ​  
 `nginx.ingress.kubernetes.io/rewrite-target: /$2`: Rewrites the matched URI to the specified target.​  
 
-Rules:
-------
+Rules  
+-------
 Traffic matching /nginx, optionally followed by a / or end of the string, and any subsequent characters ((.*)), is directed to the nginx service.​  
 Traffic matching /httpd, following the same pattern, is directed to the httpd service.​  
-All other traffic (/(.*)) is directed to the nginx service.​  
+All other traffic (/(.*)) is directed to the nginx service.​ 
+
  ​
-Rewrite Target:
+Rewrite Target
 ---------------
 The `nginx.ingress.kubernetes.io/rewrite-target: /$2` annotation rewrites the incoming request path to the specified target before forwarding it to the backend service. Ensure that this behavior aligns with your application's routing logic.
 
-Path Matching:
+Path Matching
 -------------
 The pathType: ImplementationSpecific allows the Ingress controller to interpret the path matching rules, including regular expressions. Ensure that your Ingress controller supports this path type and regex patterns.
  ​
