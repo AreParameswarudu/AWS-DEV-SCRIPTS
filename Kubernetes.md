@@ -2457,8 +2457,8 @@ so,
 IT redirect the incoming requests to the right services based on the web url or path in the address.  
 Ingress provides encryption feature and helps to balance the load of the applications.  
 
-> Host based routing ==> `example.com`, `api.example.com`, `admin.example.com`.
-> Psth based routing ==>  `bookmyshow.com/login`, `bookmyshow.com/home`, `bookmyshow.com/theathers`, `bookmyshow.com/salarmovie`.
+> Host based routing ==> `example.com`, `api.example.com`, `admin.example.com`.  
+> Path based routing ==>  `bookmyshow.com/login`, `bookmyshow.com/home`, `bookmyshow.com/theathers`, `bookmyshow.com/salarmovie`.
 
 Only Ingress provides these features, not any other aspects of service ( clusterIP, Nodeport, Loadbalancer).
 
