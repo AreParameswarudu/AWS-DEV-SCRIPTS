@@ -3318,7 +3318,7 @@ spec:
 kubectl create -f green.yml
 ```
 
-**Lets switch. **  
+#### **Lets switch**.  
 The whole switch happens at the service.yml object.   
 `blue.yml` uses the `version: blue` tag/label while the `green.yml` uses the `version: green`. so edit the service.yml to change the version tag/label from blue to green.  
 
@@ -3334,7 +3334,7 @@ refresh the edl to reflect the changes.
 
 Example of a real-world Kubernetes Canary Deployment using an NGINX web app. This shows how to gradually shift traffic from v1 (stable) to v2 (canary) — perfect for production-style rollouts.
 
-**🎯 Goal**
+🎯**Goal**
 Deploy a new version of an app (v2) side-by-side with the old version (v1), and split traffic using a Kubernetes Service.
 
 Create a separate namespace if required,
