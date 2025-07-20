@@ -574,76 +574,144 @@ spec:
         image: trainerreyaz/ib-image:latest
 ```
 
-```kubectl create -f deployment.yml``` [To run the manifist file named as deployment.yml]
+```
+kubectl create -f deployment.yml
+```
+To run the manifist file named as deployment.yml
 
-```kubectl get deploy```   or  ```kubectl get deployments```
+```
+kubectl get deploy
+```
+or
+```
+kubectl get deployments
+```
 
-```kubectl get deploy -o wide```
+```
+kubectl get deploy -o wide
+```
 
-```kubectl get rs```  [As the deployment also creates replica sets, to list that replicasets].
+```
+kubectl get rs
+```  
+As the deployment also creates replica sets, to list that replicasets.
 
-```kubectl describe deploy ib-deployment```
+```
+kubectl describe deploy ib-deployment
+```
 
-```kubectl get pods```
+```
+kubectl get pods
+```
 
 Now lets scale out and Scale IN  
 
 ### Scale Out
 
-```kubectl scale deploy/ib-deployment --replicas=10```  
-```kubectl get pods```  [Check the no.of pods].
+```
+kubectl scale deploy/ib-deployment --replicas=10
+```  
+```
+kubectl get pods
+```
+Check the no.of pods
 
 
 ### Scale In
 
-```kubectl scale deploy/ib-deployment --replicas=5```   
+```
+kubectl scale deploy/ib-deployment --replicas=5
+```   
 ```kubectl get pods```  
 
 What ever Replica set is doing Deployment is also doing the same thing
 
 if you delete any pod, it will create immediately automatically
-```kubectl get pods```  
-```kubectl delete pod pod-id```  
-```kubectl describe pod -l app=bank | grep -i ID```  
+```
+kubectl get pods
+```  
+```
+kubectl delete pod pod-id
+```  
+```
+kubectl describe pod -l app=bank | grep -i ID
+```  
 (or)  
-```kubectl describe pods | grep -i image```   [It shows all internetbankingrepo image]  
+```
+kubectl describe pods | grep -i image
+```
+It shows all internetbankingrepo image
 
-***************** Now what Deployment do additional thing is to change the application ***************
+ Now what Deployment do additional thing is to change the application.  
 
 First watch pods in another terminal  
-```kubectl get po --watch```  
+```
+kubectl get po --watch
+```  
 
-```kubectl edit deploy/ib-deployment```   [Edit the deployment object to use another image]    
+```
+kubectl edit deploy/ib-deployment
+```
+Edit the deployment object to use another image
 
 watch pods in another terminal , first it will create a new pods and then terminate old ones
-```kubectl describe pods | grep -i image``` [you can see now mobilebanking image]  
+```
+kubectl describe pods | grep -i image
+```
+you can see now mobilebanking image
 
-kubectl get events --sort-by=.metadata.creationTimestamp  
+```
+kubectl get events --sort-by=.metadata.creationTimestamp
+```
 
 
 
 ### 3.1 RollOut Few commands
 
-```kubectl rollout history deploy/ib-deployment```
+```
+kubectl rollout history deploy/ib-deployment
+```
 
-```kubectl rollout undo deploy/ib-deployment```   [It will go back to previous application / image ]
+```
+kubectl rollout undo deploy/ib-deployment
+```
+It will go back to previous application / image
 
-```kubectl get pods```  [Pods are terminating and creating new pods with new image, this was not possible in ReplicaSet]
+```
+kubectl get pods
+```
+Pods are terminating and creating new pods with new image, this was not possible in ReplicaSet
 
-```kubectl describe pods | grep -i image```
+```
+kubectl describe pods | grep -i image
+```
 
-```kubectl rollout pause deploy/ib-deployment```  --- it is like lock, cannot undo, cannot rollout to previous
+```
+kubectl rollout pause deploy/ib-deployment
+```
+it is like lock, cannot undo, cannot rollout to previous.  
 
-```kubectl rollout undo deploy/ib-deployment```  -- not possible
+```
+kubectl rollout undo deploy/ib-deployment
+```
+not possible
 
-```kubectl rollout resume deploy/ib-deployment```
+```
+kubectl rollout resume deploy/ib-deployment
+```
 
-```kubectl rollout undo deploy/ib-deployment``` -- now possible
+use following command to make it possible.
+```
+kubectl rollout undo deploy/ib-deployment
+```
 
-```kubectl rollout status deploy/ib-deployment```
+
+```
+kubectl rollout status deploy/ib-deployment
+```
 
 
-### 3.2 Deployment has 2 Strategies:  
+### 3.2 Deployment has following Strategies:  
 
 * _Rolling update_: This is **Default**, When you update the application, Rolling update will delete one pod and create . One by one
 * _Recreate_: Delete all pods and create again- Downtime. Not recommended
@@ -734,20 +802,35 @@ spec:
 
 **-c:** Tells sh to execute the following string command
 
-```kubectl apply -f pod-two-containers.yaml```
+```
+kubectl apply -f pod-two-containers.yaml
+```
 
-```kubectl get pods```    [we get single pod but 2/2 meaning, 2 containers]
+```
+kubectl get pods
+```    
+we get single pod but 2/2 meaning, 2 containers
 
-```kubectl logs two-container-pod -c busybox-container```
+```
+kubectl logs two-container-pod -c busybox-container
+```
 
-```kubectl logs two-container-pod -c nginx-container```
+```
+kubectl logs two-container-pod -c nginx-container
+```
 
-```kubectl exec -it two-container-pod -c nginx-container -- sh```       [-c: container]
+```
+kubectl exec -it two-container-pod -c nginx-container -- sh
+```
+-c: container  
 
-   `cd /usr/share/nginx/html`
+`cd /usr/share/nginx/html
+`
 
-```kubectl exec -it two-container-pod -c busybox-container -- sh```
-   `ls`
+```
+kubectl exec -it two-container-pod -c busybox-container -- sh
+```
+`ls`
 
 
 
@@ -818,17 +901,31 @@ _completions: 3_ → The Job completes only when 3 Pods have successfully run.
 | OnFailure 	|Restarts the container only if it exits with an error (non-zero exit code).| Jobs & CronJobs |
 |   Never       |Never restarts the container, even if it fails. | Jobs & CronJobs (One-time execution) |                                     
 
-```kubectl apply -f nonparallel.yml```
+```
+kubectl apply -f nonparallel.yml
+```
 
-```kubectl get pods```
+```
+kubectl get pods
+```
 
-```kubectl get jobs```
+```
+kubectl get jobs
+```
 
-```kubectl logs -l job-name=non-parallel-job```
+```
+kubectl logs -l job-name=non-parallel-job
+```
 
-```kubectl logs podname```     Ex: kubectl logs non-parallel-job-2vvf9
+kubectl logs non-parallel-job-2vvf9
+```
+kubectl logs podname
+```
 
-```kubectl delete job jobname```
+
+```
+kubectl delete job jobname
+```
 
 In above example the pods are executing one by one.
 
@@ -837,7 +934,11 @@ In above example the pods are executing one by one.
 
 Use the below simple manifest file for testing Parallel Jobs with a Fixed Completion Count jobs:
 
-`vi parallelfixed.yml`
+```
+vi parallelfixed.yml
+```
+
+
 ```
 apiVersion: batch/v1
 kind: Job
@@ -861,17 +962,30 @@ _completions: 6 _→ The Job completes only when 6 Pods have successfully run.
 _parallelism: 3_ → Runs 3 Pods at the same time.
 
 
-```kubectl apply -f parallelfixed.yml```
+```
+kubectl apply -f parallelfixed.yml
+```
 
-```kubectl get pods```
+```
+kubectl get pods
+```
 
-```kubectl get jobs```
+```
+kubectl get jobs
+```
 
-```kubectl logs -l job-name=<job-name>```
+```
+kubectl logs -l job-name=<job-name>
+```
 
-```kubectl logs parallel-job-2vvf9```	parallel-job-2vvf9 = Pod-name of one of my pods.
+```
+kubectl logs parallel-job-2vvf9
+```
+parallel-job-2vvf9 = Pod-name of one of my pods.
 
-```kubectl delete job jobname```
+```
+kubectl delete job jobname
+```
 
 In the above example three pods are executing at a time, since we mentioned Parallelism = 3, so once the three pods are completed their tasks then next three will start execution.
 
@@ -879,7 +993,10 @@ In the above example three pods are executing at a time, since we mentioned Para
 
 Use the below simple manifest file for testing Parallel Jobs with a Work Queue jobs:
 
-`vi parallel-work-queue-job.yaml`
+```
+vi parallel-work-queue-job.yaml
+```
+
 ```
 apiVersion: batch/v1
 kind: Job
@@ -898,9 +1015,13 @@ spec:
   parallelism: 3
 ```
 
-```kubectl apply -f parallel-work-queue-job.yaml```
+```
+kubectl apply -f parallel-work-queue-job.yaml
+```
 
-```kubectl get pods```
+```
+kubectl get pods
+```
 
 In the above example 3 pods are started executing at a time since we mentioned Parallelism = 3 and we didn’t mention any specified number of Completions.
                            
@@ -911,7 +1032,11 @@ A Kubernetes CronJob is used to schedule jobs to run at specific times, just lik
 
 This CronJob prints "Hello from Kubernetes!" every minute.
 
-`vi cron.yml`
+```
+vi cron.yml
+```
+
+
 ```
 apiVersion: batch/v1
 kind: CronJob
@@ -930,23 +1055,38 @@ spec:
           restartPolicy: Never  # Ensure job runs only once per schedule
 ```
 
-```kubectl apply -f cron.yaml```
+```
+kubectl apply -f cron.yaml
+```
 
-```kubectl get cronjobs```
+```
+kubectl get cronjobs
+```
 
-```kubectl describe cronjob cron```
+```
+kubectl describe cronjob cron
+```
 
 
 🔹 View Logs of Last Run
 ---------------------------
 
-```kubectl get pods```  # Get the latest pod name
+```
+kubectl get pods
+```
+# Get the latest pod name
 
-```kubectl logs <POD_NAME>```
+```
+kubectl logs <POD_NAME>
+```
 
-```kubectl get cronjob```
+```
+kubectl get cronjob
+```
 
-```kubectl delete cronjob```
+```
+kubectl delete cronjob
+```
 
 #  Lets setup a multi node cluster 
 > [!NOTE]
@@ -978,14 +1118,36 @@ create instance.
 
 Login to the instance, now settup the KOPS and Kubectl in this machine.
 
-`sudo -s`   --> To elivate the permission to root user.    
-`hostnamectl set-hostname kops`   --> set hostname for machine.    
-`sudo -i`     --> Reflect the changes.  
+To elivate the permission to root user.
+```
+sudo -s
+```
+    
+set hostname for machine.
+```
+hostnamectl set-hostname kops
+```
 
-`vi .bashrc`    --> to edit the .bachrc file and add a path.  
-`export PATH=$PATH:/usr/local/bin/`  --> add this pathe in the file.  
+Reflect the changes.  
+```
+sudo -i
+```
 
-`source .bashrc`    ---> to reflect changes /compile the edit.  
+to edit the .bachrc file and add a path.  
+```
+vi .bashrc
+```
+
+add this pathe in the file.  
+```
+export PATH=$PATH:/usr/local/bin/
+```
+
+
+to reflect changes /compile the edit.  
+```
+source .bashrc
+```
 
 Now lets add a kops.sh file and run it to install kops, kubectl.
 
@@ -1049,13 +1211,21 @@ It is advised to run the following command again ( even though it was mentioned 
 `export KOPS_STATE_STORE=s3://param-kops-testbkt143.k8s.local`  
 
 To verify the setup of cluster, use the following command  
-`kops validate cluster --wait 10m`  
+```
+kops validate cluster --wait 10m
+```  
 This command will return the status of cluster for a period of 10 mints.  
 The setup may take more than 10 mints. So Wait for untill setup was configured and you can see all 3 nodes up and healthy.  
 
 After sucessfull setup,  
-`kops get cluster`       --> to get the cluster details.  
-`kops get cluster -o wide`    --> to get more details of cluster.
+```
+kops get cluster
+```
+to get the cluster details.  
+```
+kops get cluster -o wide
+```
+to get more details of cluster.
 
 
 Lets try to create some nodes using deployment.
@@ -1084,7 +1254,10 @@ spec:
         image: nginx
 ```
 
-`kubectl create -f deployment.yml`    --> to run the deployment.
+```
+kubectl create -f deployment.yml
+```
+to run the deployment.
 
 lets see the nodes of the deployments.   
 To get the pods of deployment use,
