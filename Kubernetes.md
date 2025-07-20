@@ -3328,3 +3328,164 @@ kubectl apply -f service.yml
 ```
 
 refresh the edl to reflect the changes.
+
+
+### Cannary Deployment Project
+
+Example of a real-world Kubernetes Canary Deployment using an NGINX web app. This shows how to gradually shift traffic from v1 (stable) to v2 (canary) — perfect for production-style rollouts.
+
+**🎯 Goal**
+Deploy a new version of an app (v2) side-by-side with the old version (v1), and split traffic using a Kubernetes Service.
+
+Create a separate namespace if required,
+
+```
+kubectl create namespace canary-demo
+```
+
+```
+kubectl config set-context --current --namespace=canary-demo
+```
+
+```
+kubectl get pods
+```
+no pods
+
+🔹 Step 1: 
+Deploy Nginx or app v1  -- if required replace nginx:1.19 to some real image ib-rs or wordpres or nextwave
+
+```
+vi nginx-v1.yml
+```
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-v1
+  labels:
+    app: nginx
+    version: v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: nginx
+        version: v1
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.19
+        ports:
+        - containerPort: 80
+```
+
+```
+kubectl apply -f nginx-v1.yml
+```
+
+🔹 Step 2: Deploy Nginx or app v2
+```
+vi nginx-v2.yml
+```
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-v2
+  labels:
+    app: nginx
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: nginx
+        version: v2
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+```
+```
+kubectl apply -f nginx-v2.yml
+```
+🔹 Step 3: Create Nginx Service with ELB
+```
+vi nginx-service.yml
+```
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "classic"
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+```
+```
+kubectl apply -f nginx-service.yml
+```
+
+📌 What Are Kubernetes Annotations?
+In Kubernetes, annotations are key-value pairs used to attach non-identifying metadata to objects (like Pods, Services, Deployments, etc.). Unlike labels, which are used for selection (e.g. for scheduling or selectors), annotations are meant for storing additional information that tools, controllers, or humans can use.
+
+**🧠 Difference Between Labels and Annotations**
+| Feature     | **Labels**                         | **Annotations**                                    |
+| ----------- | ---------------------------------- | -------------------------------------------------- |
+| Purpose     | Identifying, grouping, selecting   | Attaching extra metadata                           |
+| Used by     | Kubernetes core system (selectors) | Tools, controllers, scripts                        |
+| Max size    | Small (\~63 chars per key/value)   | Can be large (up to 256 KB total)                  |
+| Example use | `app=nginx`, `tier=backend`        | `kubectl.kubernetes.io/last-applied-configuration` |
+
+
+Get ELB URL
+```
+kubectl get svc nginx-service
+```
+
+http:/elbdns  
+
+Repeat a few times — you'll randomly hit either:  
+NGINX v1 (from nginx-v1 pods)  
+NGINX v2 (from nginx-v2 pod)  
+
+**📈 Canary Rollout Strategy**  
+You can simulate progressive rollout by:  
+* Increasing v2 replicas:
+```
+kubectl scale deployment nginx-v2 --replicas=2
+```
+
+* Reducing v1 replicas:
+```
+kubectl scale deployment nginx-v1 --replicas=1
+```
+
+This gradually shifts more traffic to v2.
+```
+kubectl scale deployment nginx-v1 --replicas=0
+```
+```
+kubectl get pods
+```
+now has only v2 pods.
