@@ -2758,8 +2758,6 @@ kubectl edit node i-043783332483bf9f8
 ```
 under labels --> add `node-name: n1-node`  --> save and exit.  or we can use a direct command `kubectl label nodes i-043783332483bf9f8 node-name=n1-node`    
 
-Do the same for other node as well but with name as `n2-node`  
-
 now list the pods and look whether they are running or not. if yes then look on which node they belongs to.  
 ```
 kubectl get pods -o wide
@@ -2790,8 +2788,250 @@ Node affinity supports following operators,
 
 ##### 15.2.1 Prefered kind.
 ```
-vi preffered.yml
+vi preferred.yml
 ```
 
 ```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appache-deployment
+  labels:
+    app: apacheapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apacheapp
+  template:
+    metadata:
+      labels:
+        app: apacheapp
+    spec:
+      affinity:
+       nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          preference:
+           matchExpressions:
+           - key: node-name
+             operator: In
+             values:
+             - n2-node
+      containers:
+      - name: cont2
+        image: httpd
+        ports:
+        - containerPort: 80
+```
+
+If we glance at the `spec.affinity` of the yaml file, it describes that, prrferrible schedule the httpd pods in to the node that has node label as `n2-node`.  
+
+Also, weight: 1: Indicates the preference weight. Higher values signify stronger preferences.​
+
+```
+kubectl create -f preferred.yml
+```
+list the pods,  
+
+We can observe that, 1 pod running. Why!!  even when we mention `node-name: n2-node`, No node has this label yet, but as we used **preferred** configuration, scheduler has scheduled on other nodes.  
+
+
+Note on which node the deployment was done.  
+
+
+lets delete the deployment, `kubectl delete -f preferred.yml`  
+Lets edit the preferred.yml and change `n2-node` to `n2-node` and run the deployment again.  
+
+```
+kubectl create -f preferred.yml
+```
+
+Now observe the pods onwhich they were deployed. They will be deployed in `n1-node`.  
+
+##### 15.2.2
+```
+vi required.yml
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginxapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginxapp
+  template:
+    metadata:
+      labels:
+        app: nginxapp
+    spec:
+      affinity:
+       nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+         nodeSelectorTerms:
+         - matchExpressions:
+           - key: node-name
+             operator: In
+             values:
+             - n2-node
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+```
+
+```
+kubectl create -f required.yml
+```
+
+```
+kubectl get pods -o wide   
+```
+Pod are not running, it is in **pending** state because, required is `n2-node`, but no node has label as `n2-node`.  
+
+cleanup  
+`kubectl delete -f required.yml`    
+
+
+
+#### 15.3 TAINTS and TOLERANCE  
+
+Use analogy like Lock (taints) and Key (tolerance)
+
+Taints are like locks on the doors of your house, restricting access to certain pods (visitors).  
+Tolerations are like keys that pods (visitors) can carry to bypass the locks (taints) and be scheduled on nodes.  
+
+
+In Kubernetes, taints and tolerations work together to control the scheduling of Pods onto Nodes. Taints are applied to Nodes to prevent certain Pods from being scheduled on them, while tolerations are applied to Pods to allow them to be scheduled on Nodes with matching taints. ​  
+
+Example Scenario: Dedicated Nodes for Specific Workloads
+---------------------------------------------------------
+Suppose you have a Kubernetes cluster with Nodes equipped with specialized hardware, such as GPUs, intended exclusively for machine learning workloads. To ensure that only Pods requiring GPU resources are scheduled on these Nodes, you can use taints and tolerations.
+
+```
+kubectl edit node i-0e6b67bf1b00383be
+```
+Edit control plane, this master node has taint no schedule, **thats the reason master node will not have pods**.  
+
+##### Apply a Taint to GPU Nodes
+
+First, taint the GPU Nodes to repel/force Pods that do not require GPU resources:
+```
+kubectl get nodes
+```
+
+```
+kubectl taint nodes i-0333b24c25bf4868b hardware=gpu:NoSchedule
+```
+
+This command adds a taint with key hardware, value gpu, and effect NoSchedule to the specified Node. As a result, Pods without a matching toleration will not be scheduled on this Node.  
+
+This mechanism has 3 Effects: 
+* NoSchedule: Pods will not be scheduled onto the tainted node unless they have a matching toleration.
+* PreferNoSchedule: Scheduler tries to avoid scheduling pods onto the tainted node but can do so if necessary.
+* NoExecute: Existing pods on the node without matching tolerations are evicted.
+
+Note: Taints and Tolerance will not gurantee to have pod on the same node
+
+Lets test:
+```
+vi deploy.yml
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-deployment
+  labels:
+    app: apacheapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apacheapp
+  template:
+    metadata:
+      labels:
+        app: apacheapp
+    spec:
+      containers:
+        - name: cont1
+          image: httpd
+```
+
+```
+kubectl create -f deploy.yml
+```
+
+```
+kubectl get pods -o wide  
+```
+All pods are scheudled on another node.  
+
+##### Add a Toleration to GPU-Requiring Pods
+
+Next, add a toleration to the Pods that require GPU resources, allowing them to be scheduled on the tainted Nodes:
+```
+vi deploy.yml
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-deployment
+  labels:
+    app: apacheapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apacheapp
+  template:
+    metadata:
+      labels:
+        app: apacheapp
+    spec:
+      containers:
+        - name: cont1
+          image: httpd
+      tolerations:
+        - key: "hardware"
+          operator: "Equal"
+          value: "gpu"
+          effect: "NoSchedule"
+```
+
+In this Pod specification, the toleration matches the taint applied to the GPU Nodes, permitting the Pod to be scheduled on those Nodes.
+
+
+###### Key Points:
+
+Taints are applied to Nodes to repel certain Pods. They consist of a key, value, and effect (NoSchedule, PreferNoSchedule, or NoExecute). ​  
+Tolerations are applied to Pods to allow them to be scheduled on Nodes with matching taints. They must match the key, value, and effect of the taint to be effective.
+
+
+
+SUMMARY
+--------------
+
+Taint should be used when you want to mark a node as unavailable for certain pods. For example, you can use taint to mark a node as "maintenance" and prevent pods from being scheduled on the node while it is undergoing maintenance.  
+
+Node selector is a simpler and more primitive mechanism compared to node affinity and is sufficient for many use cases.  
+
+Node affinity should be used when you want to specify which nodes a pod should or should not be scheduled on based on node labels. Node affinity provides more fine-grained control over pod scheduling compared to node selector and allows you to specify complex rules for pod scheduling based on multiple node labels.  
+
+Pod affinity allows us to set priorities for which nodes to place our pods based off the attributes of other pods running on those nodes. This works well for grouping pods together in the same node.  
+
+Pod anti-affinity allows us to accomplish the opposite, ensuring certain pods don’t run on the same node as other pods. We are going to use this to make sure our pods that run the same application are spread among multiple nodes. To do this, we will tell the scheduler to not place a pod with a particular label onto a node that contains a pod with the same label.  
+
+[Use this for more knowledge on taints-and-tollerations-vs-node-affinity](https://blog.devops.dev/taints-and-tollerations-vs-node-affinity-42ec5305e11a)
 
