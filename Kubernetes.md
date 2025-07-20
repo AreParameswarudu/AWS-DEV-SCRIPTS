@@ -2704,3 +2704,83 @@ It is the simplest form of selection constraint, allowing pods to be scheduled o
 When to use!!  
 For simple, direct specific constraints for pods placement based on node labels.  
 
+Alright, lets create a deployment object, add node selector element to schedule the pod on specific node.  
+
+```
+vi deploy.yml
+```
+
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginxapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginxapp
+  template:
+    metadata:
+      labels:
+        app: nginxapp
+    spec:
+      nodeSelector:    
+        node-name: n1-node
+      containers:
+      - name: cont1
+        image: nginx
+```
+
+lets create deployment out of it.  
+```
+kubectl create -f deploy.yml
+```
+
+lets lists the pods.  
+```
+kubectl get pods
+```
+
+If we observe, the pods are not in the running state, WHY !!  
+It is because that we have mentioned pods to be created in specific node but never labeled the node.  
+
+so lets label the nodes first,   
+```
+kubectl get nodes
+```
+grab one of the nodes id/name, 
+```
+kubectl edit node i-043783332483bf9f8
+```
+under labels --> add `node-name: n1-node`  --> save and exit.  or we can use a direct command `kubectl label nodes i-043783332483bf9f8 node-name=n1-node`  
+
+now list the pods and look whether they are running or not. if yes then look on which node they belongs to.  
+```
+kubectl get pods -o wide
+```
+
+So with NodeSelector, we are forcing kube-schedular to schedule pod on particular node. **Its hard match**. If it doesn't match, Kube scheduler will not schedule the pod. so pod will be in pending state.  
+
+cleanup ---> delete the deployment.  
+
+#### 15.2 Node Affinity
+
+Node Affinity is a more expressive way to specify rules about the placement of pods relative to nodes' labels. It allows you to specify rules that apply only if certain conditions are met.   
+Same as Node Selector but this has flexible way, **if matches then sechdule the pods, if not then schedule pod on any another node**.  
+
+Node affinity has two kinds with it, 
+* Preferred during scheduling Ignore during execution (soft rules) : good if happen.  
+* Required during scheduling Ignore during execution (hard rules) : Must happen  : Same as NodeSelector.
+
+
+Node affinity supports following operators, 
+1. In
+2. NotIn
+3. Exists
+4. DoesNotExist
+5. Gt
+6. Lt,   etc
