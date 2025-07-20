@@ -3208,3 +3208,123 @@ Pod anti-affinity allows us to accomplish the opposite, ensuring certain pods do
 
 [Use this for more knowledge on taints-and-tollerations-vs-node-affinity](https://blog.devops.dev/taints-and-tollerations-vs-node-affinity-42ec5305e11a)
 
+
+## Refer 3 and 3.2 before going through this section.
+### Blue Green Deployment
+
+**Objective**: Lets say i have a deployment ( named as BLUE) and i have few updates and i want to change my deployment to new deployment (named as GREEN).  
+
+##### Blue deployment
+```
+vi blue.yml
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-blue
+  labels:
+    app: my-app
+    version: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: blue
+    spec:
+      containers:
+      - name: my-app
+        image: nginx
+        ports:
+        - containerPort: 80
+```
+
+```
+kubectl create -f blue.yml
+```
+
+create a service for the deployment.
+```
+vi service.yml
+```
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+spec:
+  selector:
+    app: my-app
+    version: blue
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
+```
+
+```
+kubectl create -f blue-service.yml
+```
+
+Grab the ELB's url from following command, and access the application.
+```
+kubectl get service
+```
+
+
+##### Green deployment.
+```
+vi green.yml
+```
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-green
+  labels:
+    app: my-app
+    version: green
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+      version: green
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: green
+    spec:
+      containers:
+      - name: my-app
+        image: httpd
+        ports:
+        - containerPort: 80
+```
+
+
+```
+kubectl create -f green.yml
+```
+
+**Lets switch. **  
+The whole switch happens at the service.yml object.   
+`blue.yml` uses the `version: blue` tag/label while the `green.yml` uses the `version: green`. so edit the service.yml to change the version tag/label from blue to green.  
+
+Apply those changes.
+```
+kubectl apply -f service.yml
+```
+
+refresh the edl to reflect the changes.
