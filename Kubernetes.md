@@ -2756,7 +2756,9 @@ grab one of the nodes id/name,
 ```
 kubectl edit node i-043783332483bf9f8
 ```
-under labels --> add `node-name: n1-node`  --> save and exit.  or we can use a direct command `kubectl label nodes i-043783332483bf9f8 node-name=n1-node`  
+under labels --> add `node-name: n1-node`  --> save and exit.  or we can use a direct command `kubectl label nodes i-043783332483bf9f8 node-name=n1-node`    
+
+Do the same for other node as well but with name as `n2-node`  
 
 now list the pods and look whether they are running or not. if yes then look on which node they belongs to.  
 ```
@@ -2784,3 +2786,12 @@ Node affinity supports following operators,
 4. DoesNotExist
 5. Gt
 6. Lt,   etc
+
+
+##### 15.2.1 Prefered kind.
+```
+vi preffered.yml
+```
+
+```
+
