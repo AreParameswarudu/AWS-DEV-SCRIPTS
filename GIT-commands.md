@@ -1,5 +1,6 @@
 # GITHUB
 
+## 0. Initial setup for aws instance
 Iam going to use AWS EC2 instance with RedHat linux machine to work with git.  
 We can also go with local machine, or any other cloud providers as well.  
 
@@ -27,7 +28,7 @@ Reflect the changes
 sudo -i
 ```
 
-## 1. Install git and verify the installation.
+# 1. Install git and verify the installation.
 
 ```
 yum install git -y
@@ -50,6 +51,9 @@ Initialize git , this is local repo. .git directory will be create which contain
 ```
 git status
 ```
+
+<img width="1063" height="590" alt="image" src="https://github.com/user-attachments/assets/7320c4db-a83f-4c2c-86df-6677bfb097ec" />
+
 
 touch index.html
 --> it has created locally, now move from working directory to staging area
