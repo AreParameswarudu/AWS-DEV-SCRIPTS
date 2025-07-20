@@ -689,27 +689,27 @@ ports:
   hostPort: 8080        # Port on the host machine
 ```
 
-🔹 Explanation of Changes
----------------------------
+##### 🔹 Explanation of Changes
+
 ✅ containerPort: 8080 → The app runs inside the container on port 8080.  
 ✅ hostPort: 8080 → The container maps its 8080 port to the same port on the host machine.  
 
-🔹 Important Notes on hostPort
-----------------------------------
+##### 🔹 Important Notes on hostPort
+
 hostPort directly binds the container port to the host.  
 It works only on worker nodes where the pod runs.  
-If multiple pods run on the same node, you cannot use the same hostPort for all of them.  
-Recommended alternative: Instead of hostPort, use a Kubernetes Service (NodePort or LoadBalancer) to expose the Deployment.  
-------------------------
+If multiple pods run on the same node, you cannot use the same hostPort for all of them.    
+
+###### Recommended alternative: Instead of hostPort, use a Kubernetes Service (NodePort or LoadBalancer) to expose the Deployment.  
+
 
 By default, a ReplicaSet (RS) only ensures that a specific number of Pods are running. However, it does not provide network access to those Pods externally.
 
 ✅ To access your application from the internet, you need a Kubernetes Service.
 
 **Example files for exercise:**
----------------------------
 
-*1.🚀 Kubernetes Manifest: 1 Pod with 2 Containers*  
+*🚀 Kubernetes Manifest: 1 Pod with 2 Containers*  
 In Kubernetes, a Pod can run multiple containers that share the same network and storage. Here’s how to create a single Pod with two containers inside it.
 
 `vi pod-two-containers.yaml`
