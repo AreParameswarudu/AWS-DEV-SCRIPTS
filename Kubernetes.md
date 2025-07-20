@@ -2683,3 +2683,24 @@ Kubernetes raises the delay between each attempt until it reaches a compiled-in 
 ##### 4. CrashLoopBackOff
 When you see "CrashLoopBackOff," it means that kubelet is trying to run the container, but it keeps failing and crashing.  
 After crashing, Kubernetes tries to restart the container automatically, but if the container keeps failing repeatedly, you end up in a loop of crashes and restarts, thus the term "CrashLoopBackOff."  
+
+
+# 15. PODS Scheduling
+
+Pod scheduling determines where workloads run in your cluster, directly impacting bothe resources utilization and application peformance.  
+The scheduler evaluates numerous factors from resource requirements to node availability and affinity rules to place pods optimally across your infrastructure.   
+
+In Kubernetes, the mechanisms that influence how Pods are scheduled onto Nodes within a cluster are:  
+* Node Selector
+* Node affinity
+* Traints and Tolerations.
+
+Lets talk about them one by one.
+
+#### 15.1 Node selector.
+
+It is the simplest form of selection constraint, allowing pods to be scheduled only on nodes with specific labels.  By specifing a NodeSelector in a pod's specification, we can ensure that the pods run only on nodes that match the given label.  
+
+When to use!!  
+For simple, direct specific constraints for pods placement based on node labels.  
+
