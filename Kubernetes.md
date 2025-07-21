@@ -2571,7 +2571,20 @@ spec:
     - name: shared-logs
       emptyDir: {}
 ```
-
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-sidecar-lb
+spec:
+  selector:
+    app: log-aggregator
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+```
 Lets comprehend the yml file.  
 
 1. Main application (app-container):
