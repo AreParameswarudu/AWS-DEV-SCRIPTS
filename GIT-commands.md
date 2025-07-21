@@ -42,8 +42,8 @@ git status
 ```
 You get error, because this is not initialized yet.  
 
+# 2. Initialize locally.
 ```
-
 git init
 ```
 Initialize git , this is local repo. .git directory will be create which contain files/dir maintained by git. The .git directory contains metadata and the entire history of the project,
@@ -54,28 +54,107 @@ git status
 
 <img width="1063" height="590" alt="image" src="https://github.com/user-attachments/assets/7320c4db-a83f-4c2c-86df-6677bfb097ec" />
 
+# 3. Create files or folders.
 
-touch index.html
---> it has created locally, now move from working directory to staging area
-
+```
 vi index.html
-this is sample file
+```
+this is sample file.  
+--> it has created locally, now move from working directory to staging area.  
 
+```
 git status
---> this is not tracked, Not tracked files shows in red color, if you want to track file move to staging area
+```
+--> this is not tracked, Not tracked files shows in red color, if you want to track file move to staging area.  
 
+```
 git add index.html
+```
 --> command to move to staging area
 
+```
 git status
+```
 --> now file is in staging area, tracked files shows green color, and now move to local repository
 
+```
 git commit -m "my first commit" index.html
+```
 --> now file is in local repository
 
+```
 git status
+```
 
-what ever we do track, committing file etc will be in .git directory
+what ever we do track, committing file etc will be in `.git` directory
+
+
+# 4. Now time to commit to Remote Repo to GitHub
+
+#### Sign up to GitHub and create a sample test public repository
+
+```
+touch python{1..10}
+```
+
+```
+touch hello.txt
+```
+
+```
+git add .
+```
+
+
+```
+git commit -m "python files" .
+```
+
+```
+git remote add origin https://github.com/username/reponame.git
+```
+---> copy this command from GitHub --> this will be done only first time.  
+
+once above command executed , in `.git` folder, `cat config` file, remote origin got added --> show this file.  
+```
+git push -u origin master
+```
+--> this will be used to commit the changes from local to central repo.   
+
+```
+git username:
+git password or personal token [generate the token from github]
+```
+```
+git config --global credential.helper cache
+```
+---> not to ask for the password every time
+
+```
+git credential-cache exit
+```
+--> TO remove credentials
+
+```
+git remote -v
+```
+
+**Example**  
+Now refresh the GitHub page and you can see the files.  
+
+--> In Local, open hello.txt and add some content here.    
+--> git status --> now you can see the file in red color which is modified, now you need to stage this file.  
+--> git add hello.txt --> now you have stagged this file, if you want all the files to stage use.  
+git add --a  
+--> git status --> now this is green color, ready to commit  
+
+
+--> git commit -m 'modified hello.txt' --> this is now committed to local repo, you need to push to central pro GitHub.  
+--> git push --> no need to add origin, that is only for first time and also no need to add remote origin that is also for first time.  
+
+
+
+
 
 --> now another example to create a file and add to staging and repo
 
@@ -563,56 +642,15 @@ git status
 rm -rf *
 
 
-==========================================
-Now time to commit to Remote Repo to GitHub
---------------------------------------------
 
-Sign up to GitHub and create a sample test public repository
+Lets try again  
 
-touch python{1..10}
-touch hello.txt
-git add .
-git commit -m "python files" .
+--> modify another file test.txt  
+--> git status  
+--> git add test.txt  
 
-git remote add origin https://github.com/ReyazShaik/testrepo.git  ---> copy this command from GitHub --> this will be done only first time
-
-once above command executed , in .git folder, cat config file, remote origin got added --> show this file
-
-git push -u origin master --> this will be used to commit the changes from local to central repo  
-
-git username:
-git password or personal token [generate the token from github]
-
-git config --global credential.helper cache        ---> not to ask for the password every time
-
-git credential-cache exit    --> TO remove credentials
-
-git remote -v
-
-Example
---------
-
-Now refresh the GitHub page and you can see the files
-
---> In Local, open hello.txt and add some content here  
---> git status --> now you can see the file in red color which is modified, now you need to stage this file
---> git add hello.txt --> now you have stagged this file, if you want all the files to stage use
-git add --a
---> git status --> now this is green color, ready to commit
-
-
-
---> git commit -m 'modified hello.txt' --> this is now committed to local repo, you need to push to central pro GitHub
---> git push --> no need to add origin, that is only for first time and also no need to add remote origin that is also for first time
-
-Lets try again
-
---> modify another file test.txt
---> git status
---> git add test.txt
-
-If you want to un-stage existing file use RESET command .
-if you want already added file to un-stage use reset command , for brand new file use rm command (difference rm - brand new file to un-stage , reset - existing file to un-stage)
+If you want to un-stage existing file use RESET command.  
+if you want already added file to un-stage use reset command , for brand new file use rm command (difference rm - brand new file to un-stage , reset - existing file to un-stage)  
 
 git reset HEAD <filename>
 
