@@ -28,6 +28,11 @@ Reflect the changes
 sudo -i
 ```
 
+
+**Chain of actions**.
+<img width="1063" height="590" alt="image" src="https://github.com/user-attachments/assets/7320c4db-a83f-4c2c-86df-6677bfb097ec" />
+
+
 # 1. Install git and verify the installation.
 
 ```
@@ -52,8 +57,6 @@ Initialize git , this is local repo. .git directory will be create which contain
 git status
 ```
 
-<img width="1063" height="590" alt="image" src="https://github.com/user-attachments/assets/7320c4db-a83f-4c2c-86df-6677bfb097ec" />
-
 # 3. Create files or folders.
 
 ```
@@ -67,23 +70,21 @@ git status
 ```
 --> this is not tracked, Not tracked files shows in red color, if you want to track file move to staging area.  
 
+--> following command is to move to staging area.
 ```
 git add index.html
 ```
---> command to move to staging area
+
 
 ```
 git status
 ```
 --> now file is in staging area, tracked files shows green color, and now move to local repository
 
+
+--> Lets commint the files, now file is in local repository
 ```
 git commit -m "my first commit" index.html
-```
---> now file is in local repository
-
-```
-git status
 ```
 
 what ever we do track, committing file etc will be in `.git` directory
@@ -91,29 +92,13 @@ what ever we do track, committing file etc will be in `.git` directory
 
 # 4. Now time to commit to Remote Repo to GitHub
 
-#### Sign up to GitHub and create a sample test public repository
+Sign up to GitHub and create a sample test public repository.  
 
-```
-touch python{1..10}
-```
-
-```
-touch hello.txt
-```
-
-```
-git add .
-```
-
-
-```
-git commit -m "python files" .
-```
-
+---> copy this command from GitHub --> this will be done only first time. 
 ```
 git remote add origin https://github.com/username/reponame.git
 ```
----> copy this command from GitHub --> this will be done only first time.  
+ 
 
 once above command executed , in `.git` folder, `cat config` file, remote origin got added --> show this file.  
 ```
@@ -121,23 +106,29 @@ git push -u origin master
 ```
 --> this will be used to commit the changes from local to central repo.   
 
+
+## Authenticating pull or push actions.
+If any time asked for the authentication,  following things were asked.
 ```
 git username:
 git password or personal token [generate the token from github]
 ```
+
+---> not to ask for the password every time
 ```
 git config --global credential.helper cache
 ```
----> not to ask for the password every time
 
+--> TO remove credentials
 ```
 git credential-cache exit
 ```
---> TO remove credentials
+
 
 ```
 git remote -v
 ```
+----------------------------
 
 **Example**  
 Now refresh the GitHub page and you can see the files.  
