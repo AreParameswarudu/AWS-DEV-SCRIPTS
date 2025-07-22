@@ -24,15 +24,15 @@ source .bashrc
 ```
 
 ### Step3 
-Generate a key to allote to the cluster's instances so as to login to those machines.
+Generate a key to allote to the cluster's instances so as to login to those machines.  
+Change the name or simply copy the key to a pem/pub file.  
+Add executable rights to the users for the file.
 ```
 ssh-keygen
 ```
-Change the name or simply copy the key to a pem/pub file.
 ```
 cp /root/.ssh/id_rsa.pub my-keypair.pub
 ```
-
 ```
 chmod 777 my-keypair.pub
 ```
