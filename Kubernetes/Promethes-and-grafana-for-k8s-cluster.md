@@ -127,6 +127,14 @@ kops rolling-update cluster
 
 if you want to delete : ``` kops delete cluster --name reyaz.k8s.local --yes ```
 
+<img width="761" height="434" alt="image" src="https://github.com/user-attachments/assets/e51e8bc4-e926-4c37-b073-b84e3328d746" />
+
+## Install Metric Server
+
+```
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
+```
+
 
 HELM:
 =====
@@ -145,38 +153,34 @@ a Running instance of a chart with a specific config is called Release
 
 Usually in K8S we use manifest file to deploy, but here we will convert manifest to helm chart and deploy
 
-Install HELM
-============
+
+
+## Install HELM
 ```
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 chmod 700 get_helm.sh
 ./get_helm.sh
 helm version
 ```
-Install Metric Server
-==============
-```
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
-```
-Steps to Install Prometheus
-=========================
 
-First add helm repositories for prometheus and grafana
------------------------
+### First add helm repositories for prometheus and grafana
+
 ```
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts 
 helm repo add grafana https://grafana.github.io/helm-charts
 ```
-UPDATE HELM CHART REPOS:
-=======================
+### UPDATE HELM CHART REPOS:
+
 ```
 helm repo update
 ```
 ```
 helm repo list
 ```
-CREATE PROMETHEUS NAMESPACE:
-============================
+## Steps to Install Prometheus
+
+### CREATE PROMETHEUS NAMESPACE:
+
 ```
 kubectl get ns
 ```
@@ -187,8 +191,8 @@ kubectl create namespace prometheus
 kubectl get ns
 ```
 
-INSTALL PROMETHEUS:
-----------------
+### INSTALL PROMETHEUS:
+
 ```
 helm install prometheus prometheus-community/prometheus --namespace prometheus --set alertmanager.persistentVolume.storageClass="gp2" --set server.persistentVolume.storageClass="gp2"
 ```
@@ -198,15 +202,16 @@ kubectl get pods -n prometheus
 ```
 kubectl get all -n prometheus
 ```
+## Steps to Install Grafana
 
-Create Namespace Grafana
--=====================
+### Create Namespace Grafana
+
 ```
 kubectl create namespace grafana
 ```
 
-Install Grafana
-==============
+### Install Grafana
+
 ```
 helm install grafana grafana/grafana --namespace grafana --set persistence.storageClassName="gp2" --set persistence.enabled=true --set adminPassword='Root123456' --set service.type=LoadBalancer
 ```
@@ -240,6 +245,7 @@ New --> Import --> 315 --> load --> select Prometheus --> import
 
 Add 1860 port to monitor Nodes individually  
 
+15661  --> K8S cluster dashboard.
 11454 --> pv and pvc  
 747 --> pod metrics  
 14623 --> k8s overview -- use this   
