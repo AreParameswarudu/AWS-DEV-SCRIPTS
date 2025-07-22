@@ -2,9 +2,12 @@ Version1 (= KOPS-multinodeCluster-setup) uses t2.micro for worker nodes and are 
 So came up with slight changes in the setup.  
 
 ### Step1 
-Launch Amazon Linux 2/ 2023 , t2.micro
+Launch Amazon Linux 2023 , t2.micro  and name it as **KOPS**.
 
-Attach a IAM ROLE TE=EC2, Permisions = admin
+Attach a IAM ROLE TE=EC2, Permisions = admin.  
+
+Login to the **KOPS** instances.  
+Set the Hostname for instances.  
 
 ### step2 
 ```
