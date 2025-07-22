@@ -3502,3 +3502,143 @@ kubectl scale deployment nginx-v1 --replicas=0
 kubectl get pods
 ```
 now has only v2 pods.
+
+
+
+-----------------------------------------------------
+
+
+
+# 16. HELM and ARGOCD 
+
+### 16.1 HELM:
+
+​Helm is a powerful package manager for Kubernetes, designed to streamline the deployment and management of applications within Kubernetes clusters. Often referred to as the "Kubernetes package manager," Helm utilizes charts—pre-configured packages of Kubernetes resources—to simplify the process of defining, installing, and upgrading even the most complex Kubernetes applications.
+
+
+
+In K8S Helm is a package manager to install packages
+in Redhat: yum & Ubuntu: apt & K8s: helm
+
+it is used to install applications on clusters.
+we can install and deploy applications by using helm
+it manages k8s resources packages through charts
+chart is a collection of files organized on a directory structure.
+chart is collection of manifest files.
+a running instance of a chart with a specific config is called a release.
+The Helm client and library is written in the Go programming language.
+The library uses the Kubernetes client library to communicate with Kubernetes.
+
+
+ARCHITECURE:
+1. HELM REPOSITORY: IT HAS ALL HELM REPOS WHICH IS PUBLICALLY AVAILABLE
+2. HELM CLIENT: DOWNLOADS HELM CHARTS FORM HELM REPOS.
+3. API SERVER: DOWNLOADED HELM CHARTS WILL BE EXECUTED ON CLUSTER WITH API SERVER.
+
+### 16.2 ARGOCD 
+
+To do deployment in K8S Cluster.  
+
+GitOps continuous delivery tool for Kubernetes.  
+
+It automates the deployment of applications to Kubernetes clusters,  
+Pipeline is not the best method for K8s, use ARGOCD
+
+
+
+
+INTRO:
+ArgoCD is a declarative continuous delivery tool for Kubernetes. ArgoCD is the core component of Argo Project.  
+It helps to automate the deployment and management of applications in a K8s cluster. It uses GitOps methodology to manage the application lifecycle and provides a simple and intuitive UI to monitor the application state, rollout changes, and rollbacks.  
+With ArgoCD, you can define the desired state of your Kubernetes applications as YAML manifests and version control them in a Git repository.  
+ArgoCD will continuously monitor the Git repository for changes and automatically apply them to the Kubernetes cluster.  
+ArgoCD also provides advanced features like application health monitoring, automated drift detection, and support for multiple environments such as production, staging, and development.  
+It is a popular tool among DevOps teams who want to streamline their Kubernetes application deployment process and ensure consistency and reliability in their infrastructure.  
+
+
+Setup KOPS first and with the helm we will setup ARGOCD.  
+
+#### Setup KOPS
+
+Install HELM
+-------------
+
+```
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+helm version
+```
+
+Install ARGOCD using HELM
+---------------------------
+```
+helm repo add argo https://argoproj.github.io/argo-helm
+```
+```
+helm repo update
+```
+It will update latest charts
+
+```
+kubectl create namespace argocd
+helm install argocd argo/argo-cd --namespace argocd
+kubectl get all -n argocd
+```
+
+EXPOSE ARGOCD SERVER:
+--------------------
+```
+
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+```
+```
+yum install jq -y
+```
+
+//export ARGOCD_SERVER='kubectl get svc argocd-server -n argocd -o json | jq --raw-output '.status.loadBalancer.ingress[0].hostname''
+
+//echo $ARGOCD_SERVER
+
+```
+kubectl get svc argocd-server -n argocd -o json | jq --raw-output .status.loadBalancer.ingress[0].hostname
+```
+The above command will provide load balancer URL to access ARGO CD
+
+
+TO GET ARGO CD PASSWORD:
+------------------------
+```
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+```
+
+```
+export ARGO_PWD='kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d'
+```
+```
+echo $ARGO_PWD
+```
+The above command to provide password to access argo cd
+
+
+Open ArgoCD load balancer  
+
+username: admin and password from above command  
+
+create app --> Application Name --> bankapp --> Project Name --> default --> Sync Policy --> Automatic --> Repository --> https://github.com/ReyazShaik/ar-deploy.git --> Path --> ./ --> CLuster URL --> NameSpace --> default
+
+```
+kubectl get po
+```
+--> it created automatically from argocd
+
+```
+kubectl get svc  --> copy paste the elb on browser
+```
+
+now modify replica as 5 in GitHub deploy.yml , automatically argocd will deploy
+
+History and RollBack
+------
+
+Click on history and roll back --> three dots --> rollback
