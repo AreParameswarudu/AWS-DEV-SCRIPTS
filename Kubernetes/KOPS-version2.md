@@ -63,7 +63,7 @@ sh kops.sh
 
 Following command is necessesary 
 ```
-export KOPS_STATE_STORE=s3://reyaz-kops-testbkt1433.k8s.local
+export KOPS_STATE_STORE=s3://param-kops-testbkt143.k8s.local
 ```
 
 Lets validate the cluster.
