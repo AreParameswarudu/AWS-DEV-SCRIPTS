@@ -10,15 +10,15 @@ Login to the **KOPS** instances.
 Set the Hostname for instances.  
 
 ### step2 
+Edit the `.bashrc` file.  
+Add the path `export PATH=$PATH:/usr/local/bin/` to the file.  
+Finally, run the file to save and reflect changes.
 ```
 vi .bashrc
 ```
-Add the following path
 ```
 export PATH=$PATH:/usr/local/bin/
 ```
-
-Run the following command to make the changes made above.  
 ```
 source .bashrc
 ```
