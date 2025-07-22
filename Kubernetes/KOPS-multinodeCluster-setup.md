@@ -28,40 +28,40 @@ create instance.
 
 Login to the instance, now settup the KOPS and Kubectl in this machine.
 
-To elivate the permission to root user.
+To elivate the permission to root user.  
+set hostname for machine.  
+Reflect the changes.  
 ```
 sudo -s
 ```
-    
-set hostname for machine.
 ```
 hostnamectl set-hostname kops
 ```
-
-Reflect the changes.  
 ```
 sudo -i
 ```
 
 to edit the .bachrc file and add a path.  
+add this pathe in the file.  
+to reflect changes /compile the edit.  
 ```
 vi .bashrc
 ```
-
-add this pathe in the file.  
 ```
 export PATH=$PATH:/usr/local/bin/
 ```
-
-
-to reflect changes /compile the edit.  
 ```
 source .bashrc
 ```
 
 Now lets add a kops.sh file and run it to install kops, kubectl.
 
-`vi kops.sh`     --> create a shell script.  
+create a shell script.   
+Run the script.  
+
+```
+vi kops.sh
+```    
 
 ```
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl";
@@ -84,7 +84,6 @@ kops update cluster --name param.k8s.local --yes --admin
 > 4. For this setup we are uisng t2.medium for main node ( control plane) and t2.micro for worker node.
 ------------------
 
-Save and run the script.
 ```
 sh kops.sh
 ```
