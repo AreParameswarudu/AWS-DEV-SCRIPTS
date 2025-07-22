@@ -8,6 +8,7 @@ It can be divided into three main components namely :
 · Alerts
 
 **_In general when we are using prometheus and grafana for visualization, this is the flow and requirements_**
+--------------------------
 
 <img width="800" height="536" alt="image" src="https://github.com/user-attachments/assets/92665c94-2d07-4248-a01a-f09ab6c65c75" />
 
