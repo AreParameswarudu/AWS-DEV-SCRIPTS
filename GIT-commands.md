@@ -13,17 +13,16 @@ Instal gitbash or Launch RedHat EC2 instance and login
 
 This steps is only when you are using any instances from any Cloud services.
 
-First elivate permissions to sudo
+First elivate permissions to sudo.  
+Set hostname  ( I am using gituser as name, you can choose as you wish).    
+Reflect the changes
+
 ```
 sudo -s
 ```
-
-Set hostname  ( I am using gituser as name, you can choose as you wish).  
 ```
 hostnamectl set-hostname gituser
 ```
-
-Reflect the changes
 ```
 sudo -i
 ```
@@ -41,7 +40,6 @@ yum install git -y
 ```
 git -v
 ```
-
 ```
 git status
 ```
@@ -75,7 +73,6 @@ git status
 git add index.html
 ```
 
-
 ```
 git status
 ```
@@ -102,7 +99,7 @@ git remote add origin https://github.com/username/reponame.git
 
 once above command executed , in `.git` folder, `cat config` file, remote origin got added --> show this file.  
 ```
-git push -u origin master
+git push -u origin main
 ```
 --> this will be used to commit the changes from local to central repo.   
 

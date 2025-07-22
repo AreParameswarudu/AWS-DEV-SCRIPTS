@@ -2,34 +2,37 @@ Version1 (= KOPS-multinodeCluster-setup) uses t2.micro for worker nodes and are 
 So came up with slight changes in the setup.  
 
 ### Step1 
-Launch Amazon Linux 2/ 2023 , t2.micro
+Launch Amazon Linux 2023 , t2.micro  and name it as **KOPS**.
 
-Attach a IAM ROLE TE=EC2, Permisions = admin
+Attach a IAM ROLE TE=EC2, Permisions = admin.  
+
+Login to the **KOPS** instances.  
+Set the Hostname for instances.  
 
 ### step2 
+Edit the `.bashrc` file.  
+Add the path `export PATH=$PATH:/usr/local/bin/` to the file.  
+Finally, run the file to save and reflect changes.
 ```
 vi .bashrc
 ```
-Add the following path
 ```
 export PATH=$PATH:/usr/local/bin/
 ```
-
-Run the following command to make the changes made above.  
 ```
 source .bashrc
 ```
 
 ### Step3 
-Generate a key to allote to the cluster's instances so as to login to those machines.
+Generate a key to allote to the cluster's instances so as to login to those machines.  
+Change the name or simply copy the key to a pem/pub file.  
+Add executable rights to the users for the file.
 ```
 ssh-keygen
 ```
-Change the name or simply copy the key to a pem/pub file.
 ```
 cp /root/.ssh/id_rsa.pub my-keypair.pub
 ```
-
 ```
 chmod 777 my-keypair.pub
 ```
@@ -60,7 +63,7 @@ sh kops.sh
 
 Following command is necessesary 
 ```
-export KOPS_STATE_STORE=s3://reyaz-kops-testbkt1433.k8s.local
+export KOPS_STATE_STORE=s3://param-kops-testbkt143.k8s.local
 ```
 
 Lets validate the cluster.

@@ -28,40 +28,40 @@ create instance.
 
 Login to the instance, now settup the KOPS and Kubectl in this machine.
 
-To elivate the permission to root user.
+To elivate the permission to root user.  
+set hostname for machine.  
+Reflect the changes.  
 ```
 sudo -s
 ```
-    
-set hostname for machine.
 ```
 hostnamectl set-hostname kops
 ```
-
-Reflect the changes.  
 ```
 sudo -i
 ```
 
 to edit the .bachrc file and add a path.  
+add this pathe in the file.  
+to reflect changes /compile the edit.  
 ```
 vi .bashrc
 ```
-
-add this pathe in the file.  
 ```
 export PATH=$PATH:/usr/local/bin/
 ```
-
-
-to reflect changes /compile the edit.  
 ```
 source .bashrc
 ```
 
 Now lets add a kops.sh file and run it to install kops, kubectl.
 
-`vi kops.sh`     --> create a shell script.  
+create a shell script.   
+Run the script.  
+
+```
+vi kops.sh
+```    
 
 ```
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl";
@@ -84,10 +84,31 @@ kops update cluster --name param.k8s.local --yes --admin
 > 4. For this setup we are uisng t2.medium for main node ( control plane) and t2.micro for worker node.
 ------------------
 
-Save and run the script.
 ```
 sh kops.sh
 ```
+
+It may take a while to setup as it need to configure multiple things.  
+You can see the setup configuring in the your AWS account.  
+
+It is advised to run the following command again ( even though it was mentioned in the above script).  
+```
+export KOPS_STATE_STORE=s3://param-kops-testbkt143.k8s.local
+```  
+
+To verify the setup of cluster, use the following command  
+```
+kops validate cluster --wait 10m
+```  
+This command will return the status of cluster for a period of 10 mints.  
+The setup may take more than 10 mints. So Wait for untill setup was configured and you can see all 3 nodes up and healthy.  
+
+After sucessfull setup,  
+```
+kops get cluster
+```
+to get the cluster details.  
+
 NOTE:
 -----------------------------------
 During setup, it will suggest us about few commands under _suggestions_ section, make a note of them.  
@@ -112,30 +133,6 @@ kops edit ig --name=param.k8s.local control-plane-ap-south-1a
 is to edit the control-plane (master node) instance type.
 
 ------------------------------------------
-
-
-It may take a while to setup as it need to configure multiple things.  
-You can see the setup configuring in the your AWS account.  
-
-It is advised to run the following command again ( even though it was mentioned in the above script).  
-`export KOPS_STATE_STORE=s3://param-kops-testbkt143.k8s.local`  
-
-To verify the setup of cluster, use the following command  
-```
-kops validate cluster --wait 10m
-```  
-This command will return the status of cluster for a period of 10 mints.  
-The setup may take more than 10 mints. So Wait for untill setup was configured and you can see all 3 nodes up and healthy.  
-
-After sucessfull setup,  
-```
-kops get cluster
-```
-to get the cluster details.  
-```
-kops get cluster -o wide
-```
-to get more details of cluster.
 
 
 Lets try to create some nodes using deployment.
