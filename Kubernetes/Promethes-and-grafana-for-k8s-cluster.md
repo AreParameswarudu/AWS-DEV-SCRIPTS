@@ -161,7 +161,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/late
 Steps to Install Prometheus
 =========================
 
-First add helm repositories 
+First add helm repositories for prometheus and grafana
 -----------------------
 ```
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts 
@@ -217,7 +217,7 @@ kubectl get pods -n grafana
 kubectl get service -n grafana
 ```
 
-Copy the Instance-IP and paste in browser   
+Copy the ELB url from above command and paste in browser   
 username:admin, password = Root123456  
 
 Check SG , nodes and ELB  
