@@ -83,17 +83,24 @@ Launch Amazonlinux2 instance call as Promotheus&Grafana Server, from this server
 
 Setup KOPS cluster first , amazon Linux 2
 
+```
 vim .bashrc
+```
+```
 export PATH=$PATH:/usr/local/bin/
+```
+```
 source .bashrc
+```
 
+```
 vi kops.sh
+```
+#vim .bashrc  
+#export PATH=$PATH:/usr/local/bin/  
+#source .bashrc  
 
-#vim .bashrc
-#export PATH=$PATH:/usr/local/bin/
-#source .bashrc
-
-
+```
 #! /bin/bash
 aws configure
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -107,18 +114,18 @@ aws s3api put-bucket-versioning --bucket reyaz-kops-testbkt123.k8s.local --regio
 export KOPS_STATE_STORE=s3://reyaz-kops-testbkt123.k8s.local
 kops create cluster --name reyaz.k8s.local --zones ap-south-1a --master-count=1 --master-size t2.medium --node-count=2 --node-size t2.micro
 kops update cluster --name reyaz.k8s.local --yes --admin
-
+```
 
 run the below commands
-
+```
 export KOPS_STATE_STORE=s3://reyaz-kops-testbkt123.k8s.local
 kops validate cluster --wait 10m
 kops update cluster --name reyaz.k8s.local --yes --admin
 kops rolling-update cluster
+```
 
 
-
-if you want to delete :  kops delete cluster --name reyaz.k8s.local --yes
+if you want to delete : ``` kops delete cluster --name reyaz.k8s.local --yes ```
 
 
 HELM:
@@ -140,83 +147,109 @@ Usually in K8S we use manifest file to deploy, but here we will convert manifest
 
 Install HELM
 ============
-
+```
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 chmod 700 get_helm.sh
 ./get_helm.sh
 helm version
-
+```
 Install Metric Server
 ==============
+```
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
-
+```
 Steps to Install Prometheus
 =========================
 
 First add helm repositories 
 -----------------------
-
+```
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts 
 helm repo add grafana https://grafana.github.io/helm-charts
-
+```
 UPDATE HELM CHART REPOS:
 =======================
+```
 helm repo update
+```
+```
 helm repo list
-
+```
 CREATE PROMETHEUS NAMESPACE:
 ============================
+```
 kubectl get ns
+```
+```
 kubectl create namespace prometheus
+```
+```
 kubectl get ns
+```
 
 INSTALL PROMETHEUS:
 ----------------
+```
 helm install prometheus prometheus-community/prometheus --namespace prometheus --set alertmanager.persistentVolume.storageClass="gp2" --set server.persistentVolume.storageClass="gp2"
-
+```
+```
 kubectl get pods -n prometheus
+```
+```
 kubectl get all -n prometheus
-
+```
 
 Create Namespace Grafana
 -=====================
-
+```
 kubectl create namespace grafana
-
+```
 
 Install Grafana
 ==============
-
+```
 helm install grafana grafana/grafana --namespace grafana --set persistence.storageClassName="gp2" --set persistence.enabled=true --set adminPassword='Root123456' --set service.type=LoadBalancer
-
+```
+```
 kubectl get pods -n grafana
+```
+```
 kubectl get service -n grafana
+```
 
-Copy the Instance-IP and paste in browser 
-username:admin, password = Root123456
+Copy the Instance-IP and paste in browser   
+username:admin, password = Root123456  
 
-Check SG , nodes and ELB
+Check SG , nodes and ELB  
 
 
 Go to Grafana Dashboard --> Add the DataSource --> Select Prometheus and below URL, this URL is same in K8s for all
+```
 http://prometheus-server.prometheus.svc.cluster.local/
+```
+
+--- all dashboard id's are here
+```
+https://grafana.com/grafana/dashboards/
+```
+   
+
+Import Grafana dashboard --> New --> Import --> 6417 --> load --> select Prometheus --> import   
+
+New --> Import --> 315 --> load --> select Prometheus --> import   
+
+Add 1860 port to monitor Nodes individually  
+
+11454 --> pv and pvc  
+747 --> pod metrics  
+14623 --> k8s overview -- use this   
+10907 --> monitor api-server  
 
 
-https://grafana.com/grafana/dashboards/   --- all dashboard id's are here
-
-Import Grafana dashboard --> New --> Import --> 6417 --> load --> select Prometheus --> import 
-
-New --> Import --> 315 --> load --> select Prometheus --> import 
-
-Add 1860 port to monitor Nodes individually
-
-11454 --> pv and pvc
-747 --> pod metrics
-14623 --> k8s overview -- use this
-10907 --> monitor api-server
-
-systemctl start grafana-server.service ---  to start grafana service or see in script
-
+---  to start grafana service or see in script  
+```
+systemctl start grafana-server.service
+```
 
 
 
@@ -226,9 +259,10 @@ NODEXPORTER: will help to collect the data from workernodes
 
 install NodeExporter
 ============
-
+```
 vi nodeexp.sh
-
+```
+```
 #NODEEXPORTER
 wget https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.linux-amd64.tar.gz
 tar -xf node_exporter-1.5.0.linux-amd64.tar.gz
@@ -254,8 +288,12 @@ EOF
 sudo cat /etc/systemd/system/node_exporter.service
 sudo systemctl daemon-reload  && sudo systemctl enable node_exporter
 sudo systemctl start node_exporter.service && sudo systemctl status node_exporter.service --no-pager
+```
 
 
+```
 sh nodeexp.sh
-
-http://ip:9100 -- to see if nodeexporter is working  
+```
+```
+http://ip:9100 -- to see if nodeexporter is working
+```
