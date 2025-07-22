@@ -3565,8 +3565,14 @@ Install HELM
 
 ```
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+```
+```
 chmod 700 get_helm.sh
+```
+```
 ./get_helm.sh
+```
+```
 helm version
 ```
 
@@ -3583,19 +3589,20 @@ It will update latest charts
 ```
 kubectl create namespace argocd
 helm install argocd argo/argo-cd --namespace argocd
+```
+```
 kubectl get all -n argocd
 ```
 
 EXPOSE ARGOCD SERVER:
 --------------------
-```
 
+```
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 ```
 ```
 yum install jq -y
 ```
-
 //export ARGOCD_SERVER='kubectl get svc argocd-server -n argocd -o json | jq --raw-output '.status.loadBalancer.ingress[0].hostname''
 
 //echo $ARGOCD_SERVER
@@ -3608,17 +3615,19 @@ The above command will provide load balancer URL to access ARGO CD
 
 TO GET ARGO CD PASSWORD:
 ------------------------
+The following command to provide password to access argo cd.
+
 ```
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
+Try exporting the above command and stor it in variable.
 ```
 export ARGO_PWD='kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d'
 ```
 ```
 echo $ARGO_PWD
 ```
-The above command to provide password to access argo cd
 
 
 Open ArgoCD load balancer  
