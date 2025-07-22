@@ -99,7 +99,7 @@ git remote add origin https://github.com/username/reponame.git
 
 once above command executed , in `.git` folder, `cat config` file, remote origin got added --> show this file.  
 ```
-git push -u origin master
+git push -u origin main
 ```
 --> this will be used to commit the changes from local to central repo.   
 
