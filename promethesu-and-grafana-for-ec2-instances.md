@@ -195,9 +195,9 @@ sudo systemctl daemon-reload  && sudo systemctl enable node_exporter
 sudo systemctl start node_exporter.service && sudo systemctl status node_exporter.service --no-pager
 ```
 
-Go to `http://13.233.215.35:9090/` --> promo and see the targets --> top --> Status --> Targets , worker nodes are down  
+Go to `http://13.233.215.35:9090/` --> prometheus ---> at top navibar --> Status --> Targets , worker nodes are down. 
 
-go to monitoring server   
+go to monitoring server.
 
 `cat /etc/prometheus/prometheus.yml`  --- this contains, workernode names, to add , go to `/etc/hosts` and add workernode IP's  
 
@@ -208,11 +208,13 @@ vi /etc/hosts
 13.127.130.98 worker-1  
 3.6.41.159 worker-2  
 
+<img width="723" height="157" alt="image" src="https://github.com/user-attachments/assets/82ed605f-2627-4395-8f8c-41ab034a819c" />
 
+
+Go to prometheus UI and to the target section, and refresh the page.  
 `http://13.233.215.35:9090/targets?search=` ---> refresh and nodes are up
 
-now monitor these through Grafana
-
+now monitor these through Grafana.    
 `http://3.233.215.35:3000/`--> Make sure dashboard is there --> top --> Host --> DropDown -- see workernodes
 
 
