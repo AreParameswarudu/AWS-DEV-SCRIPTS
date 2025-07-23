@@ -222,6 +222,7 @@ now monitor these through Grafana.
 
 
 Setup Loki and Promtail on Docker to save money ;-)
+Do this in th main machine.
 
 Install docker and start
 ------------------------
