@@ -219,7 +219,7 @@ now monitor these through Grafana.
 
 
 # LOG Monitoring with Loki and Promtail
-=====================================
+
 
 Setup Loki and Promtail on Docker to save money ;-)
 
