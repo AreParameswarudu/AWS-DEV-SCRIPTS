@@ -218,7 +218,7 @@ now monitor these through Grafana.
 `http://3.233.215.35:3000/`--> Make sure dashboard is there --> top --> Host --> DropDown -- see workernodes
 
 
-LOG Monitoring with Loki and Promtail
+# LOG Monitoring with Loki and Promtail
 =====================================
 
 Setup Loki and Promtail on Docker to save money ;-)
@@ -235,29 +235,34 @@ sudo mkdir grafana_configs
 cd grafana_configs
 
 
-# Download Loki Config
+## Download Loki Config
 -----------------------
+```
 sudo wget https://raw.githubusercontent.com/grafana/loki/v2.8.0/cmd/loki/loki-local-config.yaml -O loki-config.yaml
+```
 
-# Download Promtail Config
+## Download Promtail Config
 ----------------------------
+```
 sudo wget https://raw.githubusercontent.com/grafana/loki/v2.8.0/clients/cmd/promtail/promtail-docker-config.yaml -O promtail-config.yaml
+```
 
-
-# Run Loki with Docker
+## Run Loki with Docker
 -----------------------
+```
 docker run -d --name loki -v $(pwd):/mnt/config -p 3100:3100 grafana/loki:2.8.0 --config.file=/mnt/config/loki-config.yaml
+```
 
-Check the status using http://your-ec2-instance-ip:3100/metrics
+Check the status using `http://your-ec2-instance-ip:3100/metrics`  
 
-Check the status using http://your-ec2-instance-ip:3100/ready
+Check the status using `http://your-ec2-instance-ip:3100/ready`
 
 
-#RUN Run Promtail with docker
+## Run Promtail with docker
 -----------------------------
-
+```
 docker run -d --name promtail -v $(pwd):/mnt/config -v /var/log:/var/log --link loki grafana/promtail:2.8.0 --config.file=/mnt/config/promtail-config.yaml
-
+```
 
 Link Loki to Grafana
 ----------------------
@@ -265,23 +270,12 @@ Link Loki to Grafana
 
 · Add a new data source and select Loki.
 
-· Enter the Loki URL (http://ec2-public:3100) and save the configuration.
+· Enter the Loki URL (`http://ec2-public:3100`) and save the configuration.
 
 Now, our datasource is connected.
 
-Link Loki to Grafana
 
-· In Grafana, navigate to Configuration > Data Sources.
-
-· Add a new data source and select Loki.
-
-· Enter the Loki URL (http://localhost:3100) and save the configuration.
-
-Now, our datasource is connected
-
-
-
-Step 9 — Explore and filter logs
+## Explore and filter logs
 --------------------------------
 
 · Use the Explore tab in Grafana to view logs.
@@ -291,7 +285,7 @@ Step 9 — Explore and filter logs
 Show Grafana logs
 ------------------
 
-· Add the Grafana logs path (/var/logs/grafana) to the Promtail config file
+· Add the Grafana logs path `/var/logs/grafana` to the Promtail config file
 
 vi promtail-config.yaml
 
@@ -304,8 +298,14 @@ vi promtail-config.yaml
      __path__: /var/log/grafana/*log
 ```
 
--- docker ps  
--- sudo docker restart promtail-container-id
+```
+docker ps
+```
+
+```
+sudo docker restart promtail-container-id
+```
+
 
 Go to Grafana --> Dashboard --> New Dashboard --> Add Visualization --> DataSOurce = Grafana --> click Query inspector --> Refresh
 Select Loki as datasource --> 
