@@ -110,8 +110,15 @@ exclude=*beta*
 yum install grafana -y
 systemctl start grafana-server.service
 systemctl status grafana-server.service
+```
 
+Install the node exporter   
+-----------------
+```
+vi node-exporter.sh
+```
 
+```
 #NODEEXPORTER
 wget https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.linux-amd64.tar.gz
 tar -xf node_exporter-1.5.0.linux-amd64.tar.gz
@@ -138,7 +145,7 @@ sudo cat /etc/systemd/system/node_exporter.service
 sudo systemctl daemon-reload  && sudo systemctl enable node_exporter
 sudo systemctl start node_exporter.service && sudo systemctl status node_exporter.service --no-pager
 ```
-==================================
+
 
 ```http://13.233.215.35:9100``` --> node exporter is working  
 ```http://13.233.215.35:9090``` --> Promo is working
