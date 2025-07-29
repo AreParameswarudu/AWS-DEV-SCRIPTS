@@ -130,15 +130,15 @@ git remote -v
 **Example**  
 Now refresh the GitHub page and you can see the files.  
 
---> In Local, open hello.txt and add some content here.    
---> git status --> now you can see the file in red color which is modified, now you need to stage this file.  
---> git add hello.txt --> now you have stagged this file, if you want all the files to stage use.  
-git add --a  
---> git status --> now this is green color, ready to commit  
+--> In Local, open `hello.txt` and add some content here.    
+--> `git status` --> now you can see the file in red color which is modified, now you need to stage this file.  
+--> `git add hello.txt` --> now you have stagged this file, if you want all the files to stage use.  
+--> `git add --a`  
+--> `git status` --> now this is green color, ready to commit  
 
 
---> git commit -m 'modified hello.txt' --> this is now committed to local repo, you need to push to central pro GitHub.  
---> git push --> no need to add origin, that is only for first time and also no need to add remote origin that is also for first time.  
+--> `git commit -m 'modified hello.txt'` --> this is now committed to local repo, you need to push to central pro GitHub.  
+--> `git push` --> no need to add origin, that is only for first time and also no need to add remote origin that is also for first time.  
 
 
 
@@ -146,175 +146,183 @@ git add --a
 
 --> now another example to create a file and add to staging and repo
 
+```
 touch hello.txt
+```
+```
 git status
 git add hello.txt
 git commit -m "My second commit" hello.txt
 git status
+```
 
 
+```
 touch test.txt
+```
+
+```
 git status
 git add test.txt
 git commit -m "My third commit" test.txt
 git status
+```
 
 --> create mode 100644  means a normal file
 --> 100755 means executable file
+
 ------------------------------------------
+## LOGS with git
 
-git log --> to see how many commits history
-git log --oneline --> to see less lines
-git log --oneline -2 --> to see last 2 commits history
-git show --> Show the changes of the last commit
-git show 150eb87 --> to see which file is committed for this id
+`git log` --> to see how many commits history.  
+`git log --oneline` --> to see less lines.  
+`git log --oneline -2` --> to see last 2 commits history.  
+`git show` --> Show the changes of the last commit.  
+`git show 150eb87` --> to see which file is committed for this id.  
 
-git log -p -2  --> shows last 2 commits with diff
-git log --stat --> summary of the changes
+`git log -p -2`  --> shows last 2 commits with diff.  
+`git log --stat` --> summary of the changes. 
 
-git log    --pretty=oneline --> to see less info about commit details in singleline
-git log --pretty=format:"%h-%an,%ar:%s"   [h = hash/commitnumber, an = authorname, ar = time, s = commit message ]
-git shortlog --> Summarize git log output
+`git log    --pretty=oneline` --> to see less info about commit details in singleline.  
+`git log --pretty=format:"%h-%an,%ar:%s"`   --> h = hash/commitnumber, an = authorname, ar = time, s = commit message.  
+`git shortlog` --> Summarize git log output.  
 
+
+## Git Blame
+Create a file and add text to it.  
+Add the file and commit it.  
+Now you can use `git blame filename`  
+```
 vi index.html
 this is first line
+```
 
-git add index.html
-git commit -m "first line" index.html
+`git add index.html`  
+`git commit -m "first line" index.html`  
 
 
-git blame index.html --> Show WHO changed which line in a file
+`git blame index.html` --> Show **WHO** changed which line in a file.  
 
 -------------------------------------
---> modify index.html file
 
+## Git Diff command
+--> modify index.html file
+```
 vi index.html
 this is second line .. new line
-git add index.html
-git commit -m "new line" index.html
+```
+
+`git add index.html`  
+`git commit -m "new line" index.html`  
 
 Now see the difference between the commits
 
+```
 git log --oneline -2
-git diff 150eb87..1fg0e787  -- see the diff between commits
+```
+```
+git diff 150eb87..1fg0e787
+```
+--> see the diff between commits
 
+
+```
 Vi index.html
 This is the third line
+```
 
-git diff  ------> compare changes working directory to staging area
+------> compare changes working directory to staging area
+```
+git diff
+```
 
+```
 git add index.html
+```
 
-git diff --staged --> compare changes staging to local repo
+--> compare changes staging to local repo
+```
+git diff --staged
+```
 
+commit the changes
+```
 git commit -m "comparison" index.html
+```
 
+```
 vi index.html
 change something
-
-git diff HEAD ----compare changes local directory to local repo [HEAD in caps]
-
+```
+---> compare changes local directory to local repo [HEAD in caps]
+```
+git diff HEAD 
+```
 ---------------------------------------------
 
-git log
+git log  
 
 --> you see root user in commit log --> in real time we should we our name not root
 
-This is User Configuration
+This is User Configuration  
 
-git config user.name "reyaz"
-git config user.email "reyaz@gmail.com"
+git config user.name "reyaz"  
+git config user.email "reyaz@gmail.com"  
 
-git config user.name  [to see who is the user]
-git config user.email
+git config user.name  [to see who is the user]  
+git config user.email  
 
 
 Another way of adding user configuration
 
-git config --list
-git config --global --edit
-or
-cd /root
-cat .gitconfig
+`git config --list`  
+`git config --global --edit`  
+or  
+`cd /root`  
+`cat .gitconfig`  
 
 vi index.html
 added a new line
 
-git add index.html
-git commit -m "added new line" index.html
+`git add index.html`  
+`git commit -m "added new line" index.html`  
 
-git log --oneline --author='reyaz'  --- this show only committed from certain person
-git log --author="reyaz"
+`git log --oneline --author='reyaz'`  --- this show only committed from certain person  
+`git log --author="reyaz"`
 
---> now create a new file
-touch file1
-git add file1
-git commit -m "file1 commit" file1
-git status
-git log
---> now we can see Reyaz username
+--> now create a new file  
+touch file1  
+`git add file1`  
+`git commit -m "file1 commit" file1`  
+`git status`  
+`git log`  
+--> now we can see Reyaz username  
 
-=========================
-Git Amend - Change the commit history
-=========================
-if you want to change the last commit history
 
-git commit --amend -m "an updated commit message"   --> this is replace latest commit message
+## git Amend  -- to Change the commit history
 
-==================
-git rebase - If you want to change multiple commit histories
-==================
-Note: if you want to use this command, you need to have minimum 3 commits in your repo
+if you want to change the last commit history    
+`git commit --amend -m "an updated commit message"`  --> this is replace latest commit message
 
-git rebase -i HEAD~3
 
-The option -i means interactive. HEAD~3 is a relative commit reference, which means the last 3 commits from the current branch HEAD.
+## git rebase  -- to change multiple commit histories
 
-The git rebase command above will open your default text editor (Vim for example) in an interactive mode showing the last 3 commits
+Note: if you want to use this command, you need to have minimum 3 commits in your repo  
 
-Now replace pick with reword and keep changing the commit messages for 3 times and wq!
+`git rebase -i HEAD~3`  
 
-git log --oneline -2   [All commit messages has been changed]
+The option -i means interactive. HEAD~3 is a relative commit reference, which means the last 3 commits from the current branch HEAD.  
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+The git rebase command above will open your default text editor (Vim for example) in an interactive mode showing the last 3 commits  
+
+Now replace pick with reword and keep changing the commit messages for 3 times and wq!  
+
+`git log --oneline -2`  All commit messages has been changed
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 11 JUNE 2025      class missed 
-
-
-
-vi index.html
-this is first line
-
-git add index.html
-git commit - m "1st commit" index.html
-
-do this like 5 times and commit it
-
-
-
-=========================
-Git Amend - Change the commit history
-=========================
-if you want to change the last commit history
-
-git commit --amend -m "an updated commit message"   --> this is replace latest commit message
-
-==================
-git rebase - If you want to change multiple commit histories
-==================
-Note: if you want to use this command, you need to have minimum 3 commits in your repo
-
-git rebase -i HEAD~3
-
-The option -i means interactive. HEAD~3 is a relative commit reference, which means the last 3 commits from the current branch HEAD.
-
-The git rebase command above will open your default text editor (Vim for example) in an interactive mode showing the last 3 commits
-
-Now replace pick with reword and keep changing the commit messages for 3 times and wq!
-
-git log --oneline -2   [All commit messages has been changed]
-
 
 Squashing in Git is the process of combining multiple commits into a single, consolidated commit. This is typically done to clean up the commit history before merging a feature branch into the main branch.
 
