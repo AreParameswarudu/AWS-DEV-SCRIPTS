@@ -437,8 +437,7 @@ git rm test.html                       --> this will remove the file
 
 git checkout HEAD -- test.html         ---> this will restore the file
 
-======================================================
-GIT RESTORE :
+## git restore 
 git checkout and git restore does the same work: reverting to previous state
 
 Scenario 1: if you want to undo change after saving and before commit
