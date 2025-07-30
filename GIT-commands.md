@@ -342,37 +342,37 @@ Now replace pick with reword and keep changing the commit messages for 3 times a
 Squashing in Git is the process of combining multiple commits into a single, consolidated commit. This is typically done to clean up the commit history before merging a feature branch into the main branch.
 
 Create 4 commits
-----------------
+
 git log --oneline
 
-abc123 Fourth commit
-def456 Third commit
-ghi789 Second commit
-jkl012 First commit
+abc123 Fourth commit  
+def456 Third commit  
+ghi789 Second commit  
+jkl012 First commit  
 
 if you want to combine second, third and fourth commits , put squash to third and fourth and have one commit which is second left
 
 git rebase -i HEAD~3
 
 output
-----
-pick abc123 Fourth commit
-pick def456 Third commit
-pick ghi789 Second commit
+
+pick abc123 Fourth commit  
+pick def456 Third commit  
+pick ghi789 Second commit  
 
 change
-----
-squash abc123 Fourth commit
-squash def456 Third commit
-pick  ghi789 Second commit
 
-change: Combine or modify the commit message as needed.
------
-Combined commit: Second, Third, and Fourth changes
+squash abc123 Fourth commit  
+squash def456 Third commit  
+pick  ghi789 Second commit  
 
-git rebase --continue
+change: Combine or modify the commit message as needed.  
 
-git log --oneline
+Combined commit: Second, Third, and Fourth changes  
+
+git rebase --continue  
+
+git log --oneline  
 
 
 
@@ -423,8 +423,8 @@ Again if you want latest,
 
 cat index.html
 
-Another scenario of checkout
----------------------------
+### Another scenario of checkout
+
 use git rm to remove the file and restore using checkout HEAD
 
 vi test.html
@@ -440,33 +440,32 @@ git checkout HEAD -- test.html         ---> this will restore the file
 ## git restore 
 git checkout and git restore does the same work: reverting to previous state
 
-Scenario 1: if you want to undo change after saving and before commit
-----------
+### Scenario 1: if you want to undo change after saving and before commit
 
 How to undo changes after save. If you are working on latest file, you do changes and saved. If you want previous one
 use git restore index.html
 
-vi test.html
+vi test.html  
 This is demo
 
-git add .
-git commit -m "test" test.html
+`git add .`  
+`git commit -m "test" test.html`  
 
-vi test.html
-This is demo
-ajffjkdhgdkjghdf
-save it
+vi test.html  
+This is demo  
+ajffjkdhgdkjghdf  
+save it  
 
-cat test.html
+cat test.html  
 
-if you want now to restore
+if you want now to restore  
 
-git restore test.html
+`git restore test.html`  
 
-cat test.html
+`cat test.html` 
 
-=================================
- Scenario 2 = To restore files from stagged to unstage
+
+### Scenario 2 = To restore files from stagged to unstage
 
 Accidently you have added to stage using "git add" command and if you want to unstage or untrack
 
@@ -475,39 +474,39 @@ How to untrack files
 vi test.html
 This is devops demo
 
-git add test.html
-git status --> now accidently i have stagged or tracked test.html , but I want to untrack/unstage
+`git add test.html`  
+`git status`   --> now accidently i have stagged or tracked test.html , but I want to untrack/unstage
 
-git restore --staged test.html
+`git restore --staged test.html`   
 (or)
-git restore --staged . -->  [. all]
+`git restore --staged .` -->  .  represents all  
 (or)
-git rm --cached test.html --> same like restore command above but another command to untrack/unstage
+`git rm --cached test.html`  --> same like restore command above but another command to untrack/unstage
+  
+`git status` --> you can see now untracked
+  
+`git add test.html`  --> Add it to the stage again
+  
+`git commit -m "test" test.html`
 
-git status --> you can see now untracked
+### Scenario - 3 : If you accidently delete the file from your directory and want to get back
 
-git add test.html  --> Add it to the stage again
-
-git commit -m "test" test.html
-
-Scenario - 3 : If you accidently delete the file from your directory and want to get back
---------------
 
 touch newfile
-git add newfile
-git status ---> it shows green color, it is stagged
+`git add newfile`  
+`git status` ---> it shows green color, it is stagged  
 
-git add newfile  ----> now stage it
+`git add newfile`    ----> now stage it  
 
-rm -rf newfile  -----> delete the file locally
+`rm -rf newfile` -----> delete the file locally  
 
-ls  ---> no local file
+`ls`  ---> no local file  
 
-git restore newfile   --> this will help to get the deleted file back from stage to local machine
+`git restore newfile`   --> this will help to get the deleted file back from stage to local machine  
 
-git status
-
-git commit -m "newfile" newfile
+`git status`
+  
+`git commit -m "newfile" newfile`  
 
 
 
@@ -575,8 +574,8 @@ The git stash command is a useful feature in Git that allows you to temporarily 
 
 
 
-Now create a story1 file
-------------------------
+#### Now create a story1 file
+
 vi story1
  i am working on story 1
  very difficult task
@@ -595,8 +594,8 @@ git status --> working tree clean
 
 using stash we kept story 1 aside
 
-Now create story2 file
----------------------
+#### Now create story2 file
+
 vi story2
 i need to complete this story2 first
 
@@ -606,8 +605,8 @@ git commit -m "story2" story2
 
 git status
 
-Now lets work back on story1
-----------------------------
+#### Now lets work back on story1
+
 
 git stash apply --> now restore do ls
 ls
@@ -623,47 +622,23 @@ git stash push -m "commit message" -- story1 story2
 git status
 
 
-=========================================================
-
-rm -rf *
-
-
-
-Lets try again  
-
---> modify another file test.txt  
---> git status  
---> git add test.txt  
-
-If you want to un-stage existing file use RESET command.  
-if you want already added file to un-stage use reset command , for brand new file use rm command (difference rm - brand new file to un-stage , reset - existing file to un-stage)  
-
-git reset HEAD <filename>
-
-git add .
-
--Now, redo what ever you have modified in the file
-
---> git commit -m 'modified test'
---> git push
-
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Branch Concept
-======================
+## Branch Concept
+
 keep the master branch clean first
 
 If you dont have any single commit, it will not show the branch. Once you do 1 commit, it shows master branch
 
-touch index.html
-git add index.html
-git commit -m "index commit" index.html
-git status
-git branch --> it will show the branch master, default branch
+touch index.html  
+git add index.html  
+git commit -m "index commit" index.html    
+git status  
+git branch --> it will show the branch master, default branch  
 
-if you commit at least 1 file, it will show the master branch
+if you commit at least 1 file, it will show the master branch  
 
-Its not good to work everyone on master branch, individual developer create their own branch
+Its not good to work everyone on master branch, individual developer create their own branch  
 
 dev1branch
 ==========
@@ -675,7 +650,7 @@ dev1branch
 	git add dev1file*
 	git commit -m "dev1" dev1file*
 
-dev1branch has 1 + 5 files = 6 (it got 1 file from master)
+dev1branch has 1 + 5 files = 6 (it got 1 file from master)  
 
 dev2branch
 ==========
@@ -687,7 +662,7 @@ dev2branch
 	git add dev2*
 	git commit -m "dev2 commit" dev2*
 
-dev2branch has 1 + 5 + 5 = 11
+dev2branch has 1 + 5 + 5 = 11  
 
 dev3branch
 ===========
@@ -701,7 +676,7 @@ dev3branch
 	git add dev3*
 	git commit -m "dev3 commit" dev3*
 	
-dev3branch has 11 + 5= 16
+dev3branch has 11 + 5= 16  
 
 dev4branch
 ===========
