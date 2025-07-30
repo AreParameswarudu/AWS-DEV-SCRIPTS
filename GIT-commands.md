@@ -132,7 +132,7 @@ git remote -v
 ### cleanup 
 
 `rm -rf *`    --> to remove files from local dir.  
-`git add .`	--> to add that changes to gitbash or local git repo.
+`git add .`	--> to add that changes to gitbash or local git repo.  
 `git commit -m "clean" .`	--> adding the changes to remote repo.
 
 
