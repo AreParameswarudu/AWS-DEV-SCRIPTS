@@ -125,7 +125,22 @@ git credential-cache exit
 ```
 git remote -v
 ```
-----------------------------
+-------------------------------------------------------------------------
+
+-------------------------------------------------------------------------
+
+### cleanup 
+
+`rm -rf *`    --> to remove files from local dir.  
+`git add .`	--> to add that changes to gitbash or local git repo.
+`git commit -m "clean" .`	--> adding the changes to remote repo.
+
+
+This way the files form the remote repo can be deleted and cleaned.  
+
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
 
 **Example**  
 Now refresh the GitHub page and you can see the files.  
@@ -172,7 +187,7 @@ git status
 --> 100755 means executable file
 
 ------------------------------------------
-## LOGS with git
+## got log
 
 `git log` --> to see how many commits history.  
 `git log --oneline` --> to see less lines.  
@@ -188,7 +203,7 @@ git status
 `git shortlog` --> Summarize git log output.  
 
 
-## Git Blame
+## git blame
 Create a file and add text to it.  
 Add the file and commit it.  
 Now you can use `git blame filename`  
@@ -205,7 +220,7 @@ this is first line
 
 -------------------------------------
 
-## Git Diff command
+## git diff
 --> modify index.html file
 ```
 vi index.html
@@ -361,64 +376,48 @@ git log --oneline
 
 
 
+## git checkout 
+To restore previous version files in git  
 
-======================================================
+Create a file `index.html` and add some content to it.  
+commit those changes as well.  
 
-GIT Checkout : To restore previous version files in git
+`git add .`  
+`git commit -m "version 1 commit" index.html`  
 
-======================================================
-
-clean up
---------
-rm -rf *
-git status
-git add .  
-git commit -m "clean" .
-
-
-
-vi index.html
-This is version 1
-
-git add .
-git commit -m "version 1 commit" index.html
-
-vi index.html
+`vi index.html`  
+```
 This is version 1
 This is version 2
+```
+again commit the changes.  
 
-git add .
-git commit -m "version 2 commit" index.html
+`git add .`  
+`git commit -m "version 2 commit" index.html`
 
-vi index.html
-This is version 1
-This is version 2
-This is version 3
+use the log cammand.  
 
-git add .
-git commit -m "version 3 commit" index.html
-
-git log
+`git log`   
 or
-git log --oneline -2
+`git log --oneline -2`  
 
-git show f86060a685535d6d68ecaa84f3d36e9f5d04814d:index.html
+`git show f86060a685535d6d68ecaa84f3d36e9f5d04814d:index.html`  
 
-This will show first version file
+This will show first version file.  
 
-If you want to restore previous version files
+If you want to restore previous version files,  
 
-git checkout f86060a685535d6d68ecaa84f3d36e9f5d04814d -- *  [* will restore all files in that commit]
+`git checkout f86060a685535d6d68ecaa84f3d36e9f5d04814d -- *`   --> * will restore all files in that commit.  
 
-git checkout f86060a685535d6d68ecaa84f3d36e9f5d04814d -- index.html [It will restore only index.html]
+`git checkout f86060a685535d6d68ecaa84f3d36e9f5d04814d -- index.html` --> It will restore only index.html  
 
-cat index.html
+`cat index.html`  
 
-Again if you want latest
+Again if you want latest, 
 
-git checkout master -- index.html [it will restore to v3 ]
+`git checkout master -- index.html` --> it will restore to v2
 
-git checkout master -- *  [coming back to latest file]
+`git checkout master -- *`  --> coming back to latest file.  
 
 
 
@@ -471,7 +470,6 @@ cat test.html
  Scenario 2 = To restore files from stagged to unstage
 
 Accidently you have added to stage using "git add" command and if you want to unstage or untrack
-=======================================================
 
 How to untrack files
 
@@ -513,77 +511,70 @@ git status
 git commit -m "newfile" newfile
 
 
-=================
-GIT RESET --- Uncommit last commit [if you committed accidentally and want to uncommit or come the file back to local repo to staging]
-or
+
+## git reset 
+Uncommit last commit.   
+if you committed accidentally and want to uncommit or come the file back to local repo to staging.  
+or  
 Unstage files that were mistakenly added to the staging area.
 
-vi Reyaz.html
+```
+vi file.txt
 Welcome to DevOps Classes
 git add Reyaz.html
 git commit -m "reyaz" Reyaz.html
+```
 
 
-vi Reyaz.html
+```
+vi file.txt
 Welcome to DevOps Classes
 ijkdfhgdkfghdkjfhgjdfhg
+```
 
-git add Reyaz.html
-git commit -m "reyaz" Reyaz.html
+`git add file.txt`  
+`git commit -m "first commit" file.txt`  
 
-oh shit, i commit wrong code
+oh shit, i commit wrong code,   
+Accidentally you commited now, but you want to get it back from local repo to staging.  
 
-Accidentally you commited now, but you want to get it back from local repo to staging
+`git status` -->  all clean, nothing to commit.  
 
-git status -->  all clean, nothing to commit
+`git reset --soft HEAD^`   --> uncommit and keep the changes / bring back from local repo to stage.  
 
-git reset --soft HEAD^   [uncommit and keep the changes / bring back from local repo to stage]
+`git status`  --> we see file.txt now in stage.
 
-git status -- we see Reyaz.html now in stage
+again git add file.txt.  
+`git commit -m "first commit" file.txt`  
+now try  below.  
 
-again git add Reyaz.html
-git commit -m "reyaz" Reyaz.html
-now try  below
-
-git reset --hard HEAD^   [uncommit and discard the changes]
-cat Reyaz.html
-
-
-Feature                    git restore                            git reset
--------------------------------------------------------------------------------------------
-Scope          Working directory or staging area           Commit history, staging area, working directory
-*****
-Affects Commit History                   No                                    Yes (can modify HEAD)
-*********************
-Primary Use Case    Undo changes or unstage files    Move HEAD or reset state to a previous commit
-*************
-Safety                        Less destructive               Can be destructive, especially with --hard
-******
---------------------------------------------------------------------------------------------------------
-
-HEAD is a pointer to the current branch or commit you are working on
-In Git, HEAD is a source to the current branch or commit you are working on. HEAD normally shows the recent commit of the current branch and moves when you switch branches or check out exact commits.
-
-git Restore: Does not modify commit history or the repository's HEAD pointer. It only reverts changes in the working directory or staging area.
-
-git reset:  Can modify commit history by moving the HEAD pointer and potentially discarding changes.
-
-==========
-help
-===========
-
-git help
+`git reset --hard HEAD^`   --> uncommit and discard the changes.  
+`cat file.txt`  
 
 
-=================
-GIT STASH -- If you want to hide/park all the changes you did on the repo locally to a tmp place and proceed with another story changes then stash the old story, explain in diagram
+| Feature       |             git restore              |              git reset		|
+---------------| -------------------------------------| ---------------------------------------|
+| Scope       	|   Working directory or staging area     |      Commit history, staging area, working directory |
+| Affects Commit History     |              No              |                      Yes (can modify HEAD) |
+| Primary Use Case	|    Undo changes or unstage files  |  Move HEAD or reset state to a previous commit |
+| Safety                 |       Less destructive            |   Can be destructive, especially with --hard |
 
+
+
+HEAD is a pointer to the current branch or commit you are working on.  
+In Git, HEAD is a source to the current branch or commit you are working on. HEAD normally shows the recent commit of the current branch and moves when you switch branches or check out exact commits.  
+
+**git Restore**: Does not modify commit history or the repository's HEAD pointer. It only reverts changes in the working directory or staging area.  
+
+**git reset**:  Can modify commit history by moving the HEAD pointer and potentially discarding changes.  
+
+
+
+## git stach  
+If you want to hide/park all the changes you did on the repo locally to a tmp place and proceed with another story changes then stash the old story.  
 The git stash command is a useful feature in Git that allows you to temporarily save changes in your working directory without committing them
 
-===============
-rm -rf *
-git add .
-git commit -m "clean" .
+
 
 Now create a story1 file
 ------------------------
