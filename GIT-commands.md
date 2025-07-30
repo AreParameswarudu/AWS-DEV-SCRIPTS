@@ -142,7 +142,7 @@ This way the files form the remote repo can be deleted and cleaned.
 
 -----------------------------------------------------------------------------
 
-**Example**  
+## git status  
 Now refresh the GitHub page and you can see the files.  
 
 --> In Local, open `hello.txt` and add some content here.    
