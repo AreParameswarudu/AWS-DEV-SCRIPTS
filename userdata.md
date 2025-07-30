@@ -1,3 +1,4 @@
+```
 !#/bin/bash
 //install apache in ubuntu or AL2 machines
 yum install httpd -y
@@ -6,3 +7,4 @@ service httpd start
 chkconfig httpd on
 mkdir /var/www/html
 echo 'Hey this is my first website onec2' > /var/www/html/index.html
+```
