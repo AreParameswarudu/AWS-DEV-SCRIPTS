@@ -132,7 +132,7 @@ git remote -v
 
 **🧹 Step-by-Step: Delete Local main Branch**    
 1. ✅ Check Your Current Branch
-Make sure you're not currently on branch to be deleted:  
+Make sure you're not currently on branch (named as dev) to be deleted:  
 `git branch`  
   
 
@@ -140,13 +140,13 @@ If you're on same branch, switch to another branch first:
 `git checkout main`  
   
 
-2. 🗑️ Delete the Local main Branch
-`git branch -d main`
+2. 🗑️ Delete the Local dev Branch
+`git branch -d dev`
 
 
 - Use -d to delete safely (Git will warn if the branch has unmerged changes).  
 - If you're sure and want to force delete:  
-`git branch -D main`  
+`git branch -D dev`  
 
 ----------------------------------------------------------------------------------
 
@@ -1304,4 +1304,5 @@ Like Kanban board --
 Create a Project --> Select Table --> Create Task --> press tab --> and fields and assign people(tasks, assignees, start date, enddate)
 
 Go to Project Settings --> Manage access --> give permissions
+
 
