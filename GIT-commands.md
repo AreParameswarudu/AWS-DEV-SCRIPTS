@@ -136,11 +136,11 @@ Make sure you're not currently on branch (named as dev) to be deleted:
 `git branch`  
   
 
-If you're on same branch, switch to another branch first:  
+If you're on same branch, switch to another branch first:    
 `git checkout main`  
   
 
-2. 🗑️ Delete the Local dev Branch
+2. 🗑️ Delete the Local dev Branch  
 `git branch -d dev`
 
 
@@ -1304,5 +1304,6 @@ Like Kanban board --
 Create a Project --> Select Table --> Create Task --> press tab --> and fields and assign people(tasks, assignees, start date, enddate)
 
 Go to Project Settings --> Manage access --> give permissions
+
 
 
