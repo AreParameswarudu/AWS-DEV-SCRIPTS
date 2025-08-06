@@ -104,6 +104,19 @@ git push -u origin main
 --> this will be used to commit the changes from local to central repo.   
 
 
+## inorder to maintain main branch and push things
+```
+echo "# devsecops-Tetris-manifest" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/AreParameswarudu/devsecops-Tetris-manifest.git
+git push -u origin main
+```
+
+
+
 ## Authenticating pull or push actions.
 If any time asked for the authentication,  following things were asked.
 ```
@@ -1304,6 +1317,7 @@ Like Kanban board --
 Create a Project --> Select Table --> Create Task --> press tab --> and fields and assign people(tasks, assignees, start date, enddate)
 
 Go to Project Settings --> Manage access --> give permissions
+
 
 
 
