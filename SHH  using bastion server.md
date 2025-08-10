@@ -6,9 +6,9 @@
 cd /home/ec2-user/.shh/
 ```
 3. Add the .pem key with same name as in the ec2 details section
-   ```
-   vi key-name.pem
-   ```
+ ```
+vi key-name.pem
+```
 
 4. change the permissions to the key create.
 ```
