@@ -117,7 +117,7 @@ To know the version of terraform,
    ```
 
 
-**Terraform is all about,**
+**Terraform is all about,**  
 BLocks  
 Labels  
 Arguments
