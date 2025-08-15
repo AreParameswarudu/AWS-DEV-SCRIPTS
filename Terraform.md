@@ -153,5 +153,44 @@ Here,
 `{ }` and insde content is arguments.
 
 
+# Initialls and terraform files.
+
+1. **init command**:Whenever you have a new or existing Terraform directory (containing your Terraform configuration files), you need to run `terraform init` to prepare that directory for other Terraform commands.
+2. **Provider Plugins**: Terraform uses plugins to interface with cloud providers (like AWS, Azure, Google Cloud, etc.). The init command checks the configuration files to see which providers you're using and fetches the required provider plugins.
+3. **Provider Versions**: If you’ve specified a particular version of a provider in your configuration, terraform init will download that version. If not, it'll get the latest compatible version.
+
++    : Creating  
+-    : Deleting  
+~    : Update  
+
+When ever we say `terrform init`, a `.terraform` files will be created and it contains lots of information (providers plugins will be stored in this directory). use `cat .terraform` and comprehend the content.  
+
+## STATE FILE  `terraform.tfstate`
+
+Terraform must store state about your managed infrastructure and configuration. This state is used by Terraform to map real world resources to your configuration, keep track of metadata, and to improve performance for large infrastructures.   
+This state file is **extremely important**. It maps various resource metadata to actual resource IDs so that Terraform knows what it is managing. This file must be saved and distributed to anyone who might run Terraform.
+
+### Local State and Remote State
+By default, Terraform stores state locally in a file named terraform.tfstate.   
+with a **local state** file refers to storing the `terraform.tfstate` file on local machine on which we were working. It may rise the risk of looisng or correpting it in some sense, also makes difficlut to work when multiple teams are working on same file. Not advised for professional use case.  
+**Remote state** refers to storing the terraform.tfstate file in some remote state data store which can be secure, and can be shared between all members of team to use. Examples of remote store are S3 bucket.
+
+  
+```
+terraform state list
+```
+Terraform command used to list all the resources that are currently being tracked in the Terraform state file.  
 
 
+## Terraform lock file `.terraform.lock.hcl`
+
+When you run terraform init, Terraform downloads the required providers and dependencies and generates the `.terraform.lock.hcl` file.  
+If it doesn't already exist. If the file does exist, Terraform checks the versions specified in the lock file and installs those versions.
+
+The `.terraform.lock.hcl` file is a lock file used by Terraform to manage the dependencies of your Terraform project. It ensures that the same versions of provider plugins and modules are used every time you run Terraform, making your infrastructure deployments more predictable and consistent.  
+
+Purpose: Dependency Management, Consistency and Security.
+
+
+
+ 
