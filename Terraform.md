@@ -74,5 +74,68 @@ sudo apt update && sudo apt install terraform
 terraform -v
 ```
 
+When ever wants to work with terraform, always keep a seprate directory fo the terraform.
+```
+mkdir terraform
+cd terraform
+```
+
+### Terraform commands:
+  
+To know the version of terraform,
+ ```
+ terraform --version
+ ```
+#### Initialize infrastructure
+
+1. Initialize a working directory, it will dowl=nload the providers plugins
+   ```
+   terraform init
+   ```
+2. Create an execution plan (dry run) , it wont create infra but gives what will be created
+   ```
+   terraform plan
+   ```
+3. Execute/ provision the infra on cloud, or execute changes to actual env,
+   ```
+   terraform apply
+   ```
+   It will ask for approval before actual provisioning ---> `yes`.
+
+   To by pass this approval, use
+   ```
+   terraform apply --auto-approve
+   ```
+4. Destroy/ cleanup the infra that was provisioned.
+   ```
+   terraform destroy
+   ```
+
+   If want to bypass the approval,
+   ```
+   terraform destroy --auto-approve
+   ```
+
+
+**Terraform is all about,**
+BLocks  
+Labels  
+Arguments
+
+
+For example, its see following block which is defined in mian.tf, 
+
+```
+provider 'aws' {
+  region = 'ap-south-1'
+}
+```
+
+Here,   
+`provider` is the block name.   
+`aws` is label.  
+`{ }` and insde content is arguments.
+
+
 
 
