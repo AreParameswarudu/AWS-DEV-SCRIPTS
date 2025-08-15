@@ -115,6 +115,22 @@ To know the version of terraform,
    ```
    terraform destroy --auto-approve
    ```
+5. Wild cards,
+
+   ```
+   terraform fmt
+   ```
+   to format your configuration files into a canonical format and style.
+   ```
+   terraform fmt -recursive
+   ```
+   for all files.
+
+
+   ```
+   terraform validate
+   ```
+   to check the syntax, anf or any errors in the configuration files.
 
 
 **Terraform is all about,**  
