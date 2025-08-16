@@ -192,5 +192,42 @@ The `.terraform.lock.hcl` file is a lock file used by Terraform to manage the de
 Purpose: Dependency Management, Consistency and Security.
 
 
+## Current and desired state
+**Current state** represent the actual state of our infrastructure resources as they exist in our cloud. _Terraform keeps track the cirrent state of our infra in a state file_ `terraform.tfsatate`.
+
+  **Desired state** is what you defined in your terraform configuration files. It represents the infra that you want Terraform to create, update, or destroy. 
+
+#count argument
+Used to specify the count of the resource like an ec2 instance.
+ex:
+```
+provider 'aws' {
+  region = 'ap-south-1'
+}
+
+resource 'aws_instance' 'my_ec2_instance' {
+  count = 5
+  ami = 'ami-0492447090ced6eb5'
+  instance_type = 't2.micro'
+}
+```
+
+#Target - to delete a specific resource.
+target is a flag that we use in/with `terraform destroy --auto-approve` to delete specific target.
+
+
+EX:
+```
+terrafrom destroy --auto-approve -target=aws_instance.one[0]
+```
+
+If we want to use multiple specific targets, use `-target=....` multiple times.  
+```
+terraform destory --auto-approve -target=aws_instance.one[1] -target=aws_instance.one[2]
+```
+
+Once the command is executed, use `terraform state` to know the remaining resources list or to verify the destroy command success.  
+
+
 
  
