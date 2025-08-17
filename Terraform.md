@@ -426,4 +426,124 @@ variable "instance-name" {
   default     = "TF-Server"
 }
 ```
+# Terraform  `.tfvars` file.
+As of now, we have used `main.tf`, `variables.tf`.   
+The terrafrom `.tfvars` file allows us to seprate variable defination from the main configuration, making it easier to manage sifferent enviromnets and keep your codebase clean and orginezed.  
+
+We use `.tfvars` files when we have multiple configurations for different teams like ( prod, dev, test).  
+Each configuration we can write on variable file and attach it while running.
+
+THe default name that we use is `terraform.tfvars` for the `.tfvars` file. but,  
+we can also create our custom named `.tfvars` files like `dev.tfvars`, `test.tfvars`, `prod.tfvars`.  
+
+#### Lets do an example,  
+`main.tf` will have no difference and `variables.tf` will have little diff @ `default` argument. 
+
+```
+vi main.tf
+```
+
+```
+provider "aws" {
+  region = 'ap-south-1'
+}
+
+resource "aws_instance" "TraulInstance" {
+  count = var.inst-count
+  ami = var.inst-ami
+  instance_type = var.inst-type
+  tags = {
+    Name = var.inst-name
+  }
+}
+```
+
+```
+vi variables.tf
+```
+
+```
+variable 'inst-count' {
+  description = "anything"
+  type = number
+}
+
+variable "instance_ami" {
+
+  description = "anything"
+  type        = string
+}
+
+variable "instance_type" {
+
+  description = "anyhting"
+  type        = string
+}
+variable "instance_name" {
+
+  description = "anything"
+  type        = string
+}
+```
+Now, we can create 3 different `.tfvars` files each for dev, prod, test.  
+
+```
+vi dev.tfvars
+```
+```
+inst-count = 1
+inst-ami = 'ami-0492447090ced6eb5'
+inst-type = 't2.micro'
+inst-name = 'Dev-Server'
+```
+
+
+```
+vi test.tfvars
+```
+```
+inst-count = 1
+inst-ami = 'ami-0492447090ced6eb5'
+inst-type = 't2.micro'
+inst-name = 'Test-Server'
+```
+When there are more than 1 `.tfvars` files, then While running `terraform apply --auto-approve` command we will specify which `.tfvars` has to be used.  
+like, 
+```
+terraform apply --auto-approve -var-file="dev.tfvars"
+```
+
+> [!NOTE]
+> When we use `terraform apply --auto-approve -var-file="test.tfvars"`, it wont create new set of instances, rather redifines the old with changes form dev.tfvars.
+> It is because that we are using the same **default workspace**.
+
+
+#### _Another type Variable Usage : Command Line Flags: Terraform Command Line and Input Variable_,   
+
+If you don't provide any values on configurations file, TF will ask for values on Command Line or provide inputs to Command Line
+
+For Example: Remove all dev.tfvars, prod.tfvars and test.tfvars
+
+First cat Variables.tf - No values defined there in variables.tf
+
+##### Command Line Flags: Terraform Command Line
+
+
+`terraform apply --auto-approve  **`  --> it will ask the values on Command Line.  
+
+`terraform destroy --auto-approve  **`  --> it will ask the values on Command Line.  
+
+
+##### Input Variable
+```
+terraform apply --auto-approve -var="inst-type=t2.micro" -var="inst-count=1" -var="inst-name=test-server" -var="inst-ami=ami-0492447090ced6eb5"
+```
+
+```
+terraform destroy --auto-approve -var="inst-type=t2.micro" -var="inst-count=1" -var="inst-name=test-server" -var="inst-ami=ami-0492447090ced6eb5"
+```
+
+In above destroy command, remove one variable and destroy, TF will ask in Command Line but if you don't give also, it will take from statefile and destroy.  
+
+
 
