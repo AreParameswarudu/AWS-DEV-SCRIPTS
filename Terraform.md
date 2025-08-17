@@ -263,7 +263,7 @@ By using variables rather than hardcoding the values each time, makes code flexi
   7. object({...}): A structured object with named attributes
   8. tuple([types]): A fixed sequence of elements with different types
 
-### Some practical examples:
+### Some examples:
 1. list(string)
    ```
    variable 'instance_type' {
@@ -277,4 +277,42 @@ By using variables rather than hardcoding the values each time, makes code flexi
      value = length(var.instance_type)
    }
    ```
+   **NOTE:**  
+   1. `instance_type` is simply a variable name nothing else.
+   2. To call a variable, we use `var.variable-name`.
 
+2. Create 2 variables of list and output the combined list of both.
+   ```
+   #list-1
+   variable 'inst-type' {
+     type = list
+     default = ['t2.micer','t2.large']
+   }
+
+   #list-2
+   variable 'int-name' {
+     type = list
+     default - ['inst-1','inst-2']
+   }
+
+
+   #output block
+   output 'combined list' {
+     value = concat(var.inst-type, var.inst-name
+   }
+   ```
+
+3.  Create a list and return only the first element of list.
+    ```
+    variable "fruits" {
+      type    = list
+      default = ["apple", "banana", "cherry"]
+    }
+    
+    output "selected_element" {
+      value = element(var.fruits, 1)
+    }
+  
+   ```
+       
+   
