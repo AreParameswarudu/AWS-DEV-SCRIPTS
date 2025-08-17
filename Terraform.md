@@ -374,4 +374,56 @@ terraform apply --auto-approve
 ```
 
 
+Following the above way to define varaibles and using them becomes overhead when no. of variables inscreases. So  we follow/keep them in different configuration file called `variables.tf `.  
+
+```
+vi main.tf
+```
+
+```
+provider "aws" {
+  region = 'ap-south-1'
+}
+
+resource "aws_instance" "TrailInstance" {
+  count = var.inst-count
+  ami = var.inst-ami
+  instance_type = var.inst-type
+    tags = {
+      Name = var.inst-name
+    }
+}
+```
+
+
+
+```
+vi variables.tf
+```
+
+```
+variable 'inst-count' {
+  description = 'for defining the count of instances'
+  type = count
+  default = 3
+}
+
+variable 'inst-ami' {
+  description = 'defining the ami of the instance'
+  type = string
+  default = 'ami-0492447090ced6eb5'
+}
+
+variable 'inst-type' {
+  description = 'tye of the instance'
+  type = string
+  default = 't2.micro'
+}
+
+variable "instance-name" {
+  description = "defining a name for the instances"
+  type        = string
+  default     = "TF-Server"
+}
+```
 
