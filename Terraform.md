@@ -197,7 +197,7 @@ Purpose: Dependency Management, Consistency and Security.
 
   **Desired state** is what you defined in your terraform configuration files. It represents the infra that you want Terraform to create, update, or destroy. 
 
-#count argument
+# count argument
 Used to specify the count of the resource like an ec2 instance.
 ex:
 ```
@@ -212,7 +212,7 @@ resource 'aws_instance' 'my_ec2_instance' {
 }
 ```
 
-#Target - to delete a specific resource.
+# Target - to delete a specific resource.
 target is a flag that we use in/with `terraform destroy --auto-approve` to delete specific target.
 
 
@@ -229,5 +229,52 @@ terraform destory --auto-approve -target=aws_instance.one[1] -target=aws_instanc
 Once the command is executed, use `terraform state` to know the remaining resources list or to verify the destroy command success.  
 
 
+-------------------------------------------------------------------
 
- 
+
+
+# Variables
+
+Variables in terraform (every where) are used to make the configurations more dynamic and reusable.  
+Terraform features are a core features that allows us to parameterize out terrafrom configurations.  
+
+By using variables rather than hardcoding the values each time, makes code flexible, resuable, and easier to manage.  
+
+## Types of variables
+
+1. Input variables:
+    THese allows us to pass the values into terraform configurations. They are defined uisng the **variable block**.
+   
+2. Outut variables:
+   These are used to return values from the terraform configurations after thay have been applied.
+   Often used for sharing data between configurations and modules.
+
+3. Local variables:
+   THese are used to assign values to an expression or values within a configuration for reuse, imporving readability and maintainability.
+
+## Variable types:
+
+  1. String - A sequesnce of characters. EX: _'hello'_, _'world'_
+  2. Number - Any number value EX: _(-5, 1, 10, 15 etc)_
+  3. Bool:    A boolean value (true or false).
+  4. list(type):  An ordered list of elements EX: _["a", "b", "c"]_
+  5. map(type):  A key-value pair mapping EX: _{ key1 = "value1", key2 = "value2" }_
+  6. set(type):  A unique unordered collection of elements EX: _["a", "b", "c"]_
+  7. object({...}): A structured object with named attributes
+  8. tuple([types]): A fixed sequence of elements with different types
+
+### Some practical examples:
+1. list(string)
+   ```
+   variable 'instance_type' {
+     type = list(string)
+     default = ['t2.micro','t2.large','t2.medium']
+   }
+   ```
+   for this we can output things like `length(list)` using a output block.
+   ```
+   output 'list_length'{
+     value = length(var.instance_type)
+   }
+   ```
+
