@@ -546,4 +546,4 @@ terraform destroy --auto-approve -var="inst-type=t2.micro" -var="inst-count=1" -
 In above destroy command, remove one variable and destroy, TF will ask in Command Line but if you don't give also, it will take from statefile and destroy.  
 
 
-
+# Terraform output variable
