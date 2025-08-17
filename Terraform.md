@@ -573,7 +573,7 @@ In above destroy command, remove one variable and destroy, TF will ask in Comman
 # Modules in terraform   30 july
 
 
-# Dynamic Block, Terraform Provisiones # 30-2 July
+# Dynamic Block, Terraform Provisiones # 30-2 July 
 
 
 # Data source block in terraform  30 -2 july
