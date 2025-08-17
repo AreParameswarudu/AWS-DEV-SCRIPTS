@@ -546,4 +546,38 @@ terraform destroy --auto-approve -var="inst-type=t2.micro" -var="inst-count=1" -
 In above destroy command, remove one variable and destroy, TF will ask in Command Line but if you don't give also, it will take from statefile and destroy.  
 
 
-# Terraform output variable
+# Terraform output variable  25 July
+
+
+# Taint    25 July 2025
+
+
+# Terraform locals   25 july 
+
+
+
+# Terraform Workspace  28
+
+
+
+# Terraform backend setup  - Remote state.   28 
+
+
+
+# Meta arguments in terraform    29 July
+
+
+# Provider types in Terraform 29 July
+
+
+# Modules in terraform   30 july
+
+
+# Dynamic Block, Terraform Provisiones # 30-2 July
+
+
+# Data source block in terraform  30 -2 july
+
+# Conditions
+
+# Terraform vault   30 -2 july
