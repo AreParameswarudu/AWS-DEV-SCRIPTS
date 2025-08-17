@@ -302,8 +302,8 @@ By using variables rather than hardcoding the values each time, makes code flexi
    }
    ```
 
-3.  Create a list and return only the first element of list.
-    ```
+3.  Create a list and return only the first element of list.  
+    ```   
     variable "fruits" {
       type    = list
       default = ["apple", "banana", "cherry"]
@@ -311,7 +311,67 @@ By using variables rather than hardcoding the values each time, makes code flexi
     
     output "selected_element" {
       value = element(var.fruits, 1)
+      ```
+### Lets do a practical example,
+
+```
+vi main.tf
+```
+
+
+```
+#provider block
+provider "aws" {
+  region = 'ap-south-1'
+}
+
+
+# variable blocks
+
+variable 'inst-count' {
+  description = 'for defining the count of instances'
+  type = count
+  default = 3
+}
+
+variable 'inst-ami' {
+  description = 'defining the ami of the instance'
+  type = string
+  default = 'ami-0492447090ced6eb5'
+}
+
+variable 'inst-type' {
+  description = 'tye of the instance'
+  type = string
+  default = 't2.micro'
+}
+
+variable "instance-name" {
+  description = "defining a name for the instances"
+  type        = string
+  default     = "TF-Server"
+}
+
+#resources block
+resource 'aws_instance' 'TrailInstances' {
+  count = var.inst-count
+  ami = var.inst-ami
+  instance_type = var.inst-type
+    tags = {
+      Name = var.inst-name
     }
-   ```
-       
-   
+}
+
+```
+
+Use the following commnads one by one to execute the above.
+```
+terrafrom fmt
+terraform init
+terrafrom validate
+terraform plan
+terraform apply --auto-approve
+```
+
+
+
