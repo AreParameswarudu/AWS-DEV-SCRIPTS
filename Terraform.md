@@ -312,7 +312,6 @@ By using variables rather than hardcoding the values each time, makes code flexi
     output "selected_element" {
       value = element(var.fruits, 1)
     }
-  
    ```
        
    
