@@ -878,6 +878,60 @@ terraform validate
 terraform plan
 terraform apply --auto-approve
 ````
+
+```
+cat terraform.tfstate #[Currently no resources are there]
+cat terraform.tfstate.backup #This is the backup of the previous state
+```
+
+We actually segrigate the remote backend block into another file, `backend.tf`. Hence the file system looks, 
+```
+
+├── main.tf      -- actual code
+├── backend.tf   -- contains S3 statefile with statelock in dynamodb
+├── provider.tf
+├── output.tf    -- instance details as output
+├── terraform.tfvars  -- variables
+└── variables.tf   -- calling variables from tfvars
+
+```
+
+## Bring back the state file from s3 to local.
+If you don't want to use S3 and want statefile to be in local again , modify main.tf and remove the backend code.  
+
+```
+terraform init -migrate-state
+terraform init -reconfigure
+terraform apply --auto-approve
+terraform state list  #Now you have the statefile in local
+```
+
+## Untrack a terraform resource from statefile and statefile commands.
+
+```
+terraform state list
+# terraform state rm resource-type.resource-name
+terraform state rm aws_instance.MyInstance
+terraform state list
+cat terraform.tfstate   #it will not show the MyInstance but still EC2 will still be alive in AWS.
+terrafrom destroy --auto-approve
+```
+
+If we want to import it back, 
+```
+terraform import aws_instance.MyInstance i-0b1c2d3e4f5g67891
+```
+
+## Securing statefile in backend with State Lock option
+**State Lock**
+
+State locking is a mechanism that prevents multiple Terraform processes from simultaneously attempting to modify the same state file. Without state locking, concurrent Terraform operations could corrupt the state file, leading to unpredictable behavior and infrastructure issues.
+
+State locking happens automatically on all operations that could write state. You won’t see any message that it is happening. If state locking fails, Terraform will not continue. You can disable state locking for most commands with the -lock flag but it is not recommended.  
+
+
+
+
 Now Check the S3 bucket and contents of the bucket.
 
 # Meta arguments in terraform    29 July
