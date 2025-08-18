@@ -921,6 +921,7 @@ If we want to import it back,
 ```
 terraform import aws_instance.MyInstance i-0b1c2d3e4f5g67891
 ```
+Now Check the S3 bucket and contents of the bucket.  
 
 ## Securing statefile in backend with State Lock option
 **State Lock**
@@ -929,10 +930,25 @@ State locking is a mechanism that prevents multiple Terraform processes from sim
 
 State locking happens automatically on all operations that could write state. You won’t see any message that it is happening. If state locking fails, Terraform will not continue. You can disable state locking for most commands with the -lock flag but it is not recommended.  
 
+Along with S3 bucket, create a Dynamodb table in AWS,   
+**Table name** = dynamodb-terraform-state-lock  
+**Column** = LockID  
 
 
+So the backend.tf files takes, 
+```
+terraform {
+  backend "s3" {
 
-Now Check the S3 bucket and contents of the bucket.
+    bucket         = "terraform-statefile-reyaz"
+    key            = "prod/terraform.tfstate"
+    encrypt        = true
+    dynamodb_table = "dynamodb-terraform-state-lock"
+    region         = "ap-south-1"
+  }
+}
+```
+
 
 # Meta arguments in terraform    29 July
 
