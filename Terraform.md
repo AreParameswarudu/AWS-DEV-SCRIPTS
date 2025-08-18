@@ -679,11 +679,141 @@ resource "aws_instance" "myinstance" {
   tags          = local.tags
 }
 ```
+  
+  
+# Terraform Workspace  
+
+In terraform, a **workspace** is an isolated environment where a seprate state file is maintained.  
+
+This feature allows us to manage different environments (like development, staging, production) within the same Terraform configuration.
+
+Each workspace has its own state, enabling you to deploy the same infrastructure to multiple environments without needing to duplicate the configuration files.  
+
+## Key concepts of Terraform workspace
+### 1. Isolation
+  Each workspace has its own state file. This means the resources managed by Terraform in one workspace are isolated from those in another workspace.
+
+### 2. Use cases
+Workspaces are typically used for managing multiple environments (e.g., dev, staging, prod) within a single Terraform configuration.
+
+### 3. Default Workspace
+When you first initialize a Terraform directory, it starts with a default workspace named default. You can switch to other workspaces or create new ones as needed.
+
+> [!NOTE]
+> We cannot delete a current workspace untill it has resources in it.
+> We cannot delete **DEFAULT** workspace.
+
+**All workspace statefiles are under directory `terraform.tfstate.d`.**  
+
+COmmands related to workspace,  
+```
+terraform workspace list     #To show list of workspace
+terraform workspace new dev  #To create and switch to workspace named as dev
+terraform workspace show     #To show current workspace
+terraform workspace select    #To switch between workspaces
+terraform workspace delete    # To delete the workspcae
+```
+
+Lets use the locals, terraform workspace combinedly in an example,
+
+```
+terraform workspace list
+terraform workspace new dev
+terraform workspace select dev
+```
+
+```
+vi main.tf
+```
+
+```
+provider "aws" {
+  region = "ap-south-1"
+}
+
+locals {
+  instance_types = {
+      dev = "t2.micro"
+      test = "t2.small"
+      prod = "t2.medium"
+  }
+}
+
+resource "aws_instance" "workspace-example" {
+  ami = "ami-08ee1453725d19cdb"
+  instance_type = local.instance_type[terraform.workspace]
+  tags = {
+    Name = "${terraform.workspace}-server"
+  }
+}
+
+output "active-workspace" {
+  description = "current terraform workspace"
+  value = terrafrom.workspace
+}
+output "selected_instance_type" {
+  description = "Instance type selected for the current workspace"
+  value       = local.instance_types[terraform.workspace]
+}
+```
+> [!NOTE]
+> When we refer the local directly (not with in a string), we use `local.arg-name`.  
+> When we refer the local within a string we use `${local.arg-name}`.  
+> We can abserve that in the above example.
 
 
-# Terraform Workspace  28
+Lets try playing with different workspace, 
+```
+terraform plan  #you should see t2.micro getting launched
 
+terraform workspace new test  #This will create a new Workspace called test
 
+terraform plan  #you should see t2.small getting launched
+
+terraform workspace new prod  #This will create a new Workspace called prod
+
+terraform plan  #you should see t2.medium getting launched
+
+terraform workspace select dev
+
+terraform apply --auto-approve
+
+terraform workspace select test
+
+terraform apply --auto-approve
+
+cd terraform.tfstate.d
+
+ls
+
+cd .. #come back to main directory
+
+terraform workspace list
+
+terraform workspace delete test   #Workspace "test" is your active workspace, You cannot delete the currently active workspace. Please                       switch to another workspace and try again.
+
+terraform workspace select dev
+
+terraform workspace delete test   #[Error: Workspace is not empty, first delete the resources in workspace and then delete workspace]
+
+terraform workspace select test   #[Again go back to test workspace, destory the infra]
+
+terraform destroy --auto-approve
+
+terraform workspace dev  #[Switch to another workspace to delete the test workspace]
+
+terraform workspace delete test
+
+terraform workspace select dev
+
+terraform destroy --auto-approve
+
+terraform workspace select default
+
+terraform workspace delete dev
+
+terraform workspace list
+```
 
 # Terraform backend setup  - Remote state.   28 
 
