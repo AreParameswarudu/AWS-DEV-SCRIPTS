@@ -815,7 +815,8 @@ terraform workspace delete dev
 terraform workspace list
 ```
 
-# Terraform backend setup  - Remote state.   28 
+# Terraform backend setup  - Remote state.  
+**Remote State**  
 
 
 
