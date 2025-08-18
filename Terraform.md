@@ -546,10 +546,30 @@ terraform destroy --auto-approve -var="inst-type=t2.micro" -var="inst-count=1" -
 In above destroy command, remove one variable and destroy, TF will ask in Command Line but if you don't give also, it will take from statefile and destroy.  
 
 
-# Terraform output variable  25 July
+# Terraform output variable 
+These are used to return values from your Terraform configurations after they have been applied, often used for sharing data between different configurations or modules.  
 
+Example, 
+```
+provider "aws" {
+  region = 'ap-south-1'
+}
 
-# Taint    25 July 2025
+resource "aws_instance" "MyInstance" {
+  ami = ""
+  instance_type = "t2.micro"
+  tags = {
+    Name = "Example-server"
+  }
+}
+
+output "inst-info" {
+  value = [aws_instance.MyInstance.public_ip, aws_instance.MyInstance.private_ip, aws_instance.MyInstance.public_dns]
+```
+If we need all the info of the ec2 then use `value = aws_instance.MyInstance`.  
+  
+
+# Taint   
 
 
 # Terraform locals   25 july 
