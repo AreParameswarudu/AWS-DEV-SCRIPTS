@@ -566,14 +566,132 @@ resource "aws_instance" "MyInstance" {
 output "inst-info" {
   value = [aws_instance.MyInstance.public_ip, aws_instance.MyInstance.private_ip, aws_instance.MyInstance.public_dns]
 ```
-If we need all the info of the ec2 then use `value = aws_instance.MyInstance`.  
-  
+If we need all the info of the ec2 then use `value = aws_instance.MyInstance`.    
+
+
+
+And from now on, we will follow this file structure
+```
+├── main.tf
+├── output.tf
+├── provider.tf
+├── terraform.tfvars
+└── variables.tf
+```
+
 
 # Taint   
+Taint in terraform is used to recreate a specific resource in infracture.  
+
+Terraform fain command is used to manually mark a specific resource for recreation.  When we mark a resource as 'tainted', it indicates to terraform that the resource is in a bad or inconsisent condition stat and should be destroyed and recreated during the next terraform apply operation.  
+
+_When to Use_ : Failed Deployments, Manual Changes and Resource Corruption.  
+
+Example:  
+```
+vi main.tf
+```
+```
+provider "aws" {
+  region = 'ap-south-1'
+}
+
+resource "aws_instance" "MyInstance" {
+  ami = "ami-"
+  instance_type = "t2.micro"
+  tags = {
+    Name = "taint-server-example"
+  }
+}
+
+resource "aws_s3_bucket" "MyS3Bucket" {
+  bucket = "taint-server-exapmle-bkt"
+}
+```
+
+Use the following commands one by one,  
+```
+terraform apply --auto-approve
+terrform state list
+terraform taint aws_s3_bucket.MyS3Bucket
+terraform apply --auto-approve
+# This will now delete only s3 bucket and recreate it not the EC2
+# since only the s3 is marked as taint.
+```
+
+**TO untaint** :
+```
+terraform untaint aws_instance.MyS3Bucket
+```
+
+# Terraform locals  
+In Terraform, locals are used to define and assign values to variables that are meant to be used within a module or a configuration block.
+
+Unlike input variables, which allow values to be passed in from the outside, local values are set within the configuration itself and are used to simplify complex expressions, avoid repetition, and improve the readability of your Terraform code.
+
+Example:
+```
+vi main.tf
+```
+~~~
+provider "aws" {
+  region = "ap-south-1"
+}
+
+locals {
+env = "Prod"
+}
+
+resource "aws_vpc" "myvpc" {
+  cidr_block = "192.168.0.0/16"
+  tags = {
+    Name = "${local.env}-VPC"
+  }
+}
+
+resource "aws_subnet" "subnet1" {
+  vpc_id            = aws_vpc.myvpc.id
+  cidr_block        = "192.168.1.0/24"
+  availability_zone = "ap-south-1a"
+  tags = {
+    Name = "${local.env}-Subnet"
+  }
+}
+~~~
+For the local block, it doesnt need any name, it only takes the arguments, and those will be addressed or reffered as `${local.arg_name}` as show in above example.
 
 
-# Terraform locals   25 july 
+Another example, 
+```
+provider "aws" {
+  region = "ap-south-1"
+}
 
+resource "aws_vpc" "myvpc" {
+  cidr_block = "192.168.0.0/16"
+  tags = {
+    Name = "Prod-VPC"
+  }
+}
+
+resource "aws_subnet" "subnet1" {
+  vpc_id            = aws_vpc.myvpc.id
+  cidr_block        = "192.168.1.0/24"
+  availability_zone = "ap-south-1a"
+  tags = {
+    Name = "Prod-Subnet"
+  }
+}
+
+resource "aws_instance" "myinstance" {
+  subnet_id     = aws_subnet.subnet1.id
+  ami           = "ami-0492447090ced6eb5"
+  instance_type = "t2.micro"
+  tags = {
+    Name = "Prod-Server"
+  }
+}
+```
 
 
 # Terraform Workspace  28
