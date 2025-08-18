@@ -818,7 +818,67 @@ terraform workspace list
 # Terraform backend setup  - Remote state.  
 **Remote State**  
 
+By default, Terraform stores state file locally in a file named `terraform.tfstate`. When working with Terraform in a team, use of a local file makes Terraform usage complicated because each user must make sure they always have the latest state data before running Terraform and make sure that nobody else runs Terraform at the same time.  
 
+With remote state, Terraform writes the state data to a remote _data store_(S3), which can then be shared between all members of a team.  
+
+Generally we have the statefile in local, if you lost the machine, statefile is also lost. So that reason we keep statefile in S3. And also, all DevOps Engineers can share the statefile if required.  
+
+As we are using AWS cloud, we will be using S3 bucket for storing the state file remotly.  
+So, Create a S3 bucket first with versioning.  
+
+```
+vu main.tf
+```
+
+```
+provider "aws" {
+  region = "ap-south-1"
+}
+
+terraform {
+  backend "s3"  {
+    bucket = "terraform-statefile-bkt"
+    key = "prod/terraform.tfstate"
+    region = "ap-south-1"
+  }
+}
+
+resource "aws_instance" "MyInstance" {
+  ami = ""
+  instance_type = "t2.micro"
+  tags = {
+    Name = 'Backend-example"
+  }
+}
+
+resource "aws_instance" "mysecondinstance" {
+  ami           = "ami-0492447090ced6eb5"
+  instance_type = "t2.micro"
+  tags = {
+    Name = "backend-example2"
+  }
+}
+
+output "instance_ids" {
+  description = "List of EC2 instance IDs"
+  value       = [aws_instance.myfirstinstance.id, aws_instance.mysecondinstance.id]
+}
+
+output "instance_names" {
+  description = "List of EC2 instance names"
+  value       = [aws_instance.myfirstinstance.tags.Name, aws_instance.mysecondinstance.tags.Name]
+}
+
+```
+
+```
+terraform init
+terraform validate
+terraform plan
+terraform apply --auto-approve
+````
+Now Check the S3 bucket and contents of the bucket.
 
 # Meta arguments in terraform    29 July
 
