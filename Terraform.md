@@ -950,7 +950,316 @@ terraform {
 ```
 
 
-# Meta arguments in terraform    29 July
+# Meta arguments in terraform 
+
+In Terraform, meta-arguments are special arguments that you can use with resources, modules, and other blocks to control how they behave.  
+
+The most commonly used meta-arguments in Terraform include, 
+### 1. count
+The `count` meta-argument allows us to specify the no. of instances of a resource or module to create.
+
+EX:
+```
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "myinstance" {
+  count         = 2
+  ami           = "ami-08ee1453725d19cdb"
+  instance_type = "t2.micro"
+  tags = {
+    Name = "WebServer-${count.index}"
+  }
+}
+
+output "instance_ids" {
+  description = "List of EC2 instance IDs"
+  value       = aws_instance.myinstance[*].id
+}
+output "instance_names" {
+  description = "List of EC2 instance names"
+  value       = aws_instance.myinstance[*].tags.Name
+}
+```
+### 2. for_each
+The `for_each` meta-argument allows you to create multiple instances of a resource or module based on the elements of a set.   
+It provides more control and flexibility than `count`.   
+  
+count vs for_each : count will create identical resources, for_each will create different resources.
+
+```
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "myinstance" {
+  for_each      = toset(["dev-server", "test-server", "prod-server"])
+  ami           = "ami-08ee1453725d19cdb"
+  instance_type = "t2.micro"
+  tags = {
+    Name = "${each.key}"
+  }
+}
+
+output "instance_ids" {
+  description = "List of EC2 instance IDs"
+  value       = { for k, v in aws_instance.myinstance : k => v.id }
+}
+
+output "instance_names" {
+  description = "Instance names"
+  value       = { for k, v in aws_instance.myinstance : k => v.tags.Name }
+}
+```
+
+~~~
+toset() is a function to create multiple EC2 instances from a list of names:
+
+Terraform will generate a map of instances with keys as "dev-server", "test-server", and "prod-server".
+
+The for expression iterates over aws_instance.myinstance
+k represents the instance key (dev-server, test-server, etc.)
+v.id retrieves the instance ID
+The result is a map of key => instance_id
+
+In for_each , we can play with key and value like .key and .value
+~~~
+
+### 3. depends_on
+The depends_on meta-argument explicitly defines dependencies between resources. This ensures that one resource is created or updated only after another resource has been successfully created or updated.  
+
+```
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "myinstance" {
+  ami           = "ami-08ee1453725d19cdb"
+  instance_type = "t2.micro"
+tags = {
+    Name = "DependsOn-Example"
+  }
+}
+
+resource "aws_eip" "myinstance_eip" {
+  instance   = aws_instance.myinstance.id
+  depends_on = [aws_instance.myinstance]
+}
+
+output "elastic_ip" {
+  description = "Elastic IP of the instance"
+  value       = aws_eip.myinstance_eip.public_ip
+}
+
+output "instance_id" {
+  description = "EC2 instance ID"
+  value       = aws_instance.myinstance.id
+}
+
+```
+### 4. provider
+The provider meta-argument allows you to specify which provider configuration to use for a particular resource or module. This is useful when you have multiple configurations for the same provider, such as when managing resources in multiple regions.
+
+Terraform has 3 main providers  
+1. Official : maintained by Terraform (AWS, Azure, GCP)  
+2. Partner : Maintained by terraform and organizations (Oracle, Alibaba)  
+3. Community : Maintained by individual  
+
+
+EX: 1 Github   
+Create a token first in GitHub --> Settings --> Developer Settings --> Personal access tokens (classic) --> Generate new token(classic)
+
+```
+provider "github" {
+  token = "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"
+}
+
+resource "github_repository" "example" {
+  name        = "tf-github-repo"
+  description = "created repo from tf"
+
+  visibility = "public"
+
+}
+```
+EX: 2 Local provider  
+```
+provider "local" {
+}
+
+resource "local_file" "one" {
+  filename        = "test.txt"
+  content = "this is from test data from tf using local provider"
+}
+```
+```
+terraform apply --auto-approve
+ls
+
+#it will create a new file locally
+
+terraform destroy --auto-approve
+```
+
+EX: 3 Docker
+```
+yum install docker -y
+systemctl start docker
+```
+
+```
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "~> 2.0"
+    }
+  }
+}
+provider "docker" {
+  host = "unix:///var/run/docker.sock"  # For Linux/macOS
+}
+
+resource "docker_image" "nginx" {
+  name         = "nginx:latest"
+  keep_locally = false  # Removes the image when the container is deleted
+}
+
+resource "docker_container" "nginx" {
+  name  = "nginx-container"
+  image = docker_image.nginx.image_id
+
+  ports {
+    internal = 80  # Inside the container
+    external = 8080  # Exposed on the host machine
+  }
+}
+
+output "container_name" {
+  value = docker_container.nginx.name
+}
+
+output "container_id" {
+  value = docker_container.nginx.id
+}
+
+output "nginx_url" {
+  value = "http://13.201.46.206:8080"
+}
+```
+
+```
+terraform init -upgrade
+terraform plan
+terraform apply --auto-approve
+```
+
+Access @ `http://13.201.46.206:8080`  
+
+### 5. lifecycle
+The lifecycle meta-argument allows you to control the lifecycle of a resource. It provides options to prevent the destruction of resources, create resources before destroying existing ones, or ignore changes to specific attributes.  
+
+#### 5.1. create_before_destroy  
+If you change the instance type or instance name , security groups etc , It will change immediately ,
+instance will not delete but if you want to change the image id of the EC2 instance , instance will delete first and then create a new instance with new ami-id.  
+
+```
+provider "aws" {
+region = "ap-south-1"
+}
+
+resource "aws_instance" "one" {
+ami = "ami-08ee1453725d19cdb"
+instance_type = "t2.micro"
+tags = {
+Name = "reyaz-server"
+}
+lifecycle{
+create_before_destroy = true
+}
+}
+```
+`terraform apply --auto-approve`      
+  
+Now change the image id to ami-022ce6f32988af5fa.  
+
+`terraform apply --auto-approve`    #First instance will be created and then old instance will be deleted.
+
+Note: if you remove the code in main.tf and terraform apply , resources will be deleted.  
+
+Give a try,  
+`vi  main.tf`  
+
+keep only provider and remove all code and give destroy  
+
+`terraform destory --auto-approve`  
+
+#### 5.2. prevent_destroy  
+resources will not delete if you give destroy command. 
+```
+provider "aws" {
+region = "ap-south-1"
+}
+
+resource "aws_instance" "one" {
+ami = "ami-08ee1453725d19cdb"
+instance_type = "t2.micro"
+tags = {
+Name = "reyaz-server"
+}
+lifecycle{
+prevent_destroy = true
+}
+}
+```
+  
+```
+terraform apply --auto-approve
+
+terraform destroy --auto-approve
+#It will not destroy as prevent_destroy is true , make it false and then destroy.
+```
+
+
+#### 5.3. ignore_changes  
+If anyone modified the resources in AWS console which is created by TF, It will ignore that changes, it will not bring back to desired state. Actual State is AWS Console, Desired State is Statefile.  
+
+EX: 
+```
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "myinstance" {
+  ami           = "ami-08ee1453725d19cdb"
+  instance_type = "t2.micro"
+  tags = {
+    Name = "trail-server"
+  }
+  lifecycle {
+    ignore_changes = all
+  }
+}
+
+output "instance_id" {
+  description = "EC2 instance ID"
+  value       = aws_instance.myinstance.id
+}
+output "instance_name" {
+  description = "Instance Name"
+  value       = aws_instance.myinstance.tags.Name
+}
+```
+
+Now, modify instance_type or tags or ami in configuration block , TF will ignore the changes while apply
+example: modify instance_type = "t2.nano" and trail-server to hello-server.  
+
+```
+terraform apply --auto-approve
+```
+Note: No change, use `terraform state list` to verify.  
+
 
 
 # Provider types in Terraform 29 July
