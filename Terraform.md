@@ -1260,6 +1260,8 @@ terraform apply --auto-approve
 ```
 Note: No change, use `terraform state list` to verify.  
 
+### 6. ignore_changes
+This meta-argument is used within the lifecycle block to instruct Terraform to ignore changes to specific attributes of a resource. This is particularly useful when an attribute is managed outside of Terraform, or if you want to prevent Terraform from trying to update a resource when certain attributes change.  
 
 
 # Provider types in Terraform 29 July
