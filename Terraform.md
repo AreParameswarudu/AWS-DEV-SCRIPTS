@@ -1061,101 +1061,7 @@ output "instance_id" {
 ### 4. provider
 The provider meta-argument allows you to specify which provider configuration to use for a particular resource or module. This is useful when you have multiple configurations for the same provider, such as when managing resources in multiple regions.
 
-Terraform has 3 main providers  
-1. Official : maintained by Terraform (AWS, Azure, GCP)  
-2. Partner : Maintained by terraform and organizations (Oracle, Alibaba)  
-3. Community : Maintained by individual  
 
-
-EX: 1 Github   
-Create a token first in GitHub --> Settings --> Developer Settings --> Personal access tokens (classic) --> Generate new token(classic)
-
-```
-provider "github" {
-  token = "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"
-}
-
-resource "github_repository" "example" {
-  name        = "tf-github-repo"
-  description = "created repo from tf"
-
-  visibility = "public"
-
-}
-```
-EX: 2 Local provider  
-```
-provider "local" {
-}
-
-resource "local_file" "one" {
-  filename        = "test.txt"
-  content = "this is from test data from tf using local provider"
-}
-```
-```
-terraform apply --auto-approve
-ls
-
-#it will create a new file locally
-
-terraform destroy --auto-approve
-```
-
-EX: 3 Docker
-```
-yum install docker -y
-systemctl start docker
-```
-
-```
-terraform {
-  required_providers {
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "~> 2.0"
-    }
-  }
-}
-provider "docker" {
-  host = "unix:///var/run/docker.sock"  # For Linux/macOS
-}
-
-resource "docker_image" "nginx" {
-  name         = "nginx:latest"
-  keep_locally = false  # Removes the image when the container is deleted
-}
-
-resource "docker_container" "nginx" {
-  name  = "nginx-container"
-  image = docker_image.nginx.image_id
-
-  ports {
-    internal = 80  # Inside the container
-    external = 8080  # Exposed on the host machine
-  }
-}
-
-output "container_name" {
-  value = docker_container.nginx.name
-}
-
-output "container_id" {
-  value = docker_container.nginx.id
-}
-
-output "nginx_url" {
-  value = "http://13.201.46.206:8080"
-}
-```
-
-```
-terraform init -upgrade
-terraform plan
-terraform apply --auto-approve
-```
-
-Access @ `http://13.201.46.206:8080`  
 
 ### 5. lifecycle
 The lifecycle meta-argument allows you to control the lifecycle of a resource. It provides options to prevent the destruction of resources, create resources before destroying existing ones, or ignore changes to specific attributes.  
@@ -1262,7 +1168,177 @@ Note: No change, use `terraform state list` to verify.
 
 
 
-# Provider types in Terraform 29 July
+# Provider types in Terraform 
+Terraform has 3 main providers  
+1. Official : maintained by Terraform (AWS, Azure, GCP)  
+2. Partner : Maintained by terraform and organizations (Oracle, Alibaba)  
+3. Community : Maintained by individual  
+
+
+EX: 1 Github   
+Create a token first in GitHub --> Settings --> Developer Settings --> Personal access tokens (classic) --> Generate new token(classic)
+
+```
+provider "github" {
+  token = "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"
+}
+
+resource "github_repository" "example" {
+  name        = "tf-github-repo"
+  description = "created repo from tf"
+
+  visibility = "public"
+
+}
+```
+EX: 2 Local provider    
+```
+provider "local" {
+}
+
+resource "local_file" "one" {
+  filename        = "test.txt"
+  content = "this is from test data from tf using local provider"
+}
+```
+```
+terraform apply --auto-approve
+ls
+
+#it will create a new file locally
+
+terraform destroy --auto-approve
+```
+
+EX: 3 Docker  
+```
+yum install docker -y
+systemctl start docker
+```
+
+```
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "~> 2.0"
+    }
+  }
+}
+provider "docker" {
+  host = "unix:///var/run/docker.sock"  # For Linux/macOS
+}
+
+resource "docker_image" "nginx" {
+  name         = "nginx:latest"
+  keep_locally = false  # Removes the image when the container is deleted
+}
+
+resource "docker_container" "nginx" {
+  name  = "nginx-container"
+  image = docker_image.nginx.image_id
+
+  ports {
+    internal = 80  # Inside the container
+    external = 8080  # Exposed on the host machine
+  }
+}
+
+output "container_name" {
+  value = docker_container.nginx.name
+}
+
+output "container_id" {
+  value = docker_container.nginx.id
+}
+
+output "nginx_url" {
+  value = "http://13.201.46.206:8080"
+}
+```
+
+```
+terraform init -upgrade
+terraform plan
+terraform apply --auto-approve
+```
+
+Access @ `http://13.201.46.206:8080`  
+
+EX: 4 K8s  
+Setup a minikubecluster first or even go with KOPS.  
+
+```
+terraform {
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.0"
+    }
+  }
+}
+
+provider "kubernetes" {
+  config_path = "~/.kube/config"  # Adjust if using a different kubeconfig
+}
+resource "kubernetes_deployment" "nginx" {
+  metadata {
+    name = "nginx-deployment"
+    labels = {
+      app = "nginx"
+    }
+  }
+
+  spec {
+    replicas = 2
+
+    selector {
+      match_labels = {
+        app = "nginx"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "nginx"
+        }
+      }
+
+      spec {
+        container {
+          image = "nginx:latest"
+          name  = "nginx"
+
+          port {
+            container_port = 80
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "nginx" {
+  metadata {
+    name = "nginx-service"
+  }
+
+  spec {
+    selector = {
+      app = "nginx"
+    }
+
+    port {
+      protocol    = "TCP"
+      port        = 80
+      target_port = 80
+    }
+
+    type = "LoadBalancer"
+  }
+}
+```
 
 
 # Modules in terraform   30 july
