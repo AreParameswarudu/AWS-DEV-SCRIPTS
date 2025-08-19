@@ -1414,7 +1414,86 @@ yum install tree -y
 
 Check the {https://github.com/AreParameswarudu/}
 
-# Dynamic Block, Terraform Provisiones # 30-2 July 
+# Dynamic Block, Terraform Provisiones 
+
+**Provisioners**  
+Terraform provisioners are used to perform actions on a local or remote machine after a resource is created or updated.  
+
+They are typically used for tasks such as **configuring** or **installing software** on a machine, which Terraform itself does not handle directly.  
+
+Type os provisioners
+---------------------
+
+### 1. Local-exec
+Executes a command locally on the machine where Terraform is run.  
+Useful for running scripts or commands that need to be executed locally.  
+
+EX:   
+In this example, the local-exec rovisioner writes the instance IN to a file instance_id.txt on the local machine after the ec2 instance is created.  
+
+```
+resource "aws_instance" "Example" {
+  ami = "ami-08ee1453725d19cdb"
+  instance_type = "t2.micro"
+
+  Provisioner "local-exec" {
+    command = "echo 'Insrcnce ID: ${self.id}' > instance_id.txt"
+  }
+}
+
+output "instance_id" {
+  value = aws_instance.example.id
+}
+```
+self.id will be available after the instance is created.  
+The provisioner runs on the local machine, saving the instance ID to instance_id.txt.  
+
+use `terraform apply --auto-approved` to see the `instance_id.txt` file created automatically and respective resluts in the file as well.  
+
+
+### 2. Remote-exec  
+Executes commands on a remote resource, such as an EC2 instance, after it has been created. It typically requires a connection configuration.  
+Useful for configuring instances or applying configurations remotely.  
+
+
+EX:  
+In this example, from TF machine , we will connect remotely to another machine, for this we need to have pem file under `~/.ssh/id_rsa`  
+
+```
+vi ~/.ssh/id_rsa
+```
+copy past the pem file data.  
+
+```
+vi main.tf
+```
+
+```
+resource "aws_instance" "example" {
+  ami = "ami-08ee1453725d19cdb"
+  instance_type = "t2.micro"
+  key_name = "MyKey"
+  tags = {
+    Name = "ec2-instance"
+  }
+
+  Provisioner "remote-exec" {
+    inline = [
+      "sudo yum update -y", 
+      "sudo yum install -y httpd",
+      "cd /var/www/httpd/html",
+      "git clone '
+      "sudo systemctl start httpd"
+      ]
+      connection {
+        type = "ssh"
+        user = "ec2-user"
+        private_key = file("~/.shh/id_rsa")
+        host = self.public_ip
+      }
+    }
+}
+```
 
 
 # Data source block in terraform  30 -2 july
