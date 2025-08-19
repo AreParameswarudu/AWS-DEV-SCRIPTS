@@ -1096,7 +1096,7 @@ The provider meta-argument allows you to specify which provider configuration to
 ### 5. lifecycle
 The lifecycle meta-argument allows you to control the lifecycle of a resource. It provides options to prevent the destruction of resources, create resources before destroying existing ones, or ignore changes to specific attributes.  
 
-#### 5.1. create_before_destroy  
+#### 5.1. `create_before_destroy` 
 If you change the instance type or instance name , security groups etc , It will change immediately ,
 instance will not delete but if you want to change the image id of the EC2 instance , instance will delete first and then create a new instance with new ami-id.  
 
@@ -1131,7 +1131,7 @@ keep only provider and remove all code and give destroy
 
 `terraform destory --auto-approve`  
 
-#### 5.2. prevent_destroy  
+#### 5.2. `prevent_destroy`  
 resources will not delete if you give destroy command. 
 ```
 provider "aws" {
@@ -1158,7 +1158,7 @@ terraform destroy --auto-approve
 ```
 
 
-#### 5.3. ignore_changes  
+#### 5.3. `ignore_changes`  
 If anyone modified the resources in AWS console which is created by TF, It will ignore that changes, it will not bring back to desired state. Actual State is AWS Console, Desired State is Statefile.  
 
 EX: 
@@ -1424,7 +1424,7 @@ They are typically used for tasks such as **configuring** or **installing softwa
 Type os provisioners
 ---------------------
 
-### 1. Local-exec
+### 1. l`ocal-exec`
 Executes a command locally on the machine where Terraform is run.  
 Useful for running scripts or commands that need to be executed locally.  
 
@@ -1451,7 +1451,7 @@ The provisioner runs on the local machine, saving the instance ID to instance_id
 use `terraform apply --auto-approved` to see the `instance_id.txt` file created automatically and respective resluts in the file as well.  
 
 
-### 2. Remote-exec  
+### 2. `remote-exec`  
 Executes commands on a remote resource, such as an EC2 instance, after it has been created. It typically requires a connection configuration.  
 Useful for configuring instances or applying configurations remotely.  
 
@@ -1496,7 +1496,7 @@ resource "aws_instance" "example" {
 ```
 Use `terraform apply --auto-approve` and use the public ip of the instance to access the website.  
 
-### 3. File provisioner
+### 3. `file` provisioner
  The file provisioner uploads files from the local machine to the remote resource.  
 
  EX:  
