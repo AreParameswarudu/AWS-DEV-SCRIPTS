@@ -1721,3 +1721,8 @@ terraform show -no-color terraform.tfstate > recovered.tf
 ```
 
 its like print the `terraform.tfstate` file contenct and write the result to `recovered.tf` file.
+
+
+OR   
+
+Use `terraformer`, import multiple resources from console to `main.tf`.
