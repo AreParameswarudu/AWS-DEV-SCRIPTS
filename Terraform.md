@@ -159,9 +159,9 @@ Here,
 2. **Provider Plugins**: Terraform uses plugins to interface with cloud providers (like AWS, Azure, Google Cloud, etc.). The init command checks the configuration files to see which providers you're using and fetches the required provider plugins.
 3. **Provider Versions**: If you’ve specified a particular version of a provider in your configuration, terraform init will download that version. If not, it'll get the latest compatible version.
 
-+    : Creating  
--    : Deleting  
-~    : Update  
+`+` : Creating  
+`-` : Deleting  
+`~`  : Update  
 
 When ever we say `terrform init`, a `.terraform` files will be created and it contains lots of information (providers plugins will be stored in this directory). use `cat .terraform` and comprehend the content.  
 
