@@ -938,13 +938,20 @@ For that we need to manually create a resource block that will reflect the reour
 resource "aws_instance" "inst-1" {
 }
 ```
-Note: we dont need to specify any attributes or arguments.
+**Note**: we dont need to specify any attributes or arguments.
 ```
 terraform import aws_instance.inst-1 i-0ab2056f11dfa5a6e
 ```
-NOTE: The name for the resource `inst-1` we used should match witht the resource name that we defined. and the `id` should match from instance that we want to import.   
+**NOTE**: The name for the resource `inst-1` we used should match witht the resource name that we defined. and the `id` should match from instance that we want to import.   
 
+Terraform does not support importing multiple resources in a single command or operation.  
 
+Each resource must be imported individually using the terraform import command. However, you can streamline the process by scripting the import commands, especially if you have a large number of resources to import.  
+
+Terraform's import command works one resource at a time, so multiple resources need to be imported individually.  
+
+For Multiple resources import use another tool called **TERRAFORMER**.  
+  
 
 ## Securing statefile in backend with State Lock option
 **State Lock**
