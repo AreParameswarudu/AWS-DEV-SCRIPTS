@@ -923,6 +923,29 @@ terraform import aws_instance.MyInstance i-0b1c2d3e4f5g67891
 ```
 Now Check the S3 bucket and contents of the bucket.  
 
+  
+  
+## `import` in terraform
+The terraform command import` is used to bring existing infrastructure resources under terraform management.  
+
+This is practically useful when you have resources that were created manually or by another tool, and you now want to manage thenm using terraform without recreating them.  
+
+EX:  
+Lets say we have an untracked ( by terraform) resource say ec2 instance ( id = i-0ab2056f11dfa5a6e ) launched in AWS, and we want terraform to tracked it.
+
+For that we need to manually create a resource block that will reflect the reources ( in our case its EC2 ) that we want to import.  
+```
+resource "aws_instance" "inst-1" {
+}
+```
+Note: we dont need to specify any attributes or arguments.
+```
+terraform import aws_instance.inst-1 i-0ab2056f11dfa5a6e
+```
+NOTE: The name for the resource `inst-1` we used should match witht the resource name that we defined. and the `id` should match from instance that we want to import.   
+
+
+
 ## Securing statefile in backend with State Lock option
 **State Lock**
 
