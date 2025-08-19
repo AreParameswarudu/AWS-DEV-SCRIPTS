@@ -1641,7 +1641,74 @@ resource "aws_security_group" "main" {
 ```
 
 # Data source block in terraform  
+In terraform, a data block or data source allows you to fetch information from existing resourecs or services that are external to your terraform configuration.  
+
+_Fetch info about existing resources:_  
+If you need to retrieve info about an existing reosurce that wasnot created by your terraform config (ex: existing VPC, or EC2 AMI etc).  
+
+EX:  
+To get the existing VPC and bicket details.  
+
+```
+vi main.tf
+```
+```
+provider "aws" {
+  region = "ap-south-1"
+}
+
+data "aws_vpc" "default {
+  default = true
+}
+
+resource "aws_instance" "MyInstance" {
+  ami = "ami-08ee1453725d19cdb"
+  instance_type = "t2.micro"
+  subnet_id = data.was_vpc.default.id
+}
+
+data "aws_s3_bucket" "example_bucket" {
+  bucket = "test-bkt"
+}
+
+output "bucket_arn" {
+  value = data.aws_s3_bucket.example_bucket.arn
+}
+```
+
+```
+terraform apply --auto-approve
+
+terraform destroy --auto-approve
+```
+
+**Note**:  
+Notice how we referred the resource from data block in the resource block.  
+
 
 # Conditions
 
-# Terraform vault   30 -2 july
+# Terraform vault  
+HashiCorp Vault is a tool designed to securly store and manage sensitive info such as **secrets**, **passowrds**, **certificates** and **API keys**.  
+
+Terraform can be integrated with Vault to dynamically retrieve and manage secrets as part of your infrastructure provisioning process.  
+
+
+```
+sudo yum install -y yum-utils
+
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+
+sudo yum -y install vault
+
+systemctl status vault
+
+systemctl start vault
+
+vault server -dev
+
+vault secrets enable -path=secret kv
+
+vault kv put secret/mysecret password="supersecretpassword"
+```
+
