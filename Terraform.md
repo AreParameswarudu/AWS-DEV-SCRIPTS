@@ -1686,8 +1686,6 @@ terraform destroy --auto-approve
 Notice how we referred the resource from data block in the resource block.  
 
 
-# Conditions
-
 # Terraform vault  
 HashiCorp Vault is a tool designed to securly store and manage sensitive info such as **secrets**, **passowrds**, **certificates** and **API keys**.  
 
@@ -1712,3 +1710,14 @@ vault secrets enable -path=secret kv
 vault kv put secret/mysecret password="supersecretpassword"
 ```
 
+# Question
+What happens if we accidentially deleted the mian.tf file.!! can we recover the file and its content!!.  
+
+Yes we can, `terraform.tfstate` contains the record of the resources that we have provisioned using terraform. so we can use `terraform.tfstate` file for the recovery.  
+How!!  
+Using 
+```
+terraform show -no-color terraform.tfstate > recovered.tf
+```
+
+its like print the `terraform.tfstate` file contenct and write the result to `recovered.tf` file.
