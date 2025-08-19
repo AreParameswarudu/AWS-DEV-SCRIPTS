@@ -1371,7 +1371,46 @@ resource "kubernetes_service" "nginx" {
 ```
 
 
-# Modules in terraform   30 july
+# Modules in terraform  
+Terraform modules are a fundamental featur that help in organization and reuse terraform configurations.  
+
+A **Module**  is a container for multiple resources that are used together. 
+
+Modules allow you to encapsulate and manage resources as a single unit, making your Terraform configurations more modular, readable, and maintainable.  
+
+**Root Module:**  
+* The root midule is the amin configuration where theeraform statrs it execution.
+* It is usually defined in the main configuration directory where terraform init and terraform apply are run.
+* The root module can call other modules, referred to as child modules.
+
+**Child Modules:**
+* Child modules are modules that are called from within other modules (including the root module).
+* They help in organizing resources and reusing configurations.
+* Each child module can be stored in a separate directory and can be called using a module block in the root module or another parent module.
+
+Lets create a module directory with instance, bucket, and vpc.  
+
+```
+├── main.tf
+├── modules
+│   ├── ec2-instances
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   ├── s3-bucket
+│   │   ├── main.tf
+│   │   ├── outputs.tf
+│   │   └── variables.tf
+│   └── vpc
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+└── terraform.tfstate
+```
+Import `terr` for better visualization.
+```
+yum install tree -y
+```
 
 
 # Dynamic Block, Terraform Provisiones # 30-2 July 
