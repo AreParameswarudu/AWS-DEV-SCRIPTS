@@ -1482,7 +1482,7 @@ resource "aws_instance" "example" {
       "sudo yum update -y", 
       "sudo yum install -y httpd",
       "cd /var/www/httpd/html",
-      "git clone '
+      "echo 'Hey this is my first website onec2' ",
       "sudo systemctl start httpd"
       ]
       connection {
@@ -1494,9 +1494,153 @@ resource "aws_instance" "example" {
     }
 }
 ```
+Use `terraform apply --auto-approve` and use the public ip of the instance to access the website.  
 
+### 3. File provisioner
+ The file provisioner uploads files from the local machine to the remote resource.  
 
-# Data source block in terraform  30 -2 july
+ EX:  
+ create a script file in a machine that we are at,  
+ ```
+cd /tmp
+vi remote_script.sh
+```
+
+```
+#!/bin/bash
+
+# Example commands to run on the remote instance
+echo "Running remote script"
+
+# Update the system
+sudo yum update -y
+
+# Install Apache HTTP Server
+sudo yum install -y httpd
+
+# Start and enable the Apache service
+sudo systemctl start httpd
+sudo systemctl enable httpd
+
+# Write content to /var/www/html/index.html with sudo
+echo "<html><h1>This is AWS Infra created using Terraform in Mumbai Region!</h1></html>" | sudo tee /var/www/html/index.html > /dev/null
+```
+Now lets use that script for ec2 instance created using terraform.  
+
+```
+vi main.tf
+```
+```
+resource "aws_instance" "apache-inst" {
+  ami = "ami-08ee1453725d19cdb"
+  instance_type = "t2.micro"
+  key_name = "MyKey"
+  tags = {
+    Name = "ec2-apache-inst"
+  }
+
+  provisioner "file" {
+    source = "remote_script.sh"
+    destination = "/temp/remote_script.sh"
+
+    connection {
+      type = "ssh"
+      user = "ec2-user"
+      private_key = file("~/.ssh/id_rsa")
+      host = self.public_ip
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/remote_script.sh",
+      "/tmp/remote_script.sh"
+    ]
+    connection {
+      type = "ssh"
+      user = "ec2-user"
+      private_key = file("~/.ssh/id_rsa")
+      host = self.public_ip
+      }
+    }
+}
+
+output  "instance_ip" {
+  value = aws_instance.apache.public_ip
+}
+```
+
+## Dynamic Block  
+It is used to reduce the length of the block.  
+
+Example: Launch a new EC2 instance with security group allowed protocols 22 and 80, in this example we should create multiple ingress rules for multiple protocols.  
+
+But instead writing multiple ingress rules, we can use dynamic block.  
+
+```
+provider "aws" {
+  region = "ap-south-1"
+}
+
+locals {
+  ingress_rules = [{
+    port        = 443
+    description = "Ingress rules for port 443"
+    },
+    {
+      port        = 80
+      description = "Ingress rules for port 80"
+    },
+    {
+      port        = 8080
+      description = "Ingress rules for port 8080"
+
+  }]
+}
+
+resource "aws_instance" "ec2_example" {
+  ami                    = "ami-08ee1453725d19cdb"
+  instance_type          = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.main.id]
+  tags = {
+    Name = "Terraform EC2"
+  }
+}
+
+resource "aws_security_group" "main" {
+
+  egress = [
+    {
+      cidr_blocks      = ["0.0.0.0/0"]
+      description      = "*"
+      from_port        = 0
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      protocol         = "-1"
+      security_groups  = []
+      self             = false
+      to_port          = 0
+  }]
+
+  dynamic "ingress" {
+    for_each = local.ingress_rules
+
+    content {
+      description = "*"
+      from_port   = ingress.value.port
+      to_port     = ingress.value.port
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+
+  tags = {
+    Name = "terra sg"
+  }
+}
+```
+
+# Data source block in terraform  
 
 # Conditions
 
