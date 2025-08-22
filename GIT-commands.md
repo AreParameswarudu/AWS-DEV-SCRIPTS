@@ -582,7 +582,8 @@ if you want to change the last commit history
 `git commit --amend -m "an updated commit message"`  --> this is replace latest commit message
 
 
-# `git rebase`  -- to change multiple commit histories
+# `git rebase`  
+To change multiple commit histories
 
 Note: if you want to use this command, you need to have minimum 3 commits in your repo  
 
@@ -1077,6 +1078,7 @@ Like Kanban board --
 Create a Project --> Select Table --> Create Task --> press tab --> and fields and assign people(tasks, assignees, start date, enddate)
 
 Go to Project Settings --> Manage access --> give permissions
+
 
 
 
