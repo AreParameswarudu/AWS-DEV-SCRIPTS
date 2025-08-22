@@ -881,6 +881,22 @@ We actually segrigate the remote backend block into another file, `backend.tf`. 
 └── variables.tf   -- calling variables from tfvars
 
 ```
+### Migrate existing local state file to remote s3.
+Update the backend block in the `backend.tf` file.  
+```
+terraform {
+  backend "s3"  {
+    bucket = "terraform-statefile-bkt"
+    key = "prod/terraform.tfstate"
+    region = "ap-south-1"
+  }
+}
+```
+Run the `terraform init` command with `-migrate-state` flag.  
+```
+terraform init -migrate-state
+```
+
 
 ## Bring back the state file from s3 to local.
 If you don't want to use S3 and want statefile to be in local again , modify main.tf and remove the backend code.  
