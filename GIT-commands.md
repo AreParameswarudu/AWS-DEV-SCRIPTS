@@ -112,12 +112,17 @@ git add README.md
 git commit -m "first commit"
 git branch -M main
 git remote add origin https://github.com/AreParameswarudu/devsecops-Tetris-manifest.git
-git push -u origin main
+git push -u origin main   
 ```
-
+> [!NOTE]
+> `git push -u origin main`   #Pushes your local main branch to the remote origin repository as main.
+> Also, `-u` represents Remember that my local `main` is connected to `origin/main`.
 
 
 ## Authenticating pull or push actions.
+GitHub removed password authentication and put token system for better security.    
+Generate token from GitHub:    
+Profile --> settings --> developer settings --> personal access token --> classic --> Generate new token --> classic --> name:gitlearn --> select repo scopes --> generate.  
 If any time asked for the authentication,  following things were asked.
 ```
 git username:
@@ -133,15 +138,12 @@ git config --global credential.helper cache
 ```
 git credential-cache exit
 ```
-
-
 ```
 git remote -v
 ```
--------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 
--------------------------------------------------------------------------
-
+---------------------------------------------------------------------------------
 
 **🧹 Step-by-Step: Delete Local main Branch**    
 1. ✅ Check Your Current Branch
@@ -179,7 +181,7 @@ This way the files form the remote repo can be deleted and cleaned.
 
 -----------------------------------------------------------------------------
 
-## git status  
+# `git status`  
 Now refresh the GitHub page and you can see the files.  
 
 --> In Local, open `hello.txt` and add some content here.    
@@ -224,7 +226,7 @@ git status
 --> 100755 means executable file
 
 ------------------------------------------
-## got log
+# `got log`
 
 `git log` --> to see how many commits history.  
 `git log --oneline` --> to see less lines.  
@@ -240,7 +242,7 @@ git status
 `git shortlog` --> Summarize git log output.  
 
 
-## git blame
+# `git blame`
 Create a file and add text to it.  
 Add the file and commit it.  
 Now you can use `git blame filename`  
@@ -257,7 +259,7 @@ this is first line
 
 -------------------------------------
 
-## git diff
+# `git diff`
 --> modify index.html file
 ```
 vi index.html
@@ -351,13 +353,13 @@ touch file1
 --> now we can see Reyaz username  
 
 
-## git Amend  -- to Change the commit history
+# `git Amend`  -- to Change the commit history
 
 if you want to change the last commit history    
 `git commit --amend -m "an updated commit message"`  --> this is replace latest commit message
 
 
-## git rebase  -- to change multiple commit histories
+# `git rebase`  -- to change multiple commit histories
 
 Note: if you want to use this command, you need to have minimum 3 commits in your repo  
 
@@ -375,6 +377,8 @@ Now replace pick with reword and keep changing the commit messages for 3 times a
 
 
 11 JUNE 2025      class missed 
+
+# Squach 
 
 Squashing in Git is the process of combining multiple commits into a single, consolidated commit. This is typically done to clean up the commit history before merging a feature branch into the main branch.
 
@@ -661,7 +665,7 @@ git status
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-## Branch Concept
+# Branch Concept in GIT
 
 Keep the master branch clean first
 
@@ -677,8 +681,7 @@ if you commit at least 1 file, it will show the master branch
 
 Its not good to work everyone on master branch, individual developer create their own branch  
 
-dev1branch
-==========
+### dev1branch
 ```
 	git branch dev1branch	  # it will create a new branch dev1branch from master
 	git branch				  --> to list the branches, * represent the current branch
@@ -695,8 +698,8 @@ git checkout -b dev
 ```
 dev1branch has 1 + 5 files = 6 (it got 1 file from master)  
 
-dev2branch
-==========
+### dev2branch
+```
 	git branch dev2branch --> this will create a new branch dev2branch from dev1branch as we are now in dev1branch
 	git branch
 	git checkout dev2branch
@@ -704,29 +707,28 @@ dev2branch
 	touch dev2file{1..5}
 	git add dev2*
 	git commit -m "dev2 commit" dev2*
-
+```
 dev2branch has 1 + 5 + 5 = 11  
 
-dev3branch
-===========
+### dev3branch
+```
 	git branch
-	git branch dev3branch --> this will create a new branch from dev2branch
+	git branch dev3branch  			#this will create a new branch from dev2branch
 	git checkout dev3branch
               or
-              git checkout -b dev3branch --> this will also create and checkout branch dev3branch, 2 commands in 1 shot
+	git checkout -b dev3branch 		#this will also create and checkout branch dev3branch, 2 commands in 1 shot
 	git branch
 	touch dev3file{1..5}
 	git add dev3*
 	git commit -m "dev3 commit" dev3*
-	
+```	
 dev3branch has 11 + 5= 16  
 
-dev4branch
-===========
-	Now i want to create a new branch from master not from dev3
+### dev4branch
 
-	Now I want to checkout from master not from dev3 , so first checkout to master and create a branch, it will get only
-
+Now i want to create a new branch from master not from dev3  
+Now I want to checkout from master not from dev3 , so first checkout to master and create a branch, it will get only
+```
 	git branch
 	git checkout master
 	ls
@@ -734,382 +736,178 @@ dev4branch
 	git checkout dev4branch
 	ls
 
-	ls --> it should list only index.html
+	ls 		#it should list only index.html
 	touch dev4file{1..5}
 	git add dev4*
 	git commit -m "dev4 commit" dev4*
-
+```
 dev4branch has 1 + 5 = 6
 
-
-**** rename branch
-
+## rename branch
+```
 git branch -m dev5branch devnewbranch  [renaming dev5branch to devnewbranch]
+```
 
-=======================
-GIT MERGE - Merge between 2 branches
-======================
-
+# `git merge` - Merge between 2 branches
+Objective : Merge `dev1branch` branch to `master` branch  
+Lets check the present branch we are at.  
+```
 git branch
-be in master
-
+```
+Be in master, if not then switch to main branch.
+```
 git checkout master
-
-git merge dev1branch  --- what ever we have files in dev1branch will come to master
-
-Now push to GitHub, create a GitHub account
-========================================
-git branch
-
-git remote add origin https://github.com/ReyazShaik/testrepo.git
-
-git config --global credential.helper cache  
+```
+Merge command, 
+```
+git merge dev1branch  	#what ever we have files in dev1branch will come to master
+```
 
 
-git push origin master --> push the code of master to GitHub
-username:
-password: paste the token here
-GitHub removed password authentication and put token system for better security
-Generate token from GitHub
-Profile --> settings --> developer settings --> personal access token --> classic -->
-Generate new token --> classic --> name:gitlearn --> select repo scopes --> generate
-
-Now push dev1branch files
-
-git push origin dev1branch --> now see 2 branches in GitHub
+Now push other branche files to remote repo.  
+```
+git push origin dev1branch 	#To push dev1branch to remote repo, it will create a new branch with name dev1branch
+#similarly
 git push origin dev2branch --> now see 3 branches in GitHub
 git push origin dev3branch --> now see 4 branches in GitHub
 git push origin dev4branch --> now see 5 branches in GitHub
+```
 
-=======================
-GIT MERGE - Merge between 2 branches
-======================
 
-git branch
+# `git rebase` - similar action as of MERGE
+Another command instead `merge`,  use `rebase`  
+Objective: I want to rebase (or merger) `dev4branch` to `master` branch.  
 
-git checkout dev2branch -- see the files
+Switch to main branch
+```
+git checkout master
+```
 
-git checkout dev1branch -- see the files
-
-git merge dev2branch  --- what ever we have files in dev2branch will come to dev1branch
-
-another command instead merge use rebase
-
+Now, use `git rebase` command
+```
 git rebase dev4branch
+```
+## Difference between `git merge` and `git rebase`
 
-Git Merge: Keeps the history intact and is safer for shared branches. Ideal for collaborative projects.
-Git Rebase: Rewrites history for a cleaner, linear commit log. Best suited for private or feature branches.
+**Git Merge**: Keeps the history intact and is safer for shared branches. Ideal for collaborative projects. 
+>_ What happens_: Combines two branches by creating a new merge commit.
+> _Effect_: Keeps the true history (branches look like they diverged and came back together).
+> Commit graph example:
+```
+# Before merge
+main:    A --- B
+               \
+feature:        C --- D
 
-======================
-GIT REVERT -- accidental merges from one branch to another branch and undo those
+# After merge (main ← feature)
+main:    A --- B ----------- E (merge commit)
+               \           /
+feature:        C --- D ---
+```
+👉 main now has C + D, plus a new merge commit E.   
+👉 feature branch is unchanged.  
 
+_Pros_: Preserves complete history, good for big teams.  
+_Cons_: History can look “messy” with many merge commits.  
+
+**Git Rebase**: Rewrites history for a cleaner, linear commit log. Best suited for private or feature branches.
+> _What happens_: Takes the commits from your branch and replays them on top of another branch.
+> _Effect_: Creates a linear, cleaner history.
+> Commit graph example:
+```
+# Before rebase
+main:    A --- B
+               \
+feature:        C --- D
+
+# After rebase (feature onto main)
+main:    A --- B
+                  \
+feature:            C' --- D'
+```
+👉 The commits C and D are rebuilt as new commits (C' and D') on top of B.  
+👉 No merge commit — history looks like feature started after B.  
+
+_Pros_: Clean, linear history (good for git log / bisect).
+_Cons_: Rewrites commit hashes (since new commits are created). Not good if the branch is already shared with others.  
+
+
+  
+
+when to use what,  
+Merge for public repos, rebase for Private  
+Merge stores history, rebase will not store the entire history (commits)  
+merge will show files, rebase will not show files  
+
+
+# GIT REVERT -- accidental merges from one branch to another branch and undo those
+
+```
 git branch
 
 git merge dev2branch
 
 ls
 
-git revert dev2branch --> this will delete the files from current branch which was merged
-(don't to any changes to file, just quit the file)
+git revert dev2branch 	#this will delete the files from current branch which was merged
+#(don't to any changes to file, just quit the file)
+```
 
-========================
-GIT BRANCH another example
-=========================
+### git merge conflict
+**Objective:**
 
---> Create one test repo in GitHub
+Master branch ---> python.text file ----> content = version 1.2.3.4 --> commited the changes.  
+Dev branch    ---> python.txt file  ----> content = vesrion 1.2.3.4.5.6 ---> commited the changes.  
+Now, Dev branch has to obe merged with Master.  
 
-
-mkdir branchdemo
-cd branchdemo
-git init
-touch python{1..10}
-
-vi python1
-This is python1
-nice code. log code
- 
-git add .
-git commit -m "pythonfiles" .
-
-git branch
-
-== what ever we are doing is in master branch
-== A new developer came and said i will do some changes, is it good to do directly in master?
-== create a new branch for developer
-
-git branch developer
-git branch
-git checkout developer
-
-vi python11
-This is python11
-
-vi python1
-added new lines
-
-git add .
-
-git commit -m "pythonfilesnew added" .
-
-== No impact on master branch
-== Now lets go to master branch and see the data
-
-git checkout master
-
-ls
-
-== Here we dont have python11 and python1 changes
-
-if i want developer changes to master
-
-git merge developer  [merging code from developer branch]
-
-git remote add origin https://github.com/ReyazShaik/branching.git
-
-Note: if you want to change remote origin " git remote set-url origin https://github.com/ReyazShaik/branching.git&quot;
-
-git push -u origin master
-
-== Now see in GitHub, but you can see only one branch in GitHub because we pushed from master, GitHub dosent know developer branch yet
-
-git checkout developer
-vi python1
-added worst code
-version 1.2.3
-
-git add .
-
-git commit -m "pythonfilesnew added" .
-
-git push origin developer [we need to push from developer branch]
-
-== Now in GitHub, you get Compare and Pull Request --> Merge Request
-== After merging master branch contains the code of Developer branch
-
-In your terminal, if you want to get latest code from GitHub
-
-git checkout master
-
-git pull
-
-
-git merge
-========
-
-git checkout developer
-vi python1
-version 1.2.3.4
-
-git add .
-git commit -m "1.2.3.4" python1
-
-git checkout master
-vi python1
-version 1.2.3.4.5
-
-git add .
-git commit -m "1.2.3.4.5" python1
-
+Switch to master branch, and use `git merger`
+```
 git merge developer
--- merge conflit
+```
+_Throws_ : merge conflit  
+_Reason_ : Same file with changes.  
+use, 
+```
+git diff file-name   #to see the differences that caused conflict
+```
+_Solution_ : Manually change any one of the branch file, commit and merger again
 
-vi python1
+## Delete Branch in GIT
 
-remove which ever you need, we can commit only 1
-save it
+```
+git branch -D branchname
+```
 
-git add python1
-git commit --> no need to put filename
+## Restore deleted branch in GIT
+```
+git reflog
 
-merge file will come , just wq!
+git checkout -b dev 3e98e1c(commitid)
+```
+Be in deleted branch and ls
 
-git status
 
 
+# GIT CLONE -- download remote repo to local
+```
+git clone https://github.com/user-name/repo-name.git
+```
 
 
-=======================
-GIT REBASE - same as MERGE
-=======================
 
-git rebase dev3branch -- now you see dev3 also in dev1branch
+# GIT FORK 
+same as clone (remote to local) but fork (download code from one GitHub account to another GitHub account).  
 
-==========================
+If i want to enhance the code of another guy who has his own repo and code, instead me doing changes in his account directly i will fork it in my GitHub repo and do changes
 
-MERGE vs REBASE
 
-Merge for public repos, rebase for Private
-Merge stores history, rebase will not store the entire history (commits)
-merge will show files, rebase will not show files
 
+In GitHub browser - search for another GitHub account(https://github.com/ReyazShaik/test) and fork to my account(trainerreyaz account)  
+GIT FORK and GIT CLONE -- Both repos should be public, for private use token.  
+you cannot unfork, you  need to delete the repo.  
 
-====================================
 
-========================
-GIT CLONE -- download remote repo to local
-======================
-
-Now delete the local directory gitproject and clone from GitHub
-
-rm -rf gitproject
-
-git clone https://github.com/ReyazShaik/branching.git
-ls
-cd branching
-git checkout master
-ls
-git checkout dev1branch
-ls
-git checkout dev2branch
-ls
-
-
-=================================
- Another Example = MERGE CONFLIT - when we merge 2 branches with same files
-===============================
-
-mkdir abcd
-cd abcd
-git init
-
-vi index.html
-I am dev1 writing java on branch-1
-git add index.html
-git commit -m "dev1-commits" index.html
-
-git branch
-
-git branch -m master branch1 --> renaming master to branch1 (just for clarity)
-
-git branch
-
-git checkout -b branch2 --> this will create a new branch from master
-
-vi index.html
-I am dev2 writing python on branch-2
-git add index.html
-git commit -m "dev2-commits" index.html
-
-git branch
-*branch2
-cat index.html
-
-git checkout branch1
-ls
-cat index.html
-vi index.html
-add some line
-git add index.html
-git commit -m "dev1-newline-commits" index.html
-
-Now in both branches we have same index.html --> see files ,
-
-git merge branch2 -> error: conflit
-
-git diff index.html
-
-cat index.html
-
---- Now resolve conflit manually by developer, because he know what can be kept and removed
-
-vi index.html
-delete dev2 code
-git add index.html
-git commit -m "new-commits" [dont give filename]
-git status
-
-======================
-GIT Conflit - Example - latest
-=====================
-
-mkdir git-conflict-demo
-
-cd git-conflict-demo
-
-git init
-
-vi file.txt
-"Hello World"
-
-git add file.txt
-
-git commit -m "Initial commit"
-
-
-Create a new branch and switch to it:
-------------------------------------
-
-git checkout -b feature-branch
-
-vi file.txt
-Hello from feature branch
-
-git commit -am "Update file.txt in feature-branch"
-
-
-Switch back to the master branch:
------------------------------
-git checkout master
-
-vi file.txt
-Hello from master branch
-
-git commit -am "Update file.txt in main"
-
-
-Try merging feature-branch into master:
------------------------------------
-
-git merge feature-branch
-
-Git detects a conflict:
-
-Automatic merge failed; fix conflicts and then commit the result.
-
-🔹 Step 4: Resolve the Conflict
--------------------------------
-Open file.txt, and you will see:
-
-<<<<<<< HEAD
-Hello from main branch
-=======
-Hello from feature branch
->>>>>>> feature-branch
-
-Manually edit the file to keep the correct version:
-
-git add file.txt
-
-git commit -m "Resolved merge conflict"
-
-🔹 Step 5: Verify the Merge
-----------------------------
-
-Check the commit history to confirm the conflict resolution:
-
-
-git log --oneline --graph --all
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-=======================
-GIT FORK - same as clone (remote to local) but fork (download code from one GitHub account to another GitHub account)
-=====================
-
-= If i want to enhance the code of another guy who has his own repo and code, instead me doing changes in his account directly i will fork it in my GitHub repo and do changes
-
-
-
-In GitHub browser - search for another GitHub account(https://github.com/ReyazShaik/test) and fork to my account(trainerreyaz account)
-
-GIT FORK and GIT CLONE -- Both repos should be public, for private use token
-
-you cannot unfork, you  need to delete the repo
-
-
-
-PR - PULL REQUEST
----------------
+# PR - PULL REQUEST
 
 Be in trainerreyaz account and add or modify python1 file and commit
 
@@ -1152,58 +950,26 @@ In GitHub on top --> Pull request --> New Pull Request --> select branches from 
 Now code merges from branch to master
 
 
-====================
-Rename the Branch Name - GIT
-=====================
+# GIT REVERT in GITHUB
 
-touch python{1..5}
-
-git add .
-
-git commit -m "python" .
-
-git branch dev1branch
-
-git branch -m dev1branch testbranch
-
-git checkout testbranch
-
-touch java{1..5}
-
-git add .
-
-git commit -m "java" .
-
-
-create a repo and push the files and branch
-
-git remote add origin https://github.com/ReyazShaik/branching.git
-
-git push origin master
-git push origin testbranch
-
-create a pull request and merge in GitHub
-
-===============
-GIT REVERT in GITHUB
-=============
 select View all branches in branch section --> which branch you want to revert --> select that branch --> Click PR and revert
 -> it will create a revertbranch and revert
 
 
 
-=======
-git clean : delete untrack files
 
-create a file and dont track
-git clean -n filename  -- first git will ask
-git clean -f filename  -- delete without asking
+# git clean : delete untrack files
+
+create a file and dont track 
+```
+git clean -n filename  # first git will ask  
+git clean -f filename  # delete without asking
+```
 
 
 
-=========================
-CHERRY PICK - Merging the specific files based on commits
-========================
+# CHERRY PICK - Merging the specific files based on commits
+
 mkdir Reyaz
 cd Reyaz
 git init
@@ -1261,9 +1027,8 @@ example:  git tag dev/prod 0620179
 
 git log --oneline
 
-=========================
-GIT IGNORE - if you don't want to track the file, add filename in .gitignore
-========================
+
+# GIT IGNORE - if you don't want to track the file, add filename in .gitignore
 
 In Same directory
 
@@ -1276,21 +1041,7 @@ file1.txt
 
 -- git status --- cant see file1
 
-================
-Delete Branch in GIT
-==================
-- git branch -D branchname
-To get Branch restore - git checkout branchname
-git branch
 
-Restore deleted branch in GIT
-===========================
-
-git reflog
-
-git checkout -b dev 3e98e1c(commitid)
-
-Be in deleted branch and ls
 
 =====================
 Host website on GitHub
@@ -1323,6 +1074,7 @@ Like Kanban board --
 Create a Project --> Select Table --> Create Task --> press tab --> and fields and assign people(tasks, assignees, start date, enddate)
 
 Go to Project Settings --> Manage access --> give permissions
+
 
 
 
