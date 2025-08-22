@@ -197,20 +197,6 @@ Purpose: Dependency Management, Consistency and Security.
 
   **Desired state** is what you defined in your terraform configuration files. It represents the infra that you want Terraform to create, update, or destroy. 
 
-# count argument
-Used to specify the count of the resource like an ec2 instance.
-ex:
-```
-provider 'aws' {
-  region = 'ap-south-1'
-}
-
-resource 'aws_instance' 'my_ec2_instance' {
-  count = 5
-  ami = 'ami-0492447090ced6eb5'
-  instance_type = 't2.micro'
-}
-```
 
 # Target - to delete a specific resource.
 target is a flag that we use in/with `terraform destroy --auto-approve` to delete specific target.
@@ -816,7 +802,7 @@ terraform workspace list
 ```
 
 # Terraform backend setup  - Remote state.  
-**Remote State**  
+## **Remote State**  
 
 By default, Terraform stores state file locally in a file named `terraform.tfstate`. When working with Terraform in a team, use of a local file makes Terraform usage complicated because each user must make sure they always have the latest state data before running Terraform and make sure that nobody else runs Terraform at the same time.  
 
