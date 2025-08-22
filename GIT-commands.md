@@ -352,6 +352,228 @@ touch file1
 `git log`  
 --> now we can see Reyaz username  
 
+# 5. Branch Concept in GIT
+
+Keep the master branch clean first
+
+If you dont have any single commit, it will not show the branch. Once you do 1 commit, it shows master branch
+```
+touch index.html  
+git add index.html  
+git commit -m "index commit" index.html    
+git status  
+git branch  #it will show the branch master, default branch  
+```
+if you commit at least 1 file, it will show the master branch  
+
+Its not good to work everyone on master branch, individual developer create their own branch  
+
+### dev1branch
+```
+	git branch dev1branch	  # it will create a new branch dev1branch from master
+	git branch				  --> to list the branches, * represent the current branch
+	git checkout dev1branch	  --> to switch branch
+	git branch
+	touch dev1file{1..5}
+	git add dev1file*
+	git commit -m "dev1" dev1file*
+```
+
+To create and checkout a branch at same time use, 
+```
+git checkout -b dev
+```
+dev1branch has 1 + 5 files = 6 (it got 1 file from master)  
+
+### dev2branch
+```
+	git branch dev2branch --> this will create a new branch dev2branch from dev1branch as we are now in dev1branch
+	git branch
+	git checkout dev2branch
+	git branch
+	touch dev2file{1..5}
+	git add dev2*
+	git commit -m "dev2 commit" dev2*
+```
+dev2branch has 1 + 5 + 5 = 11  
+
+### dev3branch
+```
+	git branch
+	git branch dev3branch  			#this will create a new branch from dev2branch
+	git checkout dev3branch
+              or
+	git checkout -b dev3branch 		#this will also create and checkout branch dev3branch, 2 commands in 1 shot
+	git branch
+	touch dev3file{1..5}
+	git add dev3*
+	git commit -m "dev3 commit" dev3*
+```	
+dev3branch has 11 + 5= 16  
+
+### dev4branch
+
+Now i want to create a new branch from master not from dev3  
+Now I want to checkout from master not from dev3 , so first checkout to master and create a branch, it will get only
+```
+	git branch
+	git checkout master
+	ls
+	git branch dev4branch
+	git checkout dev4branch
+	ls
+
+	ls 		#it should list only index.html
+	touch dev4file{1..5}
+	git add dev4*
+	git commit -m "dev4 commit" dev4*
+```
+dev4branch has 1 + 5 = 6
+
+## rename branch
+```
+git branch -m dev5branch devnewbranch  [renaming dev5branch to devnewbranch]
+```
+
+## 5.1. `git merge` - Merge between 2 branches
+Objective : Merge `dev1branch` branch to `master` branch  
+Lets check the present branch we are at.  
+```
+git branch
+```
+Be in master, if not then switch to main branch.
+```
+git checkout master
+```
+Merge command, 
+```
+git merge dev1branch  	#what ever we have files in dev1branch will come to master
+```
+
+
+Now push other branche files to remote repo.  
+```
+git push origin dev1branch 	#To push dev1branch to remote repo, it will create a new branch with name dev1branch
+#similarly
+git push origin dev2branch --> now see 3 branches in GitHub
+git push origin dev3branch --> now see 4 branches in GitHub
+git push origin dev4branch --> now see 5 branches in GitHub
+```
+
+
+## 5.2. `git rebase` - similar action as of MERGE
+Another command instead `merge`,  use `rebase`  
+Objective: I want to rebase (or merger) `dev4branch` to `master` branch.  
+
+Switch to main branch
+```
+git checkout master
+```
+
+Now, use `git rebase` command
+```
+git rebase dev4branch
+```
+## Difference between `git merge` and `git rebase`
+
+**Git Merge**: Keeps the history intact and is safer for shared branches. Ideal for collaborative projects. 
+>_ What happens_: Combines two branches by creating a new merge commit.
+> _Effect_: Keeps the true history (branches look like they diverged and came back together).
+> Commit graph example:
+```
+# Before merge
+main:    A --- B
+               \
+feature:        C --- D
+
+# After merge (main ← feature)
+main:    A --- B ----------- E (merge commit)
+               \           /
+feature:        C --- D ---
+```
+👉 main now has C + D, plus a new merge commit E.   
+👉 feature branch is unchanged.  
+
+_Pros_: Preserves complete history, good for big teams.  
+_Cons_: History can look “messy” with many merge commits.  
+
+**Git Rebase**: Rewrites history for a cleaner, linear commit log. Best suited for private or feature branches.
+> _What happens_: Takes the commits from your branch and replays them on top of another branch.
+> _Effect_: Creates a linear, cleaner history.
+> Commit graph example:
+```
+# Before rebase
+main:    A --- B
+               \
+feature:        C --- D
+
+# After rebase (feature onto main)
+main:    A --- B
+                  \
+feature:            C' --- D'
+```
+👉 The commits C and D are rebuilt as new commits (C' and D') on top of B.  
+👉 No merge commit — history looks like feature started after B.  
+
+_Pros_: Clean, linear history (good for git log / bisect).
+_Cons_: Rewrites commit hashes (since new commits are created). Not good if the branch is already shared with others.  
+
+
+  
+
+when to use what,  
+Merge for public repos, rebase for Private  
+Merge stores history, rebase will not store the entire history (commits)  
+merge will show files, rebase will not show files  
+
+
+## 5.3. GIT REVERT -- accidental merges from one branch to another branch and undo those
+
+```
+git branch
+
+git merge dev2branch
+
+ls
+
+git revert dev2branch 	#this will delete the files from current branch which was merged
+#(don't to any changes to file, just quit the file)
+```
+
+## 5.4. git merge conflict
+**Objective:**
+
+Master branch ---> python.text file ----> content = version 1.2.3.4 --> commited the changes.  
+Dev branch    ---> python.txt file  ----> content = vesrion 1.2.3.4.5.6 ---> commited the changes.  
+Now, Dev branch has to obe merged with Master.  
+
+Switch to master branch, and use `git merger`
+```
+git merge developer
+```
+_Throws_ : merge conflit  
+_Reason_ : Same file with changes.  
+use, 
+```
+git diff file-name   #to see the differences that caused conflict
+```
+_Solution_ : Manually change any one of the branch file, commit and merger again
+
+###  Delete Branch in GIT
+
+```
+git branch -D branchname
+```
+
+### Restore deleted branch in GIT
+```
+git reflog
+
+git checkout -b dev 3e98e1c(commitid)
+```
+Be in deleted branch and ls
+
+
 
 # `git Amend`  -- to Change the commit history
 
@@ -665,226 +887,6 @@ git status
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# Branch Concept in GIT
-
-Keep the master branch clean first
-
-If you dont have any single commit, it will not show the branch. Once you do 1 commit, it shows master branch
-```
-touch index.html  
-git add index.html  
-git commit -m "index commit" index.html    
-git status  
-git branch  #it will show the branch master, default branch  
-```
-if you commit at least 1 file, it will show the master branch  
-
-Its not good to work everyone on master branch, individual developer create their own branch  
-
-### dev1branch
-```
-	git branch dev1branch	  # it will create a new branch dev1branch from master
-	git branch				  --> to list the branches, * represent the current branch
-	git checkout dev1branch	  --> to switch branch
-	git branch
-	touch dev1file{1..5}
-	git add dev1file*
-	git commit -m "dev1" dev1file*
-```
-
-To create and checkout a branch at same time use, 
-```
-git checkout -b dev
-```
-dev1branch has 1 + 5 files = 6 (it got 1 file from master)  
-
-### dev2branch
-```
-	git branch dev2branch --> this will create a new branch dev2branch from dev1branch as we are now in dev1branch
-	git branch
-	git checkout dev2branch
-	git branch
-	touch dev2file{1..5}
-	git add dev2*
-	git commit -m "dev2 commit" dev2*
-```
-dev2branch has 1 + 5 + 5 = 11  
-
-### dev3branch
-```
-	git branch
-	git branch dev3branch  			#this will create a new branch from dev2branch
-	git checkout dev3branch
-              or
-	git checkout -b dev3branch 		#this will also create and checkout branch dev3branch, 2 commands in 1 shot
-	git branch
-	touch dev3file{1..5}
-	git add dev3*
-	git commit -m "dev3 commit" dev3*
-```	
-dev3branch has 11 + 5= 16  
-
-### dev4branch
-
-Now i want to create a new branch from master not from dev3  
-Now I want to checkout from master not from dev3 , so first checkout to master and create a branch, it will get only
-```
-	git branch
-	git checkout master
-	ls
-	git branch dev4branch
-	git checkout dev4branch
-	ls
-
-	ls 		#it should list only index.html
-	touch dev4file{1..5}
-	git add dev4*
-	git commit -m "dev4 commit" dev4*
-```
-dev4branch has 1 + 5 = 6
-
-## rename branch
-```
-git branch -m dev5branch devnewbranch  [renaming dev5branch to devnewbranch]
-```
-
-# `git merge` - Merge between 2 branches
-Objective : Merge `dev1branch` branch to `master` branch  
-Lets check the present branch we are at.  
-```
-git branch
-```
-Be in master, if not then switch to main branch.
-```
-git checkout master
-```
-Merge command, 
-```
-git merge dev1branch  	#what ever we have files in dev1branch will come to master
-```
-
-
-Now push other branche files to remote repo.  
-```
-git push origin dev1branch 	#To push dev1branch to remote repo, it will create a new branch with name dev1branch
-#similarly
-git push origin dev2branch --> now see 3 branches in GitHub
-git push origin dev3branch --> now see 4 branches in GitHub
-git push origin dev4branch --> now see 5 branches in GitHub
-```
-
-
-# `git rebase` - similar action as of MERGE
-Another command instead `merge`,  use `rebase`  
-Objective: I want to rebase (or merger) `dev4branch` to `master` branch.  
-
-Switch to main branch
-```
-git checkout master
-```
-
-Now, use `git rebase` command
-```
-git rebase dev4branch
-```
-## Difference between `git merge` and `git rebase`
-
-**Git Merge**: Keeps the history intact and is safer for shared branches. Ideal for collaborative projects. 
->_ What happens_: Combines two branches by creating a new merge commit.
-> _Effect_: Keeps the true history (branches look like they diverged and came back together).
-> Commit graph example:
-```
-# Before merge
-main:    A --- B
-               \
-feature:        C --- D
-
-# After merge (main ← feature)
-main:    A --- B ----------- E (merge commit)
-               \           /
-feature:        C --- D ---
-```
-👉 main now has C + D, plus a new merge commit E.   
-👉 feature branch is unchanged.  
-
-_Pros_: Preserves complete history, good for big teams.  
-_Cons_: History can look “messy” with many merge commits.  
-
-**Git Rebase**: Rewrites history for a cleaner, linear commit log. Best suited for private or feature branches.
-> _What happens_: Takes the commits from your branch and replays them on top of another branch.
-> _Effect_: Creates a linear, cleaner history.
-> Commit graph example:
-```
-# Before rebase
-main:    A --- B
-               \
-feature:        C --- D
-
-# After rebase (feature onto main)
-main:    A --- B
-                  \
-feature:            C' --- D'
-```
-👉 The commits C and D are rebuilt as new commits (C' and D') on top of B.  
-👉 No merge commit — history looks like feature started after B.  
-
-_Pros_: Clean, linear history (good for git log / bisect).
-_Cons_: Rewrites commit hashes (since new commits are created). Not good if the branch is already shared with others.  
-
-
-  
-
-when to use what,  
-Merge for public repos, rebase for Private  
-Merge stores history, rebase will not store the entire history (commits)  
-merge will show files, rebase will not show files  
-
-
-# GIT REVERT -- accidental merges from one branch to another branch and undo those
-
-```
-git branch
-
-git merge dev2branch
-
-ls
-
-git revert dev2branch 	#this will delete the files from current branch which was merged
-#(don't to any changes to file, just quit the file)
-```
-
-### git merge conflict
-**Objective:**
-
-Master branch ---> python.text file ----> content = version 1.2.3.4 --> commited the changes.  
-Dev branch    ---> python.txt file  ----> content = vesrion 1.2.3.4.5.6 ---> commited the changes.  
-Now, Dev branch has to obe merged with Master.  
-
-Switch to master branch, and use `git merger`
-```
-git merge developer
-```
-_Throws_ : merge conflit  
-_Reason_ : Same file with changes.  
-use, 
-```
-git diff file-name   #to see the differences that caused conflict
-```
-_Solution_ : Manually change any one of the branch file, commit and merger again
-
-## Delete Branch in GIT
-
-```
-git branch -D branchname
-```
-
-## Restore deleted branch in GIT
-```
-git reflog
-
-git checkout -b dev 3e98e1c(commitid)
-```
-Be in deleted branch and ls
 
 
 
@@ -1074,6 +1076,7 @@ Like Kanban board --
 Create a Project --> Select Table --> Create Task --> press tab --> and fields and assign people(tasks, assignees, start date, enddate)
 
 Go to Project Settings --> Manage access --> give permissions
+
 
 
 
