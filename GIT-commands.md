@@ -573,17 +573,17 @@ git checkout -b dev 3e98e1c(commitid)
 ```
 Be in deleted branch and ls
 
+# 6. Manipulate the commit history
 
-
-# `git amend`  
-To Change the commit history
+## 6.1. `git amend`  
+change the last commit (message or contents).  
 
 if you want to change the last commit history    
 `git commit --amend -m "an updated commit message"`  --> this is replace latest commit message
 
 
-# `git rebase`  
-To change multiple commit histories
+## 6.2. `git rebase`  
+rewrite multiple commits (change message, squash, reorder, drop).  
 
 Note: if you want to use this command, you need to have minimum 3 commits in your repo  
 
@@ -599,8 +599,38 @@ Now replace pick with reword and keep changing the commit messages for 3 times a
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# 7. Undo commits
+## 7.1. Reset
+### 7.1.1. soft head
+Move HEAD back 1 commit.  
+Changes stay in staging area.  
+✅ Best when you want to recommit with tweaks.  
+```
+git reset --soft HEAD~1
+```
+### 7.1.2. hard head 
+Backs to previous commit.  
+Wipes out the working dir, meaning changes were lost.  
+⚠️ Dangerous — commits and changes are gone (unless recovered via reflog).
+```
+git reset --hard HEAD~1
+```
 
-11 JUNE 2025      class missed 
+
+## 7.2. Revert
+Safe undo (history preserved).   
+  
+Makes a new commit that undoes the changes from the last commit.  
+Original commit stays in history.  
+✅ Safe on shared branches.
+```
+git revert HEAD
+```
+## 📦 Temporary storage
+`git stash` / `git stash pop`  
+Save working changes aside temporarily, clean working dir.  
+Bring them back later.
+
 
 # Squach 
 
@@ -1078,6 +1108,7 @@ Like Kanban board --
 Create a Project --> Select Table --> Create Task --> press tab --> and fields and assign people(tasks, assignees, start date, enddate)
 
 Go to Project Settings --> Manage access --> give permissions
+
 
 
 
