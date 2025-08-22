@@ -1423,7 +1423,7 @@ Terraform provisioners are used to perform actions on a local or remote machine 
 
 They are typically used for tasks such as **configuring** or **installing software** on a machine, which Terraform itself does not handle directly.  
 
-Type os provisioners
+Type of provisioners
 ---------------------
 
 ### 1. l`ocal-exec`
