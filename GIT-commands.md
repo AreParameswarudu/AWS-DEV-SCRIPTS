@@ -575,7 +575,8 @@ Be in deleted branch and ls
 
 
 
-# `git Amend`  -- to Change the commit history
+# `git Amend`  
+To Change the commit history
 
 if you want to change the last commit history    
 `git commit --amend -m "an updated commit message"`  --> this is replace latest commit message
@@ -1076,6 +1077,7 @@ Like Kanban board --
 Create a Project --> Select Table --> Create Task --> press tab --> and fields and assign people(tasks, assignees, start date, enddate)
 
 Go to Project Settings --> Manage access --> give permissions
+
 
 
 
