@@ -604,6 +604,7 @@ Now replace pick with reword and keep changing the commit messages for 3 times a
 ### 7.1.1. soft head
 Move HEAD back 1 commit.  
 Changes stay in staging area.  
+changes were preserved, only commit is deleted.  
 ✅ Best when you want to recommit with tweaks.  
 ```
 git reset --soft HEAD~1
@@ -1108,6 +1109,7 @@ Like Kanban board --
 Create a Project --> Select Table --> Create Task --> press tab --> and fields and assign people(tasks, assignees, start date, enddate)
 
 Go to Project Settings --> Manage access --> give permissions
+
 
 
 
