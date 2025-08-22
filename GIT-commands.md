@@ -660,33 +660,39 @@ git status
 
 
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Branch Concept
 
-keep the master branch clean first
+Keep the master branch clean first
 
 If you dont have any single commit, it will not show the branch. Once you do 1 commit, it shows master branch
-
+```
 touch index.html  
 git add index.html  
 git commit -m "index commit" index.html    
 git status  
-git branch --> it will show the branch master, default branch  
-
+git branch  #it will show the branch master, default branch  
+```
 if you commit at least 1 file, it will show the master branch  
 
 Its not good to work everyone on master branch, individual developer create their own branch  
 
 dev1branch
 ==========
-	git branch dev1branch	  --> it will create a new branch dev1branch from master
+```
+	git branch dev1branch	  # it will create a new branch dev1branch from master
 	git branch				  --> to list the branches, * represent the current branch
 	git checkout dev1branch	  --> to switch branch
 	git branch
 	touch dev1file{1..5}
 	git add dev1file*
 	git commit -m "dev1" dev1file*
+```
 
+To create and checkout a branch at same time use, 
+```
+git checkout -b dev
+```
 dev1branch has 1 + 5 files = 6 (it got 1 file from master)  
 
 dev2branch
@@ -1317,6 +1323,7 @@ Like Kanban board --
 Create a Project --> Select Table --> Create Task --> press tab --> and fields and assign people(tasks, assignees, start date, enddate)
 
 Go to Project Settings --> Manage access --> give permissions
+
 
 
 
