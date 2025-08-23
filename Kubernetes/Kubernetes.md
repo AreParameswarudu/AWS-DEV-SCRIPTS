@@ -268,11 +268,11 @@ kind: job
 apiVersion: v1
 kind: Pod  -- creating pod
 metadata:
-name: pod1 -- name of the pod
+  name: pod1 -- name of the pod
 spec:  -- specifications
-containers:
+  containers:
   - image: nginx  -- image  name
-  name: cont1 -- container name
+    name: cont1 -- container name
 ```
 Create one using above template.
   ```vi pod.yml```
@@ -280,11 +280,11 @@ Create one using above template.
 apiVersion: v1
 kind: Pod
 metadata:
-name: pod1
+  name: pod1
 spec:
-containers:
+  containers:
   - image: nginx
-  name: cont1
+    name: cont1
 ```
 
 ```kubectl create -f pod.yml```    [ To create a pod using manifest]  
