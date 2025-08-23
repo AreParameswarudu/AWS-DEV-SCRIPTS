@@ -364,22 +364,22 @@ Template:
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
-name: ib-rs    ---------- Name of the Replicaset
-labels:
-	app: bank
-spec:     ------------- this spec is for PODS
-replicas: 3   --------- how many number of pods
-selector:
-	matchLabels:  -Ensures only pods with label app: bank are part of this Replicaset. if there is any pod with label bank, it will be a part of this replicaset
-	app: bank
-template:            ------------ Ensures the pods get labeled as app: bank
-	metadata:
+    name: ib-rs    ---------- Name of the Replicaset
 	labels:
 		app: bank
-	spec:  ----------------- this spec is for containers
-	containers:
-	- name: cont1
-		image: trainerreyaz/ib-image:latest
+spec:     ------------- this spec is for PODS
+	replicas: 3   --------- how many number of pods
+	selector:
+		matchLabels:  -Ensures only pods with label app: bank are part of this Replicaset. if there is any pod with label bank, it will be a part of this replicaset
+		app: bank
+	template:            ------------ Ensures the pods get labeled as app: bank
+		metadata:
+			labels:
+				app: bank
+		spec:  ----------------- this spec is for containers
+		  containers:
+		  - name: cont1
+			image: nginx:latest
 ```
 
 
@@ -387,22 +387,22 @@ template:            ------------ Ensures the pods get labeled as app: bank
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
-name: ib-rs
-labels:
-	app: bank
-spec:
-replicas: 3
-selector:
-	matchLabels:
-	app: bank
-template:  
-	metadata:
+	name: ib-rs
 	labels:
 		app: bank
-	spec:  
-	containers:
-	- name: cont1
-		image: trainerreyaz/ib-image:latest
+spec:
+	replicas: 3
+	selector:
+		matchLabels:
+		app: bank
+	template:  
+		metadata:
+         labels:
+          app: bank
+		spec:  
+          containers:
+          - name: cont1
+            image: nginx:latest
 ```
 
 
@@ -497,19 +497,19 @@ Same as ReplicaSet. It also used for handling multiple replicas of specific pod.
 		apiVersion: apps/v1
 		kind: ReplicationController
 		metadata:
-		name: ib-rs
-		labels:
-			app: bank
-		spec:
-		replicas: 3
-		template:  
-			metadata:
+			name: ib-rs
 			labels:
 				app: bank
-			spec:  
-			containers:
-			- name: cont1
-				image: trainerreyaz/ib-image:latest
+		spec:
+			replicas: 3
+			template:  
+				metadata:
+				 labels:
+					 app: bank
+				spec:  
+				 containers:
+				 - name: cont1
+				   image: trainerreyaz/ib-image:latest
 
 
 Replication Controller
