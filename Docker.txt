@@ -252,6 +252,10 @@ EXPOSE        : to give port number
 
 Dockerfile --> Docker Build -->  Image --> Container
 
+Truths to remember:
+1. Docker executes the instructions as the order they appear in the dockerfile.
+2. In the CMD command/argument, the first element is the executable of the image.
+3. nginx and apache2 has its own ways of specifing to run in the foreground.
 
 Example 1
 =========
@@ -1246,4 +1250,5 @@ DOKER SWARMS
 ---------------------------
 		Orchestration tool for containers.
 		
+
 
