@@ -239,8 +239,8 @@ COMPONENTS:
 ----------
 
 FROM        : used to get base image
-RUN        : used to run linux commands (During image creation)
-CMD        : used to run linux commands (After container creation)
+RUN        : used to run linux commands | During image creation | Install packages, sets up environmet.
+CMD        : used to run linux commands | After container creation or when container starts | Specifies default command to run.
 ENTRYPOINT    : high priority than cmd
 COPY        : to copy local files to container
 ADD        : to copy internet files to container
@@ -1246,3 +1246,4 @@ DOKER SWARMS
 ---------------------------
 		Orchestration tool for containers.
 		
+
