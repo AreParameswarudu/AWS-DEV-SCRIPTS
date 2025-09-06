@@ -8,6 +8,8 @@ Each instruction in a `Dockerfile`  that modifies the filesystem creates a new l
 Example for each appraoch and for more other approches, refer [https://medium.com/@ksaquib/how-i-cut-docker-image-size-by-90-best-practices-for-lean-containers-1f705cead02b]
 
 <img width="579" height="119" alt="image" src="https://github.com/user-attachments/assets/3b78b79b-5bf1-4a3e-8bf5-483ef9ca3e02" />  
+
+
 `Dockerfile`s for,    
 
 ```
