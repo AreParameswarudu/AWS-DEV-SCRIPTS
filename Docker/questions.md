@@ -7,15 +7,12 @@ Each instruction in a `Dockerfile`  that modifies the filesystem creates a new l
 
 Example for each appraoch and for more other approches, refer [https://medium.com/@ksaquib/how-i-cut-docker-image-size-by-90-best-practices-for-lean-containers-1f705cead02b]
 
-<img width="579" height="119" alt="image" src="https://github.com/user-attachments/assets/3b78b79b-5bf1-4a3e-8bf5-483ef9ca3e02" />  
-
-
+  
 `Dockerfile`s for,    
 
 ```
 #image1
 FROM ubuntu:22.04
-
 RUN apt update -y
 RUN apt install -y python3 python3-pip  git
 RUN mkdir /app
@@ -25,13 +22,11 @@ CMD ["python3", "/app/app.py"]
 
 #image2
 FROM ubuntu:22.04
-
 RUN apt update -y && \
     apt install -y python3 python3-pip git && \
     mkdir /app && \
     echo "print('Hello world')" > /app/app.py && \
     chmod +x /app/app.py
-
 CMD ["python3", "/app/app.py"]
 
 
@@ -64,3 +59,6 @@ RUN pip install flask numpy pandas && \
 
 CMD ["python", "/app/app.py"]
 ```
+
+ <img width="579" height="119" alt="image" src="https://github.com/user-attachments/assets/3b78b79b-5bf1-4a3e-8bf5-483ef9ca3e02" />  
+
