@@ -1,0 +1,289 @@
+Terraform
+=========
+
+History:
+========
+
+    In AWS till now, we have created infrastructure manually , created EC2, ELB's, ASG, S3, RDS, VPC etc
+    If we create infra manually
+        1. Time consume
+        2. Mistakes
+        3. Tracking
+
+    But if you want to repeat these creating infra multiple times? you need to automate creating infrastructure
+
+    AWS introduced a Service called CloudFormation in 2011. Its a very cool service to automate infrastructure using JSON and YAML.
+
+    A person who is very passionate about IT Infrastructure got impressed on the CF and started exploring and wrote a blog
+
+    On the way of exploring this CF, this person got a basic doubt/question .
+
+    AWS has CloudFormation
+    Azure has Azure Resource Manager (ARM)
+    Google has Deployment Manager
+
+    But do we have any COMMON tool to automate infrastructure for all cloud providers? (Cloud agnostic). So he raised this question in his post in a site called tumblr , but no one answered. He waited for many days to get answer
+
+    And as no one answered , this guy came up with the tool called Terraform. His name is Mitchell Hashimoto, the creator of HashiCorp Terraform.
+
+    In July of 2014 , Terraform 0.1 got released
+
+Terraform
+---------
+    Terraform is an open-source Infrastructure as Code (IaC) tool developed by HashiCorp.
+
+    It allows users to define and provision infrastructure resources in a consistent, repeatable manner using a high-level configuration language known as HashiCorp Configuration Language (HCL)
+
+    It was a free and opensource too1 but now it is not opensource (check in google, opentofu is a forked version of terraform)
+
+    Year: 2014
+    Developed in: GO lang
+    Who: Mitchel Hashimoto
+    Owned: Hashicorp
+
+Alternatives
+-----------
+
+    PULUMI
+    ANSIBLE  --- is mainly used for configuration management, TF will create infra
+    CHEF
+    PUPPET
+    OpenTofu
+
+
+TF VS Ansible
+=============
+
+    TF will create infra and these servers will be orchestrated/configured by Ansible
+
+Terraform Structure
+-------------------
+
+    Mainly most of the people use 3 files in Terraform
+
+    main.tf:    contains all providers, resources and data sources
+    variables.tf: contains all defined variables
+    output.tf:    contains all output resources
+
+
+    The issue with this structure is that most logic is stored in the single main.tf file which therefore becomes pretty complex and long.
+
+    Terraform, however, does not mandate this structure, it only requires a directory of Terraform files.
+    Filenames do not matter to Terraform . To make it simple we prefer the following structure
+
+
+projectname/
+    |
+    |-- provider.tf  - Plugin to connect to Cloud , search in google, TF providers --> AWS --> Use provider
+    |-- version.tf - Sets required Terraform and provider versions.
+    |-- backend.tf - this file is used to configure the backend, which determines how and where Terraform stores its state data.
+    |-- main.tf  - Contains the core resource definitions
+    |-- variables.tf - Declares input variables.​
+    |-- terraform.tfvars - Assigns values to variables
+    |-- outputs.tf - Output of the resources that main.tf created.
+
+
+provider.tf: contains the terraform block and provider block (AWS, Azure etc)
+data.tf: contains all data sources
+variables.tf: contains all defined variables
+locals.tf: contains all local variables
+output.tf: contains all output resources
+
+
+
+Installing Terraform on Amazon Linux 2
+======================================
+
+Launch Amazon  Linux 2 instance and attach a role with admin permissions
+
+        sudo yum update -y
+        sudo yum install -y yum-utils
+        sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+        sudo yum install -y terraform
+        terraform version
+
+
+Installing Terraform on Ubuntu
+==============================
+
+        apt update -y
+        apt install awscli -y
+        wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+        sudo apt update && sudo apt install terraform
+        terraform -v
+
+-- mkdir terraform
+
+-- cd terraform
+
+
+---------- #####Terraform Commands ### --------
+
+terraform –version    Shows terraform version installed
+
+### Initialize infrastructure ###   ( I P A D)
+
+terraform init                    :Initialize a working directory, it will download the providers plugins
+terraform plan                    :Creates an execution plan (dry run)
+terraform apply                    :Executes changes to the actual environment
+terraform apply –auto-approve    :Apply changes without being prompted to enter ”yes”
+terraform destroy –auto-approve :Destroy/cleanup without being prompted to enter ”yes”
+
+
+All tf code should be written in tf files, extension is .tf , also called as configuration files
+
+Main things in TF file
+---------------------
+Blocks
+Labels
+argument
+
+
+A tf file has blocks, for ex: provider is a block, "aws" is a label, for single block we can have multiple labels 0, or 1 or 2 etc, optional
+
+what ever we write in {} is called arguments, arguments can called as input for the block, argument need to have key and value
+
+For provider we have one label aws, but for resource block has 2 labels, it can be multiple labels
+_ is called identifier, if you want to combine 2 words use _
+
+we cannot use aws instance (space between) so use aws_instance , instance_type
+
+First TF Example:
+----------------
+
+vi main.tf
+
+provider "aws" {
+region = "ap-south-1"
+}
+
+provider is block
+aws is label
+{} inside is arguments
+
+-- terraform fmt    [used to format your configuration files into a canonical format and style]
+
+terraform fmt -recursive  -- for all files
+
+-- terraform init
+
+Whenever you have a new or existing Terraform directory (containing your Terraform configuration files), you need to run terraform init to prepare that directory for other Terraform commands.
+
+Provider Plugins: Terraform uses plugins to interface with cloud providers (like AWS, Azure, Google Cloud, etc.). The init command checks the configuration files to see which providers you're using and fetches the required provider plugins.
+
+Provider Versions: If you’ve specified a particular version of a provider in your configuration, terraform init will download that version. If not, it'll get the latest compatible version.
+
+
+-- ls -al
+ 
+-- cd    .terraform  ---> Navigate and see aws plugin with version
+
+-- cd
+
+
+vi main.tf
+
+provider "aws" {
+region = "ap-south-1"
+}
+
+resource "aws_instance" "myinstance" {
+ami = "ami-02ddb77f8f93ca4ca"
+instance_type = "t2.micro"
+}
+
+No need to do again terraform init, because provider already downloaded and we didn't changed in that block
+
+-- terraform validate
+-- terraform plan    ------ attach a IAM role to EC2
+-- terraform apply
+-- terraform apply --auto-approve
+
++    : Creating
+-    : Deleting
+~    : Update
+
+I - Init
+P - Plan
+A - Apply
+D - Destroy
+
+
+.terraform contains lots of information (providers plugins will be stored in this directory)
+
+-- cd .terraform
+
+STATE FILE
+==========
+
+###### What is state and why is it important in Terraform? #########
+
+“Terraform must store state about your managed infrastructure and configuration. This state is used by Terraform to map real world resources to your configuration, keep track of metadata, and to improve performance for large infrastructures. This state file is extremely important; it maps various resource metadata to actual resource IDs so that Terraform knows what it is managing. This file must be saved and distributed to anyone who might run Terraform.”
+
+Local State and Remote State:
+---------------------------
+
+“By default, Terraform stores state locally in a file named terraform.tfstate. When working with Terraform in a team, use of a local file makes Terraform usage complicated because each user must make sure they always have the latest state data before running Terraform and make sure that nobody else runs Terraform at the same time.”
+
+“With remote state, Terraform writes the state data to a remote data store, which can then be shared between all members of a team.” Ex : S3
+
+-- cat terraform.tfstate
+
+-- terraform state list
+     Terraform command used to list all the resources that are currently being tracked in the Terraform state file
+
+-- terraform destroy --auto-approve
+
+.terraform.lock.hcl
+===================
+
+When you run terraform init, Terraform downloads the required providers and dependencies and generates the .terraform.lock.hcl file if it doesn't already exist. If the file does exist, Terraform checks the versions specified in the lock file and installs those versions.
+
+The .terraform.lock.hcl file is a lock file used by Terraform to manage the dependencies of your Terraform project. It ensures that the same versions of provider plugins and modules are used every time you run Terraform, making your infrastructure deployments more predictable and consistent.
+
+Purpose: Dependency Management, Consistency and Security
+
+.terraform.lock.hcl
+
+
+Current State vs Desired State
+=============================
+
+The current state represents the actual state of your infrastructure resources as they exist in the real world (e.g., in your cloud provider). Terraform tracks the current state of your infrastructure in a state file (terraform.tfstate).
+
+The desired state is what you define in your Terraform configuration files. It represents the infrastructure that you want Terraform to create, update, or destroy.You define the desired state using HashiCorp Configuration Language (HCL) in .tf files
+
+Example: Launching 5 EC2 instances using - COUNT Argument
+=========================================================
+
+provider "aws" {
+region = "ap-south-1"
+}
+
+resource "aws_instance" "myinstance" {
+count = 5
+ami = "ami-0492447090ced6eb5"
+instance_type = "t2.micro"
+}
+
+terraform apply --auto-approve
+
+terraform state list
+
+==============================================
+TARGET =  is used to delete a specific resource
+==============================================
+Single Target:
+-------------
+
+-- terraform destroy --auto-approve -target=aws_instance.myinstance[0]
+
+Multi Target:
+------------
+
+-- terraform destroy --auto-approve -target=aws_instance.one[1] -target=aws_instance.one[2]
+
+terraform state list
+
+terraform destroy --auto-approve
