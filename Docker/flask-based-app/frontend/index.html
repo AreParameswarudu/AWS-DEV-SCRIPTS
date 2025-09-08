@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><title>Frontend</title></head>
+<body>
+  <h1 id="msg">Loading...</h1>
+  <script>
+    fetch('/api')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('msg').innerText = data.message;
+      });
+  </script>
+</body>
+</html>

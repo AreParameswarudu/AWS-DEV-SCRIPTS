@@ -1,0 +1,11 @@
+1. VPC peering.
+    How to do it practically.
+    Does it only needs configuring the SG or does it also needs additional setting changes like route tables.
+    What is the procedure 
+    Practical application.
+    mumbai region: 1 public 1 private, 
+    Ireland: 2 private instances.
+
+    objective:
+        1. ssh from mumbai-public (jump server) to mumbai-private (db server)
+        2. ssh from mumbai-private to Ireland-private using vpc peering.

@@ -1,0 +1,1720 @@
+what is the length of javelin exerciser .
+	Men's = 2.6 m and 800g 
+	Women's =2.2 m and 600g
+
+Do we call it as stick.
+	Javelin
+	Spear
+	Throwing spear
+
+What is the weight of  jawline throw for men, for women.
+	Men's == 800g
+	Women's == 600g
+
+How is the world champion present. what is the distance 
+ 	 Neeraj Chopra, 2023 world athletics in Budapest.
+
+
+
+
+File system hierarchy.
+
+/   ---> top level directories = root directory  = parent directory.
+
+/root,   	---> home for the root user
+/home,   	---> contains users.
+/boot,   	----> contains OS booting files.
+/var, 	----> contains the logs and variable data.
+/etc,   	---> contains all the configuration files.
+/bin 		---> contains the noraml user executable commands.
+/sbin		----> contains the super user/root user executable commands.
+/usr 		---> unix sharable resources, contain program files.
+/opt		---> is opional for usr, contain 3rd party program files.
+/proc		---> (=process) contain background running process.
+			cat /proc/cpuinfo   ---gives the cpu information.
+			cat /proc/meminfo  --gives memory info and swap(=virtual ram) info.
+
+/run/media ----> contain realtime data, running services, last boot info and media
+			it contain removable media.
+
+
+23 July 2025
+
+/dev 		---> contain device files. = processors, hard disk, pen drive, mouse, 
+/mnt		---> is an empty directory to create a mount point for any partition.
+
+/tmp		----> contain temporary files.
+/lib		----> contain library files, sharable objects.
+/sys		---> contain system related directories 
+/srv		----> contain service directories
+
+
+https://drive.google.com/file/d/1ChLtTjczdXxC8Nr3SDzZ23ajVrK2Cb-H/view
+link virtual box based Linux 
+
+ 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+users in the Linux 
+-------------------
+
+login as root user.
+
+1. check the etc/passwd file
+
+	> less /etc/passwd
+
+	res: f1 = username
+	     f2	 = password 	
+		 f3	 = userid
+		 f4	 = group id
+		 f5	 = comment
+		 f6	 = homedir
+		 f7	 = shell environment
+
+2. Create a user     ( user id starts form 1000) 
+	
+	> useradd u1
+	
+	u1 is the name
+
+	verify the user -->
+		1. use id command
+		     > id u1
+		     res: user id and group id will be returned.
+
+		2. Search in the  /etc/passwd file
+			> tail /etc/passwd
+			res: the user and details will be there in the file
+
+3. add user with specific id as desired.
+
+	> useradd u2 -u 2002 -c HR -d /home/dir2 -s /sbin/nologin
+
+		-u for adding user id
+		-c for comment
+		-d home dir for the user
+		-s shell env  
+			/sbin/nologin  refers to no login to the user. ( not recommended for normal users).
+
+4. change form root to user u1
+	
+	> su - u1
+
+5. modify the shell env of existing user
+	
+	> usermod -s /bin/bash u2
+
+	now try to login as u2 user
+
+6. modify the home dir for existing user.
+
+	> usermod -m -d /home/u2 u2
+
+ 	check for the modifications in the /etc/passwd file.
+
+7. Change/modify the use name.
+
+	> usermod -l   newname oldname
+
+	> usermod -l  user1  u1
+
+	try to change the home dir for the changed user.
+
+8. Assign password for users.
+
+	> passwd user1 
+	asks for password.
+	following instructions.
+
+If trying to login as any user,
+	from root user, then no need to provide password.
+	but if from any other user, then asks for password.
+
+9. Lock the existing user.  (from root user).
+
+	> usermod -L user1
+
+	how to check the user is locked or not.
+
+	> passwd -S u1 
+
+	-S --> statu of password
+
+10. Unlock the password.
+
+	> usermod -U user1
+
+	it uses SHA512 <---- algorithm to encrypt the passwords
+	NLB from AWS also uses same algo with different version. 
+		i.e. SHA   is the algo used.
+
+11. Delete a user.
+
+	> userdel  user1
+
+       it deletes the user but few related files are not deleted. ( like homedir of the user).
+
+	to delete all aspects of that user.
+	> userdel -r user1
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+User Password Age
+------------------
+
+in the /etc/shadow  --> contain local user password details.
+
+	Username: passwd : last-date: min-age: passwd-ex-wr: passwd-ex-date: acc-ex-date: blank
+
+	> chage -l user1
+	
+		gives the details of user password like last changed etc.
+
+	lets change the aging properties of the user1.
+	> chage user1  
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+file and dir permissions:
+-------------------------
+	chmod u+ rwx
+
+	u = user
+	g = group
+	o = others
+
+	+  = add
+	-  = add
+
+	
+	r = read
+	w = write
+	x = execute
+
+
+
+	practice:
+
+		1. using user, group, others followed by - or + followed by kind of permission.
+
+		2. Using octal values
+	
+			chmod 755 file1
+
+
+chown:	to change the ownership of the files and directories.
+------------------------------------------------------------
+
+	syntax =>  chown username filename 
+
+
+
+special permissions:
+--------------------
+	1. user
+
+		setuid / suid  --> chmod u+s filename 
+						or
+					  chmod 4755 filename
+
+		s / S represents the executable permission
+		and its octal value is 4  ( user special permissions )
+		only for executable file ( not for dir ).
+
+		if iam the owner of file and it has X permission they, only I can execute the file
+		but if the file has S permission , then anyone can execute that file.
+
+	
+	2. Group
+	
+		setgid / sgid --> chmod g+s dir-name
+						or
+					chmod 2775 dir-name 
+
+		for group the special permissions octal value is 2
+		this can be assigned to files or even dir
+
+
+	3. Other
+		
+		sticky --> chmod o+t dir-name
+						or
+				chmod 1757 dir-name
+
+		for others, the special permission octal value is 1.
+		this is only for directory (not for files)
+
+
+	Practice:
+	-------------
+		1. for users
+			Lets say the /sbin/fdisk ( an actual file or command) can be treated as script, 
+			only the root can be able to execute this file ( because /sbin --> for root executables )
+	
+			so with some random user, cannot execute the file.
+			for normal user to execute, we can use
+				1. with sudo command
+				2. we can add special permission ( S ) to the file 
+					by this every can execute the file.
+
+		2. Group
+			create a dir, 
+			create a group
+			create 2 users  and add that users to this group.
+
+			change the owner ship of the dir to this group.
+		
+			provide the write and S permissions to dir.
+		
+
+		3. Other
+			create a dir with rot user, then only root has rwx permissions 
+			and no user can create a file inside the dir.
+
+			i want everyone either owner ( root ), group , or even any other.
+			solution: chmod o+w dir
+	
+		 	with W permission, we can add files/dir and we can even delete them as well.
+		
+			I want that no one other than owner can able to delete the files.
+			solution: sticky permission.
+					chmod o+t dir
+			
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+Access control list
+--------------------
+
+practice:
+	
+	login as root user and create  a dir oppo
+
+	drwxrwxrwx . 2 root root 6 aug 7 18:19 oppo
+
+	when we have . at the end of permission the it says the file/dir has no ACL. (which is default )
+	if it has + then it says file/dir has ACL
+
+	lets add few users and add then to a group 
+		say ram, raj, leka, latha users 
+		add them to NIT group ( group also need to be created.)
+
+	> getfcal oppo 
+		gives the details of owner, group owner, and respective permission.
+
+	give ACL ( rwx) permissions to raj ( user) , rwx permissions for group (NIT) and only r permissions to others.
+	add one user who should be not in any group. (user - kali)
+
+	> setfacl -m u;raj:rwx,g:NIT:rwx,o::r -- oppo
+
+	if we see permissions of oppo then . will be replaced with + ( --> means ACL )
+	add files to oppo dir with user ( raj) , group members, and with other user ( user --> kali )
+
+	raj can 
+	group members can
+	other user ( kali ) cannot 
+
+
+
+Default ACL
+-----------
+	By default if we create any file or dir, they wont contain ACL permission.
+	
+	But if we want ACL permissions by default when created, then we can use default ACLs
+
+	
+	> setacl -m d:u:pradnya:rwx oppo  ---> This has to be executed by root
+
+	-m = modify
+	d = default
+	u:pradnya = user named as pradnya
+	
+	
+	context:
+		pradnya dont have permission on oppo
+		but with that command, we are giving permission to oppo but, the user cannot work on/in oppo
+		but if some dir are there inside the oppo and if we can go inside the dir that is in oppo by any user 
+		and then switched to pradyna, then she can work on/in this dir
+
+		oppo				---> on oppo pradnya wont have permission
+		  |__ dir1			---> but have permission on this level and levels inside this dir
+			   |__dir1.1
+		   |__dir2 
+	
+
+To remove ACL permission :
+--------------------------
+	> getfacl -x u:aravind oppo     ---> for user
+
+
+	> getfacl -x g:NIT oppo	     ---> for group (NIT).
+
+	> setfacl -b oppo			     ----> to remove acl permission to all, and make it not ACL.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+How to manage services and deamons
+-----------------------------------
+	
+	systemd  ---> the very first and only service that are going to run when started machine.
+			     it starts the all service, along with 
+
+			    systemctl is going to maintain or like point of contact for systemd.
+				simple like manager who manages the activities of works of systemd.
+
+
+
+
+
+
+
+which os using :   cat /etc/os-release
+
+        
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+packages:
+----------
+	Amazon Linux 2023 :
+		yum = yellow dog update and modified
+		dnf = 
+	
+	Redhat: ( uses/works with yum)
+		rpm = red hat package manager.
+
+		install tree 
+		-------------
+		rpm -ivh tree
+			i = installation, v = verbose, h = hash tags ( for download status )
+			i is mandatory,  v & h are optional
+
+		verify the installation and more
+		-------------------------------------------
+			rpm -q tree   ---> returns version
+			rpm -qi tree	---> returns the complete details of the tree.
+		***	rpm -qc nginx	---> query config file.
+			rpm -Uvh vsftpd ---> update the package.
+
+		uninstall or delete:
+		--------------------------
+			rpm -e tree	--> e = erase.
+
+
+
+	Difference between rpm and yum
+	-----------------------------------------------
+		yum require repositories (small database)  to install packages into system
+			by default, AL 2023 have pre defined or installed repositories in it.
+		but rpm does not require.
+
+		rpm, we are unable to install dependencies automatically.
+		with yum, we can, automatically.
+
+	Difference between packages and dependencies
+	------------------------------------------------------------------
+		some services or packages depends on some others, like .net needs java or etc
+		so they are dependencies that are necessary for packages.
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+ 
+In AL223, 
+	To check the repos that yum has by default or so far installed.
+	> sudo yum repo list
+
+	The package  from the repo. ( both installed and available ).
+	> yum list all
+	
+	All web server related packages  ( similarly for another kinds of packages).
+	> yum search all "web server"
+
+	Install a package
+	> yum install httpd -y
+
+	Uninstall/remove a package
+	> yum remove httpd -y
+
+
+
+	List the different group of packages
+	> sudo yum group list
+
+	install package groups.
+	> yum group install  "Development group"
+	
+
+	uninstall 
+	> yum group remove group-name
+
+
+
+	yum history
+	-----------------
+	> yum history
+		to get the history of yum based/related commands
+
+	
+	> yum history undo 3
+		it will undo the work done which is recorded as 3.
+
+
+--------------------------------------------------------------------------------------------------------
+
+Disk management
+---------------
+	
+If we take a raw disk, 
+	1. format 
+		by FAT and NTFS
+	
+	2. Partition
+		how many can we do 
+			primarily 3 types
+			1. MBR	--> max of 4 with 3 primary and 1 extended
+						Primary   ---> where we reside our primary
+							like C:/> 100G    -P
+								D:/> 200G   - P
+								E:/> 200G    -P
+						Extended, ---> with this we can create 15 logical drives.
+							like F:/> 500G - E
+							for extended we cannot directly store data, for that we need to create logical drives
+							like  G:/> 200G - L           ---> L = Logical drive.
+
+						( While A and B are for floppy )
+
+			2. GPT 
+                              No primary or extended, 
+				we have GPT Head, GPT Tail
+				In between these two , we can create 128 partitions 
+				
+
+
+Practically adding volumes or disk to Linux.
+----------------------------------------------------------
+
+	> u limit -a  		--> to get the limits of files , sizes , etc.
+
+
+
+		1024 mg = 1 GB
+		1024 gb  = 1 TB
+		1024 tb  = 1 PB  
+		1024 PB = 1 EB  --> Exa bytes
+		1024 EB = 1 ZB
+		1024 ZB = 1 BB
+
+
+	> fdisk -l    		--> to get info of hard disks.
+	
+	Hard disk types:
+	-----------------------
+		HDD  ---> 1. ATA 	advance technology attachment --->1.1 PATA  or IDE
+														  	  1.2 SATA
+				   2. SCSI	costly and faster ( used in servers mainly)
+				   3. SSD
+
+
+	> parted -l 		--> info of the partitions
+	
+	Partitions:
+	---------------
+		1. /dev/hda   --> PATA or IDE
+		2. /dev/sda   ---> SATA or SCSI
+		3. /dev/xvda   ---> Virtual HDD       	<----- found in EBS volumes.
+
+
+
+	Login as root user,
+		
+		> fdisk -l         -----> disk details along with partitions as well.
+
+
+
+		1. Create a new partitions     ( /dev/sda3 ) 
+
+		2.  Update the changes of partitions 
+
+		3. Use the newly created partitions
+	
+			need to create file system for that partition.
+			
+			> mkfs -t xfs /dev/sda3                      ---> assign xfs file system to /dev/sda3 partition.
+
+			> blkid /dev/sda3                        ---> gives the UUID unique ID and also file system type.
+
+		4. Store data in to the partition 
+			we need to mount first to use the partition.
+
+			 /mnt -------> drive letter or mount point
+
+			> mount  /dev/sda3  /mnt 
+				( unmount ---> umount /dev/sda3 )
+	
+			so we are going to save the files or dir into the /mnt as it is mounted to /dev/sda3
+			
+			> df  -Th                 ----> to know the mount point and other details.
+
+			now go to the /mnt and create files or dir into it.
+
+			> cd /mnt 
+			> mkdir file1
+
+			If we reboot the system, we are going to loos the mount point for the partition but not the data stored.
+			so how to create a mount point that is resilient and persistent!!!!!!!!
+			and where is the data saved !!!!
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+	Permanent mount point for a partition created.
+	-----------------------------------------------
+		It is done with configuration file.
+	
+		> vim /etc/fstab   --> file system tab
+
+			at the very end of file, we can find mount points, 
+			
+			partition-name      mount path       filesystem type 	permissions     0 	0
+				1					2				3						4		5	6
+
+
+			5 = dump ( 1 = enable, 0 = disable )
+			6 = check sequence ( 1 = enable, 0 = disable , 2 = check later ) ( recommended 0 or 1)
+
+		> mount -a 	--> for saving the changes.
+
+
+
+	Procedure to unmount and delete the partition.
+	------------------------------------------------
+		1. remove the mount path  in the fstab
+
+		2. > umount /sda/dev3
+
+		3. Delete the partition
+		
+			> fdisk /dev/sda
+
+		
+SWAP  = virtual memory
+--------------------------------------
+	!!!!!
+
+
+
+LBM: Logical volume Management.
+------------------------------
+
+	To increase the partition size and reduce the partition sixe.
+	
+
+	Take 2 hardisks each od 1 TB, 
+	create 1 volume group and link those 2 Hard disks
+	and now create LVM that uses the storage size of VG ( 2TB ), 
+	With this LVM, we can increase and decrease the size of partitions.
+
+	Treat these LVMs as partitions.
+		
+
+	Event the root or /, swap, /home are also the LVM.
+	so as to increase the sizes if needed at any condition.
+	> lsblk
+
+		Result:
+		sda1  ----> /boot
+		sda2  ----> rhel -root   =  /
+					rhel - swap = swap
+					rhel - home = /home
+
+	For exercies, treat partitions as hard disks and use them to to create LVMs
+	1. create 3 more partitions
+		/dev/sda3 - 2G - P
+		/dev/sda4 - 8G - E extended
+		/dev/sda5 - 4G   L 
+
+		if using AWS, then go for EBS volumes in place of partitions from above.
+	
+	2. Convert them into PV = Physical volume
+	   use that to create Volume Group ( VG ) 
+
+	   /dev/sda3 - 2G ------> PV  -----> VG ---> create LVM (400 MB)
+
+
+
+
+
+--------------------------------------------------------------------------------------------------
+
+👍practical on LVM
+----------------
+
+	1. create 3 pastions sda3,4,5
+
+		> fdisk /dev/sda
+
+			for last section --> +2G     for 2 GB size
+
+			change the partition to Linux to Linux LVM
+
+			> t
+			> 8
+
+			> e 
+
+
+		similar for sda4,5
+
+	2.  creates them into PV ( hysical volumes)
+
+
+		> pvcreate /dev/sda3    ----> to convert lvm partition to physical volume
+
+		> pvs					---> check the status of physical volumes.
+
+		> pvdisplay /dev/sda3    ---> to get complete details of the physical volume.
+
+	3. Create volume group from PV
+
+		> vgcreate my_vg  /dev/sda3  ----> creating a VG  (volume group)
+
+		> vgs 						---> volume group status ( lists all the VGs present)
+
+		> vgdisplay my_vg       ---> details of the vg that we have created.
+
+	4. Create LVM 
+
+		> lvcreate -L 400M -n my_lv  my_vg
+
+				-l = Length or size
+				-n = name
+				my_vg is the vg from which we want to create LVM.
+
+		> lvs                ---> list, display, details of LVM
+
+		> lvdisplay 
+
+
+		so as now we created LVM, we should use this to store data not the partition.
+
+
+	5. Now format the /dev/my_vg/my_lv
+
+		> mkfs -t ext4 /dev/my_vg/my_lv
+
+
+	6. store the data ( for that we need lount point)
+
+		Temperary mount point
+		---------------------
+
+			> mkdir /home/ec2-user/dir1      --> creatig a dir for mounting the LVM
+
+			> mount /dev/my_vg/my_lv /home/ec2-user/dir1
+
+			With this LVM mounted to the dir, we can chnage/alter the size as wanted.
+
+			create few files and reboot or restart the system.
+			The mount point will be lost but not the data
+
+		Permanent mount point:
+		----------------------
+			It is done with configuration file.
+	
+			> vim /etc/fstab   --> file system tab
+
+				at the very end of file, we can find mount points, 
+			
+				partition-name      mount path       filesystem type 	permissions     0 	0
+					1					2				3					4			5	6
+
+
+					5 = dump ( 1 = enable, 0 = disable )
+					6 = check sequence ( 1 = enable, 0 = disable , 2 = check later ) ( recommended 0 or 1)
+
+			> mount -a 	--> for saving the changes.
+
+	Q: What it the use of LVM !!
+	A: We can increase or decrese the size of the LVM without loosing data.
+
+
+	Increase the size of LVM
+	------------------------
+		login as root user, 
+
+		> lvextend	-L +200M  /dev/my_vg/my_lv
+
+		we have resized the LVM ( added 200M for already present as 400MB)  --> present size is 600MB
+
+		> resize2fs /dev/my_vg/my_lv
+
+			this will saves the changes we did earlier ( adding size.)
+
+	Reduce the sixe of LVM
+	----------------------
+		Make sure that the amount of size you are going to reduces is available as free ( without data.)
+
+		1. First unmount the LVM
+
+			> umount /dev/my_vg/my_lv
+
+		2. orginise the data into LVM
+
+			> e2fsck -f /dev/my_vg/my_lv
+
+		3. resize 
+
+			> resize2fs /dev/my_vg/my_lv 400MB		---> to resize to 400MB
+		
+		4. Remove the remaining 200MB
+
+			> lvreduce -L -200MB /dev/my_vg/my_lv
+
+			asks for conformation. --> yes
+
+		5. mount again
+
+			> mount -a 
+
+
+		6. verify the size or files
+			> ls -l 
+
+	
+	The limit of the LVM depends of the VG that used to creathe LVM.
+
+
+	Increase the size of the VG
+	---------------------------
+		we have other partitions ( dev/sda5 ) right, then use them to create new PV 
+		Add this new PV to the VG
+
+		VG size will increaese.
+
+
+		Practically we no need to create PV and make or add it to VG
+		we can directly add partition to VG.
+
+		> vbextend my_vg  /dev/sda5
+
+	Reduce the VG  size ( from 6 to 4 gb)
+	-------------------------------------
+		we cannot the remove directly, it wont allow
+			we can try but it wont allow ---> >vgreduce my_vg /dev/sda3 
+			it says that the /dev/sda3 is still in use.
+
+		we need to transfer data and LVM form sda3 to sda5
+
+		> pvmove /dev/sda3 /dev/sda5
+
+	NOTE: we are not able to increase the size of /dev/sda3, /dev/sda5
+
+		now /sda3 is free.
+
+		> vgreduce my_vg /dev/sda3
+
+		
+	How to delete, 
+
+		1. unmount
+
+			>umount /dev/my_vg/my_lv
+
+			> vim /etc/fstab
+
+		    > mount -A
+
+		2. delete LV
+			> lvremove /dev/my_vg/my_lv
+
+		3. delete the VG
+
+			> vgremove my_vg
+
+			> vgdisplay   --> to verufy
+
+		4. remove the pv
+
+			> pvremove /dev/sda3 /dev/sda5
+
+Q: Create VG called REDHAT, create 16 PE, create 15 LE, assign ext4 file system and mount that to /test dir.
+
+A: Size of the Logical Volume  = PE * LE = 16 * 15 
+										  = 240MB
+
+	so create a partition with size >= 240MB
+
+	for the entire answer, follow the procedure as above.
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+NETWORK             
+
+
+Route = Enables communication between 2 logical networks.
+
+
+How does a router decides what is the best path ( less efforts) path to transfer data or to connect.!!
+It uses 
+	1. RIP 	 - 					( outdated)
+	2. Eigrp  - Enhanced Interior gateway routing protocol
+	3. Ospf  - Oprn Shortest Path First.
+
+	We should configure only one of them not all at a time.
+
+
+	RIP:
+		works on count of hops ( least routes count).
+		It wont support more than 99 routers
+
+	Eigrp:
+		decides on the bandwidth ( more bandwidth path )
+
+	OSPF:
+		successor of RIP
+		
+
+
+Routed protocols:
+-----------------
+	The means of router route the traffic/data to devices.
+
+	IP
+	IPx - IBM
+	Apple talk - for Apple
+
+
+IPs - Internet protocol
+-----------------------
+	An unique id that is assigned to devices.
+
+	Flow of authority of IP addresses: 	ICANN Internet Corporation for Assigned Names and Numbers.
+										IANA - Internet Assigned Numbers Authority
+										RIP	
+										ISP
+										Customers or Small ISPs
+										Host
+
+	IPv4 = 32 bits  = 2**(32) = 4,294,967,296  = more than 4 billion combinations.
+	----
+
+	IPv6 = Why!!!
+	---- 	because, IPv4 is almost used upto max.
+		
+		 = 128 bit  = (2**(32))**4
+
+		 Why exactly only 128 bits!! 
+		 	More than 128 bits, our devices wont support.
+
+
+	NAT = Network Address Translation
+	---------------------------------
+		It enables communication between public and private IP addresses.
+
+		With 1 public static/elastic IP address, we can connect to 60,000 private IP addresses.
+		
+
+IPv4 :
+-----
+	All the 4 billion address are divided into 4 Octets.
+
+	10100011.10001101.11100101.11000011 ---> 2**(8) = 256 = 0 -255
+		1		2		3			4 
+
+	Each octet has 8 bits.
+
+
+	IP address Classification: done by using priority bits. = most significant bit of first octet 
+	------------------------
+			Class						Priority bit
+		Class A 0 - 127						0
+		Class B	128 - 191					10
+		Class C	192 - 223					110
+		Class D	224 - 239					1110
+		Class E	240 - 255					1111
+
+		A, B, C are reserved for LAN and WAN ( we maintain or manage.)
+		D,  for multicast
+		E is for Research and Deveopment (RnD)
+
+
+		subnet mask:
+		------------
+			Is like a compound wall to avoid communication between different classes.
+
+			N = Network, H = host
+			All network bits (octets) become 1 and all hosts bits (octets) become 0
+
+			CLASS A : N . H . H . H =  11111111 . 00000000 . 00000000 . 00000000 = 255.0.0.0
+			CLASS B : N . N . H . H =  11111111 . 11111111 . 00000000 . 00000000 = 255.255.0.0
+			CLASS C : N . N . N . H =  11111111 . 11111111 . 11111111 . 00000000 = 255.255.255.0
+
+			For private IP ranges:
+				CLASS A = 10.0.0.0    - 10.255.255.255
+				CLASS B = 172.16.0.0  - 172.31.255.255
+				CLASS C = 192.168.0.0 - 192.168.255.255
+
+			Apart form this every IP is for public IP.
+
+
+---------------------------------------------------------------------
+
+19 AUG 2025
+-----------
+	> ifconfig  ----> to get the private ip of the instance.
+
+
+	Q: WHich IP class is preferrable to deploy!!!
+	A: Class c
+
+	
+	CLass A  = N H H H  = N = 8 bits, H = 24 bits
+	-------
+		N = 8
+		H = 24
+		Priority bit = P = 0 = 1 bit
+
+		No of networks  = 2**(N-P) - 2   for class A ---> -2 for excluding 0.0.0.0 and 127.0.0.0
+						= 2**(8-1) - 2
+						= 2**(7) -2
+						= 126 networks.
+
+		No. of hosts  = 2**(H) -2    ---> -2 is for network id and broadcast id
+					  = 2**(24) - 2
+					  = 16,777,214 hosts per network.
+
+					  So, choose class A only if there are hundereds and thousands hosts per network.
+
+			Network ID = If all the Host bits are zero then it says its is network ID
+						ex: 10.0.0.0
+			Broadclast ID = If all the host bits become 1 
+					ex: 10.255.255.255
+
+
+		127.0.0.1 --> loop back ip address.
+		if you ping and recieve from 127.0.0.1 then our NIC card is working and fine.
+		if not then it says we have problem.
+
+
+
+	CLASS B 
+	-------
+		N = 16
+		H = 16
+		P = 10  = 2 bits
+
+		No. of networks = 2**(N-P)
+						 = 2**(16-2)
+						  = 2**(14)
+						  = 16,384
+
+		No. of hosts  = 65,534 hosts per networks
+
+		not choosen 
+
+	
+	Class C 
+	-------
+	N = 24
+	H = 8
+	P = 110 = 3 bits
+
+	No. of hosts  = 2**(N-P)
+	              = 2**(21)
+				   = 2,097,152 networks
+
+	No. of hosts = 2**(H)  -2
+				 = 2**(8)  - 2
+				  = 254 hosts per network
+
+	Class C is more no. of networks with less no. of hosts per networks
+
+	So, Class C is classic to choose.
+
+
+
+
+Subnetting
+----------
+
+	Slicing the network into segments, these segments are called subnets.
+
+	2 types in subnets:
+			1. FLSM Fixed length subnet mask.
+			2. VLSM Variable length subnet mask.
+
+	
+	FLSM:
+	----
+		Lets say HCL came to us for netrok work.
+		It have 2 branches , IT (100) and BPO (100)
+
+		With this count, Class C is good to choose for networking.
+
+
+		CLASS C = 192.168.1.0 - 192.168.1.255
+		and these 2 extremes are not used for network or hosts.
+
+
+		CIDR = class less domain router = no. of network bits
+
+		subnets = converting host bits into network bits.
+
+
+		!!!!!!!
+
+		192.168.1.0 -- 192.168.1.127  for IT
+		192.168.1.128 -- 192.168.1.255 for BPO
+
+		192.168.1.0/25
+
+
+	VLSM
+	----
+		now requirement => 20 HR, 50 ACC, 100 IT
+
+
+CIDR = class less domain router = no. of network bits
+-----------------------------------------------------
+
+	For class A ---> CIDR = 8
+		class B ---> CIDR = 16
+		class C ---> CIDR = 24
+
+FOR AWS:
+-------
+
+	for VPC  - always use /16 as cidr
+	-------
+		Class A = CIDR - /16 = 65,536-5 = 65,531 
+		Class B = CIDR - /16 = 65,536-5 = 65,531 
+		CLass C = CIDR - /16 = 65,536-5 = 65,531 
+
+	-5 represent, 
+		1. Network			--> x.0.0.0
+		3. Default routing  --> x.0.0.1
+		4. DNS purpose      --> x.0.0.2
+		5. Future purposer	--> x.0.0.3
+		2. broad cast 		--> x.255.255.255
+
+	for subnets  - cidr ranges from 24 to 28
+	-----------
+		cidr - /24 --> 256 -5 = 251       if near to 200 hosts  this is the max
+		cidr - /25 --> 128 -5 = 123 	  upto 123 instances
+		cidr - /26 --> 64-5 = 59			upto 59 machines
+		cidr - /27 --> 32 -5 = 27 			upto 27 instances
+		cidr - /28 --> 16 - 5 = 11 								this is the min
+		
+
+--------------------------------------------------------------------------------------------------------------
+
+	NIC card  - > ifconfig 
+					for ec2 --> enX0:
+
+
+	To check the machine is connected to internet!!
+		> ping 8.8.8.8    --> primary global dns/server ip address which is maintaned by GOOGLE.
+
+			resonce:
+				64 bytes from 8.8.8.8: icmp_seq=1 ttl=117 time=2.63 ms
+
+				icmp = internet control messaging protocol ( ping uses icmp to respond or to reply)
+				TTL = Time to Live
+
+		> ping 8.8.4.4    --> secondary global dns ip address.
+
+			resonce:
+				64 bytes from 8.8.8.8: icmp_seq=1 ttl=117 time=2.63 ms
+
+				icmp = internet control messaging protocol ( ping uses icmp to respond or to reply)
+				TTL = Time to Live
+		
+		> ping -c4 8.8.8.8   --> to recieve only the 4 packets.
+
+	
+	What is the use of loop back ip address.!!
+
+		To know whether NIC card is working properly or not.
+
+		> ping 127.0.0.1 		mostly used
+			or 
+		> ping 127.0.0.2
+
+		if we get response then incoming and outgoing are working 
+		which says NIC cards is working normally
+
+
+	Tracepath 
+	---------
+		> tracepath www.google.com
+
+			to trace how many machines/hosts/networks/hops are there between you and google
+
+		> traceroute google.com
+
+			same purpose but with little diff responce.
+
+	
+	ping:
+	----
+		To check the communication between sourec ( you ) and destination.
+
+	ip route:
+	---------
+
+
+	ss:  socket status = to find the port no of particular server.
+	----
+
+		> ss  -tlunap
+
+			t = tcp sockets
+			l = listening sockets
+			u = udp sockets
+			n = names insted of number
+			a = all sockets
+			p = protocols
+
+		> netstat -tlunap    ---> for older versions of linux machines.
+
+	
+How we can/need to assign static ip address.!!!
+-----------------------------------------------
+
+	These are the way to do that:
+		1. nmtui = network manager text user interface
+
+		2. nmcli = network manager command line interface
+
+		3. network-scripts
+
+
+	nmtui:
+	------
+
+		its like gui but not exactly gui 
+		its TUI text user interface
+
+		not accessable with most linux machines.
+
+
+	How to set hostname !!!
+		1. With nmtui
+		2. with hostnamectl set-hostname example-server
+		3. vim /etc/hostname   --> edit the config file.
+
+
+	nucli:	network manager command line interface
+	------
+
+		> nmcli connection show
+		> nmcli conn show
+
+		res = NAME  		UUID 									TYPE 				device
+			eno16777736		dfreo-aih-swiejfb -siefnoin-wmfxib		802-3-ethernet	eno16777736
+
+			802-3 = 1980 feb 3rd  ---> introduced ethernet
+
+			802-11  = 1980 feb 11 ---> introduced wifi 
+
+-------------------------------------------------
+
+NMCLI - Network Manager Command line interface.
+
+	> nmcli connection show
+
+
+	> nmcli device status 
+
+	> nmcli device disconnect nic-card-number	
+		to disconnect the device form internet or ethernet.
+		> ifconfig ---> returns no IP for device
+
+	> nmcli device connect nic_card_number
+		to reconnect 
+
+
+	> nmcli device show nic_card_number
+		device, connect info
+	
+
+
+	To create new dynamic connection or profile (network profile)
+
+	> nmcli connection add con-name "default" type ethernet ifname eno16777736
+		con-name = name for the connection
+		type  = connection type 
+		ifname = interface name  = nic card number or id
+
+		
+		To activate profile.
+		> nmcli connection up default
+
+		we dont need to explicitly mention the ip for new profile, 
+		dhcp server will create or assign it.
+
+
+
+	To create a profile with static ip
+
+	> nmcli connection add con-name "static" type ethernet ifname eno16777736 ip4 10.0.0.11/8 gw4 10.0.0.1
+
+		verify -->  > nmcli connection show
+
+	Can we modify the ip address!! for the static profile we have created.
+	yes we can
+
+		> nmcli connection modify static ipv4.addresses '172.16.0.11/16 172.16.0.1'
+
+		to verify  > ip addr show eno16777736
+		it will show the old ip, we need to restart
+
+		> nmcli connection down static
+		> nmcli connection up static
+
+		it will be changed by now.
+
+
+	To disallow / disable the automatic ip address.
+	> nmcli connection modify static ip4.method manual
+
+		it some time creates issue even we mention a static ip, at that situatoin this command is very imprt.
+
+	
+	> nmcli connection modify static connection.automatic yes
+		for not to allow this network profile be auto connect after a boot or start.
+
+
+	Path for all the network profiles that were created and were default.
+		> cd /etc/sysconfig/network-scripts/
+		
+		use vi or cat commands to see the content.
+
+
+	To delete the network profile
+	> nmcli connection delete default       (Its the profile that we have created, not the actual default form machine.)
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+How to deploy networks between 2 machines.
+
+server1 								clietn 
+--------------------------------------------------------
+IP 192.168.1.11/24						192.168.1.12/24
+hostname = server.example.com			hostname = client.example.com
+# ping 192.168.1.12						#ping 192.168.1.11
+# cat/etc/hosts							# cat/etc/hosts			<---- alternate for dns server    
+
+Add the following into the /etc/hosts in botht the machines.
+192.168.1.11 server.example.com			192.168.1.11 server.example.com
+192.168.1.12 client.example.com			192.168.1.12 client.example.com
+
+
+DNS = it will map ip with a domain name 
+		it will resolve the ip to domain and domain to ip 
+
+
+
+SSH -  Secure Shell    --> (sshd is service)
+--------------------
+	Is a protocol that is used to securly connect to remote machines. It use authentication, and encryption.
+
+	for windows, we have rdp  - remote desktop protocol.
+	for linux, we have ssh, telnet
+
+	Telnet is older version, and it is not secure and data is transfered in plain text.
+
+
+
+	if want to install sshd  --> > yum install openshh -y 
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+	SSH - Secure Shell 
+	-------------------
+		TO perform ssh between two machines, we need connectivity.
+		To check the connectivity, use 
+			> ping private-ip-of-other-machine
+			if there is responce, then yes, we have connection.
+
+
+
+		
+	Create 2 user in the client machine.
+		u1 user, u2 user and add password as well.
+
+	Go to serve machine, access u1 user of client 
+		> ssh u1@client.example.com
+
+		asks for approval to add client details permanently to server as known host.
+
+		asks for u1 user password.
+
+		now fine, we are accessing the u1 user of client form server remotely.
+
+
+		exit --> to close the connection.
+
+		Q: where is the key ( know host key ) is created.
+		A: In the server machine.
+			> ls -la    ---> hidden files  .ssh
+			> cd .ssh
+			> ls -la    --> known_hosts
+			> vi known_hosts   --> details of hosts with encrypted key.
+
+
+	Password less authentication:
+	-----------------------------
+		Public and private key pair.
+
+		Go to server, in server machine
+
+		create a key pair 
+		> ssh-keygen
+			location - /home/user/.ssh/id_rsa 
+			dont give any pass or thing when asked while generating.
+
+		THe key will be generated at /home/user/.ssh/id_rsa
+		it is the pem key --> pem = privacy enhanced mail.
+
+		copy the id to u1 user of the client
+		> shh-copy-id -i /home/user/.ssh/id_rsa.pub u1@client.example.com
+
+
+		so this id_ras.pub key from server machine will be copied as authorised key in the client machine mainly in the u1 user account.
+
+
+
+		Q: Can we access the root user of the client form server machines!!
+		> ssh root@client.example.com  
+			it will ask for the root user password.
+
+			Even if you have access to root user, for switching to any other user, we need to have that particular user password.
+
+
+		To restrict the permission to login as root user, 
+			go to client machine, open ssh_config file and modify the permitRootLogin
+			> vi /etc/ssh/ssh_config
+			`permitRootLogin no`
+
+			save and quit
+
+			> systemctl restart sshd
+
+			by this we denied the root access for client machine.
+
+		😎But we can ssh to u1 suer and switch to root user with pass
+			but by this, logs will be noted and will be stored about the logins.
+
+		Go to client machine, 
+			> vi /etc/ssh/ssh_config
+
+			PasswrodAuthentication no
+			save and quit
+
+			> systemctl restart sshd
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+19
+how to find the size of any dir(/etc dir)!!
+	> du -h /etc
+
+How many types of backups 
+	1. Full backup 
+	2. Incremental backup	(EBS snapshorts follow this)
+	3. Differential backup
+
+Archive:
+--------
+	Create multiple files and even add data to them.
+
+	Create a tar file
+
+	> tar cvf destination-file-name.tar sources-file-names
+
+		for source file name, we can give multiple file names and even directories
+
+	 	c = creating Archive       - mandatory
+		v = varbose ( print meaage) - mandatory
+		f = file name				- mandatory
+
+
+	1. > tar cvf my-file.tar file1 file2 file3 file4
+		> ls
+
+		without untar, how can we see what are the files in a .tar file
+			> tar tf my-file.tar
+
+				t = list		
+				f = file
+
+	
+		How to archive the directory!!!
+		Lets use /etc dir
+			> tar cvf etc.tar /etc
+
+			lets find the size of the etc.tar file
+			> du -h etc.tar
+
+	2. TO further compress the size of the tar fiel, use zip with archive.
+		> tar czf etc.tar.gz /etc 
+
+			find the size.
+			> du -h etc.tar.gz
+		
+
+	3. > tar cjf etc.tar.bz2 /etc
+
+			j = bz2 (bzip version 2) compression
+
+	4. > tar cJf etc.tar.xz /etc
+
+			J = xz
+
+
+	SCP
+	---
+	--> How to transfer the files betwen machines through a network.!!!!
+		SCP = secure copy
+
+		> scp sourcefile source-ip/dns-name:destination
+
+		> scp etc.tar.gz 192.168.1.11:/root/backup
+
+			192.168.1.11 is the ip of the destination machine, and these 2 machiens are connected through network
+
+
+	rsync
+	-----
+	--> rsync = remote sync 
+		It is having incremental backups.	
+
+		> rsync -av etc.tar.xz 195.168.1.11:/root/backup
+	
+	sftp
+	----
+	--> sftp = secure file transfer protocol
+		> sftp 
+
+
+	
+	How to extract the tar files.
+	-----------------------------
+		> tar xzf etc.tar.gz
+
+			x = extracting 
+			v = verbose
+			f = file name
+
+		> tar xjf etc.tar.bz2
+
+			j = bz2
+
+		
+		> tar xJf etc.tar.xz
+
+			J = xz
+
+		
+	Algorithm behind the compression and decompression
+	---------------------------------------------------
+		Huffman Encoding  (Algorithm)
+			72 to 14 bits ---> compression
+			14 to 72 bits ---> decompression 
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+26 AUG 2025
+-----------
+
+Be a Warrior, Contineous working, Upskill in anyway possible, time is the differentiator.
+Be confident
+
+
+Scripting
+---------
+	1. For loop
+	   -------
+
+	   Writing a script to create multiple users
+	   ------------------------------------------------------
+	   	Create a file, called users.text
+	   	This file is called unisg a script file called users.sh 
+
+			users.sh	
+				#!/bin/bash
+
+				for i in `more users.txt`	# this is a unix command so it need to be placed in ``
+				do 
+				echo " "
+				echo $i 
+				useradd $i 
+				echo $i"1234" | passwd --stdin $i 
+				echo "-------------------------"
+				done
+
+
+			command:
+				echo "redhat" | passwd --stdin u1
+
+			chmod +x user.sh
+			sh user.sh
+		
+
+	   Data-base backup-script
+	   ----------------------
+	   	3.1 Install required packages.
+
+			> yum install mariadb* -y 
+		
+		3.2 Edit the configuration files
+			nothing to do much for now
+
+		3.3 Start and enable services, firewalls
+			> systemctl start mariadb
+			> systemctl enable mariadb.service
+
+		3.4 Configure the data base and login as root user
+			> mysql_secure_installation 
+
+				It will ask for the password for database. give none
+				It will ask for root user password, give anything.
+
+				remove anonymous users --> use = y 
+				remove root login remotely --> yes = y
+				remove tset database and access to it --> yes = y 
+
+				reload privilege tables --> yes = yellow
+		
+			Login to database server.
+			> mysql -u root -p 
+			provide pass
+
+			> show databases;
+			> exit # to back to linux user.
+
+		
+		Script:
+		-------
+			#!/bin/bash
+
+			DBUSER=root
+			FMTOPTIONS='--skip-column-names -E'
+			COMMAND='SHOW DATABASES'
+			BACKUPDIR=/dbbackup
+
+			for DBNAME in $(mysql $FMTOPTIONS -u $DBUSER -p -e "$COMMAND" | grep -v ^* | grep -v 
+			^information_schema | grep -v ^performance_schema); do
+														# we are filtering the db results 
+
+			echo "Backing up \"$DBNAME\""
+
+			mysql dump -u $DBUSER $DBNAME > $BACKUPDIR/$DBNAME.dump
+
+			done
+
+			# for presentation purpose of data transforward in size.
+			for .................
+			done
+
+			# for presentation purpose of data transforward in percentage.
+			for ......................
+			done
+			 
+	2. While loop
+
+
+
+
+
+
+	4. if, if else, elif statements
+	   -----------------------------------
+		4.1. if..then..fi statement (Simple If)
+		--------------------------------------------------
+			#!/bin/bash
+			count=100
+			if [ $count -eq 100 ]
+			then
+				echo "Count is 100"
+			fi
+
+		4.2. if..then..else..fi statement (If-Else)
+		-----------------------------------------------------
+			#!/bin/bash
+			count=99
+			if [ $count -eq 100 ]
+			then
+				echo "Count is 100"
+			else
+				echo "Count is not 100"
+			fi
+
+		4.3. if..elif..else..fi statement (Else If ladder)
+		--------------------------------------------------------------
+			#!/bin/bash
+			count=99
+			if [ $count -eq 100 ]
+			then
+				echo "Count is 100"
+			elif [ $count -gt 100 ]
+			then
+				echo "Count is greater than 100"
+			else
+				echo "Count is less than 100"
+			fi
+
+		4.4. if..then..else..if..then..fi..fi..(Nested if)
+		----------------------------------------------------------
+			#!/bin/bash
+			count=99
+			if [ $count -eq 100 ]
+			then
+				echo "Count is 100"
+			else
+				if [ $count -gt 100 ]
+				then
+					echo "Count is greater than 100"
+				else
+					echo "Count is less than 100"
+				fi
+			fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		

@@ -62,3 +62,60 @@ CMD ["python", "/app/app.py"]
 
  <img width="579" height="119" alt="image" src="https://github.com/user-attachments/assets/3b78b79b-5bf1-4a3e-8bf5-483ef9ca3e02" />  
 
+
+
+2. What happens if you use `CMD ["python", "app.py"]` in you docker file!!
+
+Lets say that we ahve a docker file that uses a python docker image ( or ubuntu and you installed ptyhon in it),  
+and you defined a python script to be run. 
+
+The responce/working of the `CMD ["python", "app.py"]` will actually depends.  
+    A. If the docker file(more specifically in the python script) says that the script runs and be exposed to some port number then it will still be in running state untill stoped explicitly.  
+    Example:
+    ```
+    #Dockerfile
+    FROM python:3.9
+    WORKDIR /app
+    COPY requirements.txt .
+    RUN pip install -r requirements.txt
+    COPY . .
+    EXPOSE 5000
+    CMD ["python", "app.py"]
+
+
+    #app.py
+    from flask import Flask
+    app = Flask(__name__)
+    @app.route('/')
+    def hello():
+        return "Hello, World!"
+
+    if __name__ == '__main__':
+        app.run(host='0.0.0.0', port=5000)
+
+
+    #requirements.txt
+    flask==2.3.2
+    ```
+    We can use ip:5000 in browser and can get the output.
+
+    
+    B. If the docker file(more specifically in the python script) simply defined to run a script then it runs the script and the container get exited as there are no working processes present.
+
+    Example:
+    ```
+    #app.py
+    print("hello world")
+
+    #requirements.txt 
+    flask==2.3.2
+
+    #Dockerfile
+    FROM python:latest
+    WORKDIR /app
+    COPY requirements.txt
+    RUN pip install -r requirements.txt
+    COPY . . 
+    CMD ["python","app.py"]
+
+    ```
