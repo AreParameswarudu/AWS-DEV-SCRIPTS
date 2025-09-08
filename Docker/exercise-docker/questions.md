@@ -64,7 +64,7 @@ CMD ["python", "/app/app.py"]
 
 
 
-2. What happens if you use `CMD ["python", "app.py"]` in you docker file!!
+# Q2. What happens if you use `CMD ["python", "app.py"]` in you docker file!!
 
 Lets say that we ahve a docker file that uses a python docker image ( or ubuntu and you installed ptyhon in it),  
 and you defined a python script to be run. 
@@ -119,3 +119,5 @@ The responce/working of the `CMD ["python", "app.py"]` will actually depends.
     CMD ["python","app.py"]
 
     ```
+
+# Q3. Write a Dockerfile to containerize a Python Flask application. Expose port 5000 and ensure the app runs on container start.
