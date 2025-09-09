@@ -9,3 +9,17 @@
     objective:
         1. ssh from mumbai-public (jump server) to mumbai-private (db server)
         2. ssh from mumbai-private to Ireland-private using vpc peering.
+
+
+2. Weighted routing.
+    How to acheive this.
+        Ans: create 2 records with same record name and alias to different LBs(with two different websites) and change the weightage to 100 and 0. 
+             access the record-name in broswer, shift the weights and you should see the chnage in the website being accessed.
+
+    Do we need to uses two different records with same name with alias to LB or do we need to use a single record!!!
+        Ans: Yes we need to create two records with same name.
+
+    Even after changing the weightage to the records ( one with 100 and other to 0), why cannot I see the changes when i used the same donamin/record-name in the browser.
+        Ans: Reason1: It will be because of the TTL, chnage it to very mini like 5 sec.
+             REason2: It amy be because of the browser we are using. The request may go to chache in the local machine's browser first rathe rather than actual website.
+                      So better to use Incognito mode while accessing the website through record-name.
