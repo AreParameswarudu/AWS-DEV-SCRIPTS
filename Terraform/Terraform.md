@@ -56,7 +56,7 @@ Create a srcipt and add the following and run the script.
 sudo yum update -y
 sudo yum install -y yum-utils
 sudo yum config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-sudi yum install -y terraform
+sudo yum install -y terraform
 terraform version
 ```
 
