@@ -105,3 +105,58 @@ ss -tlunap
 `-a` = show all scokets.  
 
 
+## Q8
+How do you print all environment variables in linux
+
+## Q9
+How do you pass arguments to a shell scripts
+
+## 10 
+What does the `$0`, `$1`, `$#` and `$@` represent in a shell scripts.
+
+## 11 
+Write a bash script to check if a file exists and readable.
+
+```
+#!/biin/bash
+
+echo "enter the directory path"
+read dir_path
+echo -e "\n enter the file name"
+read file_name
+abs_path = $dir_path/$file_name
+if [ -f $abs_path ]; then
+    if [ -r $abs_path ]; then
+        echo 'File exists and is readable"
+    else
+        echo "File exists and is not readable"
+    fi
+else
+    echo "File does not exists"
+fi
+```
+
+## Q12 
+How do you handle errors in a shell script? Give example.
+
+Different ways of handling the errors,
+
+ 1. Using `set -x` after the shebang to print which command of script is being executed and to interpert at which command the error was.
+
+ 2. Using `set -x` after the shebang to exit the script execution after any error or script failure.
+
+ 3. Using or checking the logs for the cron job  errors at the ath `/var/log/syslog`.
+
+ 4. Check the exit status ( `$?` ), if  
+    `$? =0` refers to sucess, if not 0 or equal to any other integer ( 1,2,17,etc ) refers to not sucess or error.
+
+Example script to check if a coping a file to `/backup/` was success or not.  
+```
+#!/bin/bash
+cp file.txt /backup/
+if [ $? -ne 0]; then    
+    echo "Failed to copy the file"
+    exit 1
+fi
+```
+
