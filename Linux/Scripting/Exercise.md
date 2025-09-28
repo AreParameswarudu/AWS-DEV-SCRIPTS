@@ -111,10 +111,10 @@ How do you print all environment variables in linux
 ## Q9
 How do you pass arguments to a shell scripts
 
-## 10 
+## Q10 
 What does the `$0`, `$1`, `$#` and `$@` represent in a shell scripts.
 
-## 11 
+## Q11 
 Write a bash script to check if a file exists and readable.
 
 ```
