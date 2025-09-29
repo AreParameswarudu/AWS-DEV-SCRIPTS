@@ -223,10 +223,24 @@ In bash and most shells,
 --> `1` --> Standard output (stdout)   
 --> `2` --> Standard Error (stderr)  
 
-so when we say, `command > output.log 2>&1`    
+so when we say, `command >> output.log 2>&1`    
 we mean to say, send stdout to `output.log` and also, send stderr to where stdout is going ( i.e. also to `output.log`). This ensures that both output and errors go to the same place.
 
-    
+| Synatx | Meaning|
+|---|---|
+| `>` | Redirect `stdout` to a file (overwrite) |
+|  `>>` | Redirect `stdout` to a file (append) | 
+| `2>` | Redirect the `stderr` to a file|
+| `2>>`| Append `stderr` to a file |
+| `2>&1` | Redirect `stderr` to where ever `stdout` is going |
+| `&>` | Redirect bothe `stdout` and `stderr` to a file ( bash shorthand) |
+
+EX: script.sh
+```
+#!/bin/bash
+myscript.sh >> /ave/log/myscript.log 2>&1
+```
+
 
 ### 2. To use `set -x`, `set -e` commands to know at which command caused error.
 
@@ -236,8 +250,8 @@ we mean to say, send stdout to `output.log` and also, send stderr to where stdou
 
  #### 2.3. Using or checking the logs for the cron job  errors at the ath `/var/log/syslog`.
 
- #### 2.4. Check the exit status ( `$?` ), if  
-    `$? =0` refers to sucess, if not 0 or equal to any other integer ( 1,2,17,etc ) refers to not sucess or error.
+ #### 2.4. Check the exit status ( `$?` )  
+  if `$? =0` refers to sucess, if not 0 or equal to any other integer ( 1,2,17,etc ) refers to not sucess or error.
 
 Example script to check if a coping a file to `/backup/` was success or not.  
 ```
