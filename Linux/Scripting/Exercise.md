@@ -216,27 +216,27 @@ fi
 ## Q12 
 How do you handle errors in a shell script? Give example.
 
-Different ways of handling the errors,
- To ways to appraoch this, 
-* 1. To add the errors to the log files
-    In bash and most shells,   
-    `1` --> Standard output (stdout)   
-    `2` --> Standard Error (stderr)  
+Different ways of handling the errors,  
+To ways to appraoch this, 
+### 1. To add the errors to the log files
+In bash and most shells,   
+--> `1` --> Standard output (stdout)   
+--> `2` --> Standard Error (stderr)  
 
-    so when we say, `command > output.log 2>&1`  
-    we mean to say, send stdout to `output.log` and also, send stderr to where stdout is going ( i.e. also to `output.log`). This ensures that both output and errors go to the same place.
+so when we say, `command > output.log 2>&1`    
+we mean to say, send stdout to `output.log` and also, send stderr to where stdout is going ( i.e. also to `output.log`). This ensures that both output and errors go to the same place.
 
     
 
-* 2. To use `set -x`, `set -e` commands to know at which command caused error.
+### 2. To use `set -x`, `set -e` commands to know at which command caused error.
 
- 2.1. Using `set -x` after the shebang to print which command of script is being executed and to interpert at which command the error was.
+ #### 2.1. Using `set -x` after the shebang to print which command of script is being executed and to interpert at which command the error was.
 
- 2.2. Using `set -e` after the shebang to exit the script execution after any error or script failure.
+ #### 2.2. Using `set -e` after the shebang to exit the script execution after any error or script failure.
 
- 2.3. Using or checking the logs for the cron job  errors at the ath `/var/log/syslog`.
+ #### 2.3. Using or checking the logs for the cron job  errors at the ath `/var/log/syslog`.
 
- 2.4. Check the exit status ( `$?` ), if  
+ #### 2.4. Check the exit status ( `$?` ), if  
     `$? =0` refers to sucess, if not 0 or equal to any other integer ( 1,2,17,etc ) refers to not sucess or error.
 
 Example script to check if a coping a file to `/backup/` was success or not.  
