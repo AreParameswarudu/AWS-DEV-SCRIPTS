@@ -66,10 +66,10 @@ Target_dir="/temp"
 Log_file="/var/log/delete_30d.log"
 
 #Timepstamp 
-TimeStamp=$(data '+%Y-%m-%d %H:%M:%S')
+TimeStamp=$(date '+%Y-%m-%d %H:%M:%S')
 
 # start log
-echo "[$TimeStapm] starting cleaning of $Target_dir " >> "$Log_file
+echo "[$TimeStamp] starting cleaning of $Target_dir " >> "$Log_file
 
 #Check if directory exists
 if [ ! -d $Target_dir ]; then
@@ -78,7 +78,7 @@ if [ ! -d $Target_dir ]; then
 fi
 
 #delete files older than 30 days
-find "$Target_dir" -type -f -mtime +30 -print -delete >> "$Log_file" 2>&1
+find "$Target_dir" -type f -mtime +30 -print -delete >> "$Log_file" 2>&1
 
 #Completion log
 echo "[$TimeStamp] cleaning completed." >> "$Log_file"
@@ -262,4 +262,19 @@ if [ $? -ne 0]; then
     exit 1
 fi
 ```
+
+## Q13
+Write a script to monitor disk usage and send an alert if it exceeds a threshold.
+
+
+## Q14 
+Write a bash script to find and kill the processes that are using a given port.
+
+## Q15
+How do you use `trap` in bash scripts and give an example for such usages.
+
+## Q16
+Write a bash script to perform a backup of a directory to another location.
+
+## Q17 
 
