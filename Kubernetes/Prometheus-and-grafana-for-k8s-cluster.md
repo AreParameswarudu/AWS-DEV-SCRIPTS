@@ -13,6 +13,11 @@ It can be divided into three main components namely :
 <img width="800" height="536" alt="image" src="https://github.com/user-attachments/assets/92665c94-2d07-4248-a01a-f09ab6c65c75" />
 
 
+```
+- Master Node: Grafana + Prometheus (+ Promtail if collecting logs)
+- Worker Node: Node Exporter (+ Promtail if collecting logs)
+```
+
 What is Grafana ?
 ====================
 Grafana was built on the principle that data should be accessible to everyone in your organization, not just the single Ops person.  
