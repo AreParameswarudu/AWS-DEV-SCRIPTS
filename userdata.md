@@ -22,7 +22,15 @@ yum install nginx -y
 
 //run or start the service
 systemctl start nginx
+```
 
+## Repos, links, 
+1. Veerababu sir
+   ```
+   https://github.com/CloudTechDevOps
+   ```
 
-
-https://docs.google.com/document/d/1WAS6QbHIqt5Vup6fKo7hAsmBMit6D87tySaS0-uwhXg/edit?tab=t.0
+2. Raham sir
+  ```
+  https://github.com/rahamshaik007
+```
