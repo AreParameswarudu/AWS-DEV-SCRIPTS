@@ -86,7 +86,6 @@ echo "[$TimeStamp] cleaning completed." >> "$Log_file"
 
 
 ## Q5
-
 Create a script that takes a list of IPs form a file and checks which ones are reachable ( ping ).
 
 Create a text file and add IP addresses to it and name it as `file.txt`. add IP addresses like ( 8.8.8.8, 192.168.1.0, 8.8.8.4, 10.0.0.1)
@@ -219,7 +218,7 @@ How do you handle errors in a shell script? Give example.
 Different ways of handling the errors,  
 To ways to appraoch this, 
 ### 1. To add the errors to the log files
-In bash and most shells,   
+In bash and most shells,  ( `1` and `2` represents the file descriptions)
 --> `1` --> Standard output (stdout)   
 --> `2` --> Standard Error (stderr)  
 
@@ -238,7 +237,7 @@ we mean to say, send stdout to `output.log` and also, send stderr to where stdou
 EX: script.sh
 ```
 #!/bin/bash
-myscript.sh >> /ave/log/myscript.log 2>&1
+myscript.sh >> /var/log/myscript.log 2>&1
 ```
 
 
@@ -265,16 +264,159 @@ fi
 
 ## Q13
 Write a script to monitor disk usage and send an alert if it exceeds a threshold.
+Create a file named `script.sh`  
+
+```
+#!/bin/bash
+
+mount_path='/'
+#Defining the threshold
+Threshold=75  
+usage=$( df -h "$mount_path" | awk 'NR==2 {gsub("%", "", $5); print $5}')
+
+if [ "$usage" -ge "$Threshold" ]; then
+    echo "Disk usage is at ${usage}% and is more than threshold"
+else
+    echo "Disk usage is fine and is below threshold"
+fi
+```
+Here,   
+`awk` is a pattern scanning and processing language. It reads input line by line, splits each line into fields (columns) and lets us to apply logic to extract, transform, or report data.  Its like a mini scripting language built for structured text.  
+
+Core concepts of `awk`:  
+1. Input is processed line by line, 
+Each line is referred as record, and awk reads one record at a time.
+
+2. Fields are auto-split:
+By default, fields are split by whitespaces, we can change the delimeter suing `-F`,   
+`$1` refers the firts column, `$2` refers 2nd column and so on.
+
+3. Built in variables
+| Variable | Meaning|
+|---|---|
+| `NR` | Current line number (record number) |
+|  `NF` | Number of fields in the current line | 
+| `$0` | Entire line |
+| `$1`, `$2`| individual records |
+
+4. Common functions
+`print` --> output fileds.  
+`gsub( regex, replacement, target)` --> global substitution (not inplace).  
+`length($0)` --> length of line.  
+`tolower($1)` --> lower case convertion.  
+`substr($3,1, 5)` --> substring of field 3.  
+
 
 
 ## Q14 
-Write a bash script to find and kill the processes that are using a given port.
+Write a bash script to find and kill the processes that are using a given port.  
+
+
+Create a script named `script.sh`  
+```
+#!/bin/bash
+file_path="/var/log/myapp-log"
+awk "{print $3}" "$file_path"
+```
 
 ## Q15
-How do you use `trap` in bash scripts and give an example for such usages.
+How do you use `trap` in bash scripts and give an example for such usages.  
+
+
+`trap` command is used to run/execute a custom defined command when the script exits or encounters errors.  
+ex: `trap 'echo "Script failed at line $LINENO"; exit 1' ERR
 
 ## Q16
 Write a bash script to perform a backup of a directory to another location.
 
-## Q17 
+Well the question is little ambiguous, so lets assume few aspects here, we will make the script dynamic by giving the users the ability to prompt which directory to be migrated, where ( server ip) to, and what is the destination.
 
+```
+#!/bin/bash
+
+echo "started migrating...."
+
+#inputing for users 
+read -p "Enter the source directory path: " source_dir
+read -p "Enter the backup server IP: " backup_server
+read -p "Enter the distribution path on server: " dest_path
+
+#check if source directory exists
+if [ ! -d "$source_dir" ]; then
+    echo "Source Directory doesnot eixst."
+    exit 1
+fi
+
+#check if server is reacheable
+ping -c 1 "$backup_server" > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "Cannot reach backup server at $backup_server"
+    exit 2
+fi
+
+#create .tar.gz for the source_dir
+source_dir_gz="target_dir.tar.gz"
+tar -czf "$source_dir_gz" "$source_dir"
+
+# perform backup using rsync
+rsync -avz "$source_dir_gz" "$backup_server:$dest_path"
+
+if  [$? -eq 0]; then
+    echo "Migration complete"
+else
+    echo "Migration failed"
+fi
+
+echo "Script execution was complete."
+```
+
+## Q17
+
+How do we securly store and use passwords in shell scripting!!
+
+When do we use them, 
+1. Connecting to remote server: via SSH, SFTP or rsync.  
+2. Accessing databases: Mysql, PostgresSQL, etc.  
+3. Interacting with APIs: that require authentication.  
+4. Mounting network drives or encrypted volumes.  
+5. Running backup scripts that push to cloud or remote storage.  
+
+Secure strategies to  store and use passwords:
+1. Using Env variables
+```
+export DB_PASSWORD="mySecret123"
+```
+
+With that we can just refer the env variable as, 
+```
+#!/bin/bash
+echo "Using password: $DB_PASSWORD"
+```
+But was not more secured.
+
+2. Use of `.netrc` or `.pgpass` files  
+For tools like `culr`, `ftp`, or `psql`, we can use dedicated files:
+*   `~/.netrc` for FTP or curl  
+*   `~/.pgpass` for postgreSQL  
+These files should be owned by user and also to set `chmod 600` for security.  
+
+3. Use a password manager or secret vault.  
+Foe enterprise-grade security, use tools like,   
+* HashiCorp Vault
+* AWS Secret manager
+* Gnome Keyring / KWallet 
+With them, the scripts can query the vault securely and retrive the password only when needed.  
+
+4. Prompt the user at runtime  
+```
+read -s -p "Enter your passwword: " password
+```
+here, `-s` will hides the input and by this way, the password wiil be kept in memory for the duration of execution.   
+
+5. Use of SSH keys intead of passwords  
+For remote access ( eg. rsync, scp, ssh) use key-based authentication.
+
+```
+rsync -e 'ssh -i ~/.ssh/idrsa" /data user@server:/backup
+```
+No password needed, and more secure.  
