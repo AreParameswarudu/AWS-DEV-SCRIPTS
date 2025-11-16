@@ -385,50 +385,10 @@ git checkout -b dev
 ```
 dev1branch has 1 + 5 files = 6 (it got 1 file from master)  
 
-### dev2branch
+### Adding that branch to remote repo.  
 ```
-	git branch dev2branch --> this will create a new branch dev2branch from dev1branch as we are now in dev1branch
-	git branch
-	git checkout dev2branch
-	git branch
-	touch dev2file{1..5}
-	git add dev2*
-	git commit -m "dev2 commit" dev2*
+git push origin dev1branch
 ```
-dev2branch has 1 + 5 + 5 = 11  
-
-### dev3branch
-```
-	git branch
-	git branch dev3branch  			#this will create a new branch from dev2branch
-	git checkout dev3branch
-              or
-	git checkout -b dev3branch 		#this will also create and checkout branch dev3branch, 2 commands in 1 shot
-	git branch
-	touch dev3file{1..5}
-	git add dev3*
-	git commit -m "dev3 commit" dev3*
-```	
-dev3branch has 11 + 5= 16  
-
-### dev4branch
-
-Now i want to create a new branch from master not from dev3  
-Now I want to checkout from master not from dev3 , so first checkout to master and create a branch, it will get only
-```
-	git branch
-	git checkout master
-	ls
-	git branch dev4branch
-	git checkout dev4branch
-	ls
-
-	ls 		#it should list only index.html
-	touch dev4file{1..5}
-	git add dev4*
-	git commit -m "dev4 commit" dev4*
-```
-dev4branch has 1 + 5 = 6
 
 ## rename branch
 ```
@@ -1109,6 +1069,7 @@ Like Kanban board --
 Create a Project --> Select Table --> Create Task --> press tab --> and fields and assign people(tasks, assignees, start date, enddate)
 
 Go to Project Settings --> Manage access --> give permissions
+
 
 
 
